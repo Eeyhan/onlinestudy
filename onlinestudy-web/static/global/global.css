@@ -1,0 +1,23 @@
+*{
+	padding: 0;
+	margin: 0;
+}
+body{
+	font-size: 14px;
+	color: #464646;
+	font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+	font-weight: 400;
+	
+}
+ul{
+	list-style: none;
+}
+.container{
+	width: 100%;
+	margin: 0 auto;
+	background: #f1f0f0;
+}
+a{
+	text-decoration: none;
+}
+

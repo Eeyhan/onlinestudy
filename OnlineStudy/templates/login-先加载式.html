@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gt-python-django-demo</title>
+    <style>
+        body {
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .inp {
+            border: 1px solid gray;
+            padding: 0 10px;
+            width: 200px;
+            height: 30px;
+            font-size: 18px;
+        }
+
+        .btn {
+            border: 1px solid gray;
+            width: 100px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #embed-captcha {
+            width: 300px;
+            margin: 0 auto;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        #notice {
+            color: red;
+        }
+
+        /* 可自行设计实现captcha的位置大小 */
+        .popup-mobile {
+            position: relative;
+        }
+
+        #popup-captcha-mobile {
+            position: fixed;
+            display: none;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+<!-- 若是https，使用以下接口 -->
+<!-- <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script> -->
+<!-- <script src="https://static.geetest.com/static/tools/gt.js"></script> -->
+
+<div id="app">
+    <form class="popup" action="http://127.0.0.1:8000/auth/login" method="post" >
+        <!--这里的地址是暂时的本地测试地址，正式上线时用的是公网地址-->
+        <h2>请登录</h2>
+        <br>
+        <p>
+            <label for="username">用户名：</label>
+            <input class="inp" id="username" type="text" name="username" placeholder="请输入用户名" v-model="username">
+        </p>
+        <br>
+        <p>
+            <label for="password">密&nbsp;&nbsp;&nbsp;&nbsp;码：</label>
+            <input class="inp" id="password" type="password" name="passwd" placeholder="请输入密码" v-model="passwd">
+        </p>
+
+        <div id="embed-captcha"></div>
+        <p id="wait" class="show" ref='wait'>正在加载验证码......</p>
+        <p id="notice" class="hide" ref='notice'>请先拖动验证码到相应位置</p>
+
+        <br>
+        <input class="btn" id="embed-submit" type="submit" value="提交" ref='btn'>
+    </form>
+</div>
+
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            username: null,
+            passwd: null
+        },
+        methods: {
+            onSubmit: function () {
+                // 阻止默认表单提交
+                // 做你自己想做的事，比如ajax请求后台数据
+
+            }
+        },
+        mounted() {
+            axios.request({
+                // 获取id，challenge，success（是否启用failback）
+                url: "http://127.0.0.1:8000/auth/auth?t=" + (new Date()).getTime(), // 加随机数防止缓存
+                method: 'get'
+            }).then((data) => {
+                var that = this;
+                initGeetest({
+                    gt: data.data.gt,
+                    challenge: data.data.challenge,
+                    product: "embed", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                    offline: !data.data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                    // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+                }, function (captchaObj) {
+                    var validate = captchaObj.getValidate();
+                    if (!validate) {
+                        that.$refs.notice.className = "show";
+                        setTimeout(function () {
+                            that.$refs.notice.className = "hide";
+                        }, 2000);
+                        that.$refs.btn.preventDefault;
+                    }
+                    // 将验证码加到id为captcha的元素里，同时会有三个input的值：geetest_challenge, geetest_validate, geetest_seccode
+                    captchaObj.appendTo("#embed-captcha");
+                    captchaObj.onReady(function () {
+                        that.$refs.wait.className = "hide";
+                    });
+                    // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+                });
+            })
+        },
+
+    });
+
+
+</script>
+</body>
+
+</html>

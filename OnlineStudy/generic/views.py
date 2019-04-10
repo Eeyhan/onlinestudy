@@ -10,6 +10,7 @@ from utils.BaseResponse import BaseResponse
 import redis
 import json
 import time
+from collections import OrderedDict
 
 
 # Create your views here.
@@ -35,27 +36,37 @@ class CourseView(APIView):
         # 是否有课程分类id
         if cid == 0:
             course = models.Course.objects.all()
-            if query:
-                if query == 'hot':
-                    course = course.order_by('-study_number')
-                elif query == 'price':
-                    course = course.order_by('price_policy__price').distinct()  # 跨表排序升序
-                elif query == '-price':
-                    course = course.order_by('price_policy__price').distinct()   # 跨表排序降序
-                    course = course.reverse()
+            course = self.order_query(query, course)
         else:
             course = models.Course.objects.filter(category_id=cid).all().order_by('category_id')
-            if query:
-                if query == 'hot':
-                    course = course.order_by('-study_number')
-                elif query == 'price':
-                    course = course.order_by('price_policy__price').distinct()   # 跨表排序升序
-                elif query == '-price':
-                    course = course.order_by('price_policy__price').distinct()   # 跨表排序降序
-                    course = course.reverse()
+            course = self.order_query(query, course)
         res = serializers.CourseSerializer(course, many=True)
 
+        # 针对mysql数据库数据去重
+        if query:
+            temp = res.data
+            temp.clear()
+            for item in res.data:
+                if item not in temp:
+                    temp.append(item)
+                else:
+                    continue
+            return Response(temp)
         return Response(res.data)
+
+    def order_query(self, query, course):
+        """mysql对distinct不能加参数"""
+        if query:
+            if query == 'hot':
+                course = course.order_by('-study_number')
+            elif query == 'price':
+                course = course.order_by('price_policy__price').distinct()  # 跨表排序升序
+
+            elif query == '-price':
+                course = course.order_by('price_policy__price').distinct()  # 跨表排序降序
+                course = course.reverse()
+                # 拆分去重代码
+        return course
 
 
 class DegreeView(APIView):

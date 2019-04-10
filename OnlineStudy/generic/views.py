@@ -55,7 +55,7 @@ class CourseView(APIView):
         return Response(res.data)
 
     def order_query(self, query, course):
-        """mysql对distinct不能加参数"""
+        """去重，mysql对distinct不能加参数"""
         if query:
             if query == 'hot':
                 course = course.order_by('-study_number')

@@ -1,12 +1,43 @@
 <template>
-  <div class='wrap'>
+  <div class="wrap">
     <div class="web-course-banner">
-      <div class="container">
-        <div class="title">
-          <img :src="details.course_img|filterImg" height="67" width="67" alt>
-          <h1 class="course-title">{{details.title}}</h1>
+      <div class="container-coursedetail">
+        <div class="course-top">
+          <div class="title">
+            <img :src="details.course_img">
+            <video>
+              <div class="video-icon"></div>
+            </video>
+          </div>
+          <div class="course-detail-info">
+            <p class="course-title">{{details.title}}</p>
+            <div class="course-inner">
+              <p class="course-slogin">{{details.slogan}}</p>
+              <p>
+                <span>{{details.study_number}}人在学</span>
+                <span>课程总课时：{{details.lesson}}</span>
+                <span>难度：{{details.difficult}}</span>
+              </p>
+              <div class="course-preferential">
+                <p v-if="details.price === 0">限时免费</p>
+                <p v-else>限时折扣</p>
+                <span>距离活动结束：仅剩：15 天 12 小时 8 分 9秒</span>
+              </div>
+            </div>
+            <p class="course-title"></p>
+            <div class="course-buy">
+              <p>
+                <el-button type="danger">立即购买</el-button>
+                <el-button type="primary" plain>免费试学</el-button>
+              </p>
+              <p class="shopping">
+                <i class="el-icon-goods"></i>
+                <span>加入购物车</span>
+              </p>
+            </div>
+          </div>
         </div>
-        <span class="course-text">{{details.slogan}}</span>
+
         <div class="course-list">
           <ul>
             <li class="detail-item">难度：{{details.level}}</li>
@@ -22,21 +53,76 @@
     </div>
     <div class="course-review">
       <ul class="review-head-wrap">
-        <li class="head-item">课程概述</li>
-        <li class="head-item">课程章节</li>
-        <li class="head-item">用户评价(12)</li>
-        <li class="head-item">常见问题</li>
+        <li class="head-item" @click="getcourseInfo">课程概述</li>
+        <li class="head-item" @click="getcourseChapter">课程章节</li>
+        <li class="head-item" @click="getcourseComment">用户评价(12)</li>
+        <li class="head-item" @click="getcourseQuestion">常见问题</li>
       </ul>
     </div>
     <!-- 课程详情 -->
     <div class="course-detail">
-      <div class="container">
-        <div class="course-detail-text">
-          <h3>课程概述</h3>
-          <p>{{details.brief}}</p>
+      <div class="container-coursedetail-buttom">
+        <div class="coursedetail-left">
+          <div class="course-detail-text">
+            <h3>课程背景</h3>
+            <p>{{details.why_study}}</p>
+
+            <h3>学前准备</h3>
+            <p>{{details.prerequisite}}</p>
+
+            <h3>课程概述</h3>
+            <p>{{details.brief}}</p>
+
+            <h3>适合人群</h3>
+            <p>{{details.object_person}}</p>
+
+            <h3>课程覆盖知识点</h3>
+            <p>{{details.point}}</p>
+
+            <h3>课程特点</h3>
+            <p>{{details.feature}}</p>
+
+            <h3>课程大纲</h3>
+            <p>{{details.course_outline}}</p>
+
+            <h3>学完收获</h3>
+            <p>{{details.harvest}}</p>
+          </div>
         </div>
-        <div class="course-img">
-          <img src="https://www.luffycity.com/static/img/web-introduce.d075499.png" alt>
+
+        <div class="course-teacher-recommend">
+          <div class="course-teacher">
+            <h3
+              style="border-left: 2px solid rgb(239, 53, 53); text-align: left; text-indent: 6px;"
+            >授课讲师</h3>
+            <div v-for="(teacher,index) in details.teacher" :key="index" class="teacher-info">
+              <img :src="teacher.teacher_img">
+              <p>{{teacher.username}}</p>
+              <p>{{teacher.title}}</p>
+              <p>{{teacher.brief}}</p>
+            </div>
+          </div>
+
+          <div class="course-recommend">
+            <h3
+              style="border-left: 2px solid rgb(239, 53, 53); text-align: left; text-indent: 6px;"
+            >课程推荐</h3>
+            <div v-if='details.recommend_course.length !== 0'>
+              <div
+                v-for="(course,index) in details.recommend_course"
+                :key="index"
+                class="teacher-info"
+              >
+                <img :src="course.course_img">
+                <p>{{teacher.title}}</p>
+                <p>{{teacher.brief}}</p>
+                <p>{{course.point}}</p>
+              </div>              
+            </div>
+            <div v-else>
+              <p>暂无课程推荐</p>  
+              </div>
+          </div>
         </div>
       </div>
     </div>
@@ -58,7 +144,7 @@
           <button class="left">购买</button>
           <button class="right" @click="addShopCart">加入购物车</button>
         </div>
-      </div> -->
+      </div>-->
     </div>
   </div>
 </template>
@@ -68,23 +154,75 @@ export default {
   name: "CourseDetail",
   data() {
     return {
-      details: ""
+      details: "",
+      courseInfo:'',
+      courseChapter:'',
+      courseComment:'',
+      CourseQuestion:''
     };
   },
   methods: {
+    // 课程详情
     getcourseDetail() {
       this.$http
         .courseDetail(this.$route.params.detailId)
         .then(res => {
           if (!res.error) {
             this.details = res.data[0];
-            console.log(this.detail);
+            console.log(this.details)
           }
         })
         .catch(error => {
           error.error;
         });
-    }
+    },
+    // 课程概述信息
+    getcourseInfo(){
+      this.getcourseDetail()
+    },
+    // 课程评论
+    getcourseComment() {
+      this.$http
+        .comment(this.$route.params.detailId)
+        .then(res => {
+          if (!res.error) {
+            this.courseComment = res.data;
+            console.log(this.courseComment)
+          }
+        })
+        .catch(error => {
+          error.error;
+        });
+    },
+    // 课程常见问题
+    getcourseQuestion() {
+      this.$http
+        .commonquestion(this.$route.params.detailId)
+        .then(res => {
+          if (!res.error) {
+            this.CourseQuestion = res.data;
+            console.log(this.CourseQuestion)
+          }
+        })
+        .catch(error => {
+          error.error;
+        });
+    },
+
+    //课程章节
+    getcourseChapter() {
+      this.$http
+        .chapter(this.$route.params.detailId)
+        .then(res => {
+          if (!res.error) {
+            this.courseChapter = res.data;
+            console.log(this.courseChapter)
+          }
+        })
+        .catch(error => {
+          error.error;
+        });
+    },
   },
   filters: {
     filterImg(value) {
@@ -99,194 +237,309 @@ export default {
 </script>
 
 <style lang="css" scoped>
+.wrap {
+  width: 100%;
+}
+.web-course-banner {
+  width: 100%;
+  height: 512px;
+  background-size: 100% 100%;
+  text-align: center;
+  overflow: hidden;
+}
+.container-coursedetail {
+  width: 1200px;
+  margin: 12px auto;
+  text-align: left;
+}
 
+/* .video-icon{
+    background: url('../../../../static/images/video.png') no-repeat;
+    background-size: contain;
+    width: 64px;
+    height: 64px;
+} */
 
-.wrap{
-	width: 100%;
+.course-top {
+  border: 1px solid #cecdcd57;
+  display: flex;
+  box-shadow: 1px 0px 5px #cecdcd57;
 }
-.web-course-banner{
-    width: 100%;
-    height: 512px;
-    background-size: 100% 100%;
-    text-align: center;
-    overflow: hidden;
-}
-.container{
-	width: 1200px;
-	margin: 182px auto 0;
-	text-align: left;
-}
-.container img{
-	vertical-align: middle;
-}
-.container h1{
-	display: inline-block;
-	font-size: 48px;
-    color: #4a4a4a;
-    letter-spacing: .37px;
-    margin-left: 40px;
-    font-family: PingFangSC-Light;
-    font-weight: 500;
-    line-height: 1.1;
-    position: relative;
-    top: 10px;
-}
-.course-text{
-    width: 464px;
-    display: inline-block;
-    font-size: 22px;
-    color: #4a4a4a;
-    letter-spacing: .17px;
-    line-height: 36px;
-    margin-top: 33px;
-}
-.course-list{
-	width: 100%;
-}
-.course-list ul{
-	margin-top: 63px;
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-}
-.course-list ul li.detail-item{
-    font-size: 18px;
-    color: #4a4a4a;
-    letter-spacing: .74px;
-    height: 26px;
-    padding: 0 20px;
-}
-.course-list ul li.sep{
-	width: 2px;
-	height: 14px;
-	border-left: 1px solid #979797;
-}
-.course-review{
-	width: 100%;
-	height: 80px;
-	background: #fafbfc;
-	border-top: 1px solid #e8e8e8;
-	box-shadow: 0 1px 0 0 #e8e8e8;
-}
-.review-head-wrap{
-	width: 590px;
-	margin: 0 auto;
-	display: flex;
-	justify-content: space-between;
-}
-.review-head-wrap .head-item{
-height: 80px;
-    line-height: 80px;
-    font-size: 16px;
-    color: #555;
-    cursor: pointer;
-}
-.course-detail{
-	width: 100%;
-	padding-top: 90px;
 
+.title {
+  width: 720px;
 }
-.course-detail .container{
-	width: 1200px;
-	margin: 0 auto;
-	display: flex;
-	justify-content:space-between;
-}
-.course-detail-text{
-	width: 500px;
-	text-align:left;
 
+.title img {
+  width: 720px;
+  height: 490px;
+  padding: 6px 4px;
 }
-.course-detail-text h3{
-	padding: 20px 0;
-}
-.course-detail-text p{
-	    width: 100%;
-	    height: 196px;
-	    font-size: 14px;
-	    color: #4A4A4A;
-	    letter-spacing: 1.83px;
-	    line-height: 30px;
-	    text-align: left;
-}
-.course-price{
-	width: 100%;
-	background: #FAFAFA;
 
+.container-coursedetail img {
+  vertical-align: middle;
 }
-.course-price .container{
-	width: 1200px;
-	margin: 0 auto;
-	text-align: center;
+.container-coursedetail h1 {
+  display: inline-block;
+  font-size: 48px;
+  color: #4a4a4a;
+  letter-spacing: 0.37px;
+  font-family: PingFangSC-Light;
+  font-weight: 500;
+  line-height: 1.1;
+  position: relative;
+  top: 10px;
 }
-.course-price span{
-	 font-size: 12px;
-	    color: #9b9b9b;
-	    letter-spacing: 1.57px;
-	    display: inline-block;
-	    margin-top: 102px
-} 
-.course-price ul{
-	/*width: 800px;*/
-	margin: 50px auto;
 
-	display: flex;
-	flex-wrap: wrap;
-	justify-content:space-between;
+.course-detail-info {
+  position: relative;
+  flex: 1;
+  height: 420px;
+  padding: 20px;
 }
-.course-price ul li{
-	width: 200px;
-	height: 112px;
-	border: 1px solid #979797;
-}
-.course-price ul li.active{
-	background: #00CD23;
-}
-.course-price ul li p:first-child{
-	font-size: 24px;
-   	 letter-spacing: 1.92px;
-    	color: #333;
-    	margin-top: 17px;
-}
-.course-price ul li p:nth-child(2){
 
-	    color: #9b9b9b;
-	    font-size: 20px;
-	    letter-spacing: 1.6px;
-	    margin-top: 9px;
+.course-slogin {
+  margin-top: 12px;
+  margin-bottom: 5px;
+  font-size: 17px;
+  color: #eb5089;
+  font-weight: bold;
+  border-top: 1px solid #bababa;
+  line-height: 2em;
 }
-.course-price ul li p.active{
-	color: #fff;
+.course-title {
+  font-size: 30px;
+  margin-bottom: 4px;
 }
-.course-action{
-	width: 1000px;
-	margin: 0 auto;
-	padding-bottom: 80px;
-	display: flex;
-	justify-content: center;
+
+.course-inner {
+  color: #979797;
 }
-.course-action button{
-	border:none;
-	outline: none;
-	cursor: pointer;
-	display: inline-block;
-	width: 181px;
-	    height: 51px;
-	    font-size: 14px;
-	    color: #fff;
-	    letter-spacing: 1.12px;
-	    text-align: center;
-	    background: #f5a623;
-	    border-radius: 82px;
+
+.course-preferential {
+  width: 100%;
+  height: auto;
+  background: #fa6240;
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 5px;
+  margin-top: 16px;
+  border-left: 3px solid #7c0b8a;
 }
-.course-action button.left{
-	background: #7ed321;
-    	box-shadow: 0 2px 4px 0 #e8e8e8;
-    	color: #fff;
-    	margin-right: 48px;
-    	padding: 0 20px;
+
+.course-buy {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: auto;
+  bottom: 2px;
+  flex: 1;
 }
-.course-action button.right{
-	background: #f5a623 url() no-repeat 125px 15px!important;
+
+.course-buy .shopping {
+  right: 40px;
+  position: absolute;
+  font-size: 14px;
+  color: #ef58d5;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #e73767;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 1px 0px 4px 0px #e73767;
+}
+
+.course-text {
+  width: 464px;
+  display: inline-block;
+  font-size: 22px;
+  color: #4a4a4a;
+  letter-spacing: 0.17px;
+  line-height: 36px;
+  margin-top: 33px;
+}
+
+.course-teacher-recommend {
+  position: absolute;
+  right: 44px;
+  top: 24px;
+}
+
+.container-coursedetail-buttom {
+  position: relative;
+  display: flex;
+}
+
+.coursedetail-left {
+  margin-left: 35px;
+  margin-top: 7px;
+}
+
+.teacher-info {
+  margin-bottom: 10px;
+  border-bottom: 1px inset #cdcdcd;
+}
+
+.teacher-info p {
+  text-align: left;
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.course-list {
+  width: 100%;
+}
+.course-list ul {
+  margin-top: 63px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.course-list ul li.detail-item {
+  font-size: 18px;
+  color: #4a4a4a;
+  letter-spacing: 0.74px;
+  height: 26px;
+  padding: 0 20px;
+}
+.course-list ul li.sep {
+  width: 2px;
+  height: 14px;
+  border-left: 1px solid #979797;
+}
+.course-review {
+  width: 100%;
+  height: 80px;
+  background: #fafbfc;
+  border-top: 1px solid #e8e8e8;
+  box-shadow: 0 1px 0 0 #e8e8e8;
+}
+.review-head-wrap {
+  width: 590px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.review-head-wrap .head-item {
+  height: 80px;
+  line-height: 80px;
+  font-size: 16px;
+  color: #555;
+  cursor: pointer;
+}
+.course-detail {
+  width: 100%;
+}
+.course-detail .container {
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.course-detail-text {
+  width: 650px;
+  text-align: left;
+}
+.course-detail-text h3 {
+  padding: 20px 0;
+  border-left: 2px solid #904beb;
+  text-indent: 4px;
+  margin-bottom: 10px;
+}
+.course-detail-text p {
+  width: 100%;
+  font-size: 14px;
+  color: #4a4a4a;
+  letter-spacing: 1.83px;
+  line-height: 30px;
+  text-align: left;
+  margin-bottom: 40px;
+  text-indent: 10px;
+  border-bottom: 1px inset #cdcdcd;
+  padding: 20px;
+}
+.course-price {
+  width: 100%;
+  background: #fafafa;
+}
+.course-price .container {
+  width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+.course-price span {
+  font-size: 12px;
+  color: #9b9b9b;
+  letter-spacing: 1.57px;
+  display: inline-block;
+  margin-top: 102px;
+}
+.course-price ul {
+  /*width: 800px;*/
+  margin: 50px auto;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.course-price ul li {
+  width: 200px;
+  height: 112px;
+  border: 1px solid #979797;
+}
+.course-price ul li.active {
+  background: #00cd23;
+}
+.course-price ul li p:first-child {
+  font-size: 24px;
+  letter-spacing: 1.92px;
+  color: #333;
+  margin-top: 17px;
+}
+.course-price ul li p:nth-child(2) {
+  color: #9b9b9b;
+  font-size: 20px;
+  letter-spacing: 1.6px;
+  margin-top: 9px;
+}
+.course-price ul li p.active {
+  color: #fff;
+}
+.course-action {
+  width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+  display: flex;
+  justify-content: center;
+}
+.course-action button {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: inline-block;
+  width: 181px;
+  height: 51px;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 1.12px;
+  text-align: center;
+  background: #f5a623;
+  border-radius: 82px;
+}
+.course-action button.left {
+  background: #7ed321;
+  box-shadow: 0 2px 4px 0 #e8e8e8;
+  color: #fff;
+  margin-right: 48px;
+  padding: 0 20px;
+}
+.course-action button.right {
+  background: #f5a623 url() no-repeat 125px 15px !important;
 }
 </style>

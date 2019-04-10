@@ -75,6 +75,7 @@ class CourseDetail(models.Model):
     teacher = models.ManyToManyField(to='Teacher', verbose_name='授课讲师')
     recommend_course = models.ManyToManyField(to='Course', related_name='recommend_by',
                                               verbose_name='推荐课程')
+    course_review = models.FloatField(null=True,blank=True,verbose_name='课程评分')
 
     def __str__(self):
         return self.course.title

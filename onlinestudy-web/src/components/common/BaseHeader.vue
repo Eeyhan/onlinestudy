@@ -16,9 +16,7 @@
 
         <!-- <el-dropdown> -->
 
-        <div  class="nav-right"  @mouseenter="enterHandler"
-          @mouseleave="leaveHandler"
-        >
+        <div class="nav-right" @mouseenter="enterHandler" @mouseleave="leaveHandler">
           <span class="el-dropdown-link">购物车</span>
           <span class="el-dropdown-link">学习中心</span>
           <!-- <span class="user">{{userInfo.username}}</span> -->
@@ -53,7 +51,7 @@
           </ul>
         </div>
         <!-- </el-dropdown> -->
-        <div class="nav-right" >
+        <div class="nav-right">
           <span>登录</span>
           &nbsp;| &nbsp;
           <span>注册</span>
@@ -89,13 +87,13 @@ export default {
     leaveHandler() {
       this.isShow = false;
     }
-  },
-//   computed: {
-//     userInfo() {
-//       console.log(this.$store.state.userInfo);
-//       return this.$store.state.userInfo;
-//     }
-//   }
+  }
+  //   computed: {
+  //     userInfo() {
+  //       console.log(this.$store.state.userInfo);
+  //       return this.$store.state.userInfo;
+  //     }
+  //   }
 };
 </script>
 
@@ -115,15 +113,15 @@ export default {
   margin-top: 10px;
 }
 
-.nav-left img{
-    margin-top:10px;
-    width: 50px;
-    height: 50px;
+.nav-left img {
+  margin-top: 10px;
+  width: 40px;
+  height: 40px;
 }
 .nav-center {
   float: left;
   margin-left: 100px;
-  width: '';
+  width: "";
 }
 .nav-center ul {
   overflow: hidden;
@@ -200,7 +198,7 @@ export default {
   color: red;
 }
 
-.nav-center ul li a.router-link-exact-active{
-    border-bottom: 2px solid #409eff
+.nav-center ul li a.router-link-exact-active {
+  border-bottom: 2px solid #409eff;
 }
 </style>

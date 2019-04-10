@@ -89,7 +89,7 @@ export default {
       categorys: "",
       courses: "",
       query: "", // 做上一次筛选条件存储
-      query_isup: "-price",
+      query_isup: "-price", //只针对价格筛选的标志位参数
       isActive: false,
       conditon: [
         { id: 0, title: "默认", query: "" },
@@ -110,20 +110,26 @@ export default {
     conditoncourse(query, id) {
       this.condition_id = id; // 修改当前的筛选条件id,选中条件高亮显示
       this.query = query; // 做上一次筛选条件存储，点击热门，切换课程分类时，筛选条件仍是热门
-
       // 清除条件为非价格时三角形图标样式
       this.$refs.spantop[0].className = "condtion-i i-top";
       this.$refs.spanbuttom[0].className = "condtion-i i-buttom";
+
+      // 设定请求参数
 
       if (this.query_isup != query) {
         // 最开始 this.query_isup 为 -price  query 为 price
         this.query_isup = query; // 当筛选条件为hot或price时,赋值, this.query_isup已经为price
         // 价格升序
         if (query == "price") {
-          // 当筛选条件为price时，
+          // 当筛选条件为price时
+          
+          // 修改三角形按钮样式
           this.$refs.spantop[0].className = "condtion-i i-top";
           this.$refs.spanbuttom[0].className = "condtion-i i-buttom active";
+        }else {
+          this.query_isup = query; // 如果筛选条件不为价格，为hot,做条件缓存
         }
+        
       } else if (this.query_isup == query) {
         //this.query_isup = price  query = price
         if (query == "price") {  // 如果筛选条件为价格,做条件缓存
@@ -137,9 +143,9 @@ export default {
           this.query_isup = query; // 如果筛选条件不为价格，为hot,做条件缓存
         }
       }
+
+      //最请求后端接口
       this.GetconditionCourse(this.category_id,this.query_isup)
-
-
       
     },
     coursedetail(courseid) {
@@ -169,7 +175,7 @@ export default {
     // 获取课程分类下的对应课程
     GetcategoryTocourse(id){
       this.category_id = id;
-      this.$http.categoryTocourse(id)
+      this.$http.categoryTocourse(id,this.query)
       .then(res => {
         this.courses = res.data;
       })

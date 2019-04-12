@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home/Home'
 import Course from '@/components/Course/Course'
 import CourseDetail from '@/components/Course/CourseDetail'
+import CourseDetailTab from '@/components/Course/CourseDetailTab'
 import LightCourse from '@/components/LightCourse/LightCourse'
 import Degree from '@/components/Degree/Degree'
 import ShopCart from '@/components/ShopCart/ShopCart'
@@ -11,40 +12,54 @@ import ShopCart from '@/components/ShopCart/ShopCart'
 Vue.use(Router)
 
 export default new Router({
+  linkActiveClass: 'is-active',
+  mode: 'history',//改成history模式
   routes: [
     {
       path: '/',
-      redirect:Home
+      redirect: '/home'
     },
     {
-      path:'/Home',
-      name:'Home',
-      component:Home
+      path: "/home",
+      name: 'Home',
+      component: Home
     },
     {
-      path:'/Course',
-      name:'Course',
-      component:Course
+      path: '/Course',
+      name: 'Course',
+      component: Course
     },
     {
-      path:'/Course/detail/:detailId',
-      name:'CourseDetail',
-      component:CourseDetail
+      path: '/Course/detail/:detailId',
+      name: 'CourseDetail',
+      component: CourseDetail,
+      children: [
+        {
+          path: '/',
+          name: 'CourseDetailTab',
+          component: CourseDetailTab
+        },
+        {
+          path: '/Course/detail/:detailId',
+          name: 'CourseDetailTab',
+          component: CourseDetailTab
+        }
+      ]
     },
     {
-      path:'/LightCourse',
-      name:'LightCourse',
-      component:LightCourse
+      path: '/LightCourse',
+      name: 'LightCourse',
+      component: LightCourse
     },
     {
-      path:'/Degree',
-      name:'Degree',
-      component:Degree
+      path: '/Degree',
+      name: 'Degree',
+      component: Degree
     },
     {
-      path:'/ShopCart',
-      name:'ShopCart',
-      component:ShopCart
+      path: '/ShopCart',
+      name: 'ShopCart',
+      component: ShopCart
     },
 
   ]

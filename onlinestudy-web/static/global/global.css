@@ -1,23 +1,25 @@
-*{
+* {
 	padding: 0;
 	margin: 0;
 }
-body{
+
+body {
 	font-size: 14px;
 	color: #464646;
-	font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+	font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 	font-weight: 400;
-	
 }
-ul{
+
+ul {
 	list-style: none;
 }
-.container{
+
+.container {
 	width: 100%;
 	margin: 0 auto;
 	background: #f1f0f0;
 }
-a{
+
+a {
 	text-decoration: none;
 }
-

@@ -53,17 +53,21 @@
     </div>
     <div class="course-review">
       <ul class="review-head-wrap">
-        <li class="head-item" @click="getcourseInfo">课程概述</li>
-        <li class="head-item" @click="getcourseChapter">课程章节</li>
-        <li class="head-item" @click="getcourseComment">用户评价(12)</li>
-        <li class="head-item" @click="getcourseQuestion">常见问题</li>
+        <li
+          class="head-item"
+          @click="getcourseInfo(item.field)"
+          v-for="item in tab"
+          :key="item.id"
+        >课程概述</li>
       </ul>
     </div>
     <!-- 课程详情 -->
     <div class="course-detail">
       <div class="container-coursedetail-buttom">
         <div class="coursedetail-left">
-          <div class="course-detail-text">
+          <router-view></router-view>
+
+          <div class="course-detail-text" v-show="isShow">
             <h3>课程背景</h3>
             <p>{{details.why_study}}</p>
 
@@ -83,7 +87,8 @@
             <p>{{details.feature}}</p>
 
             <h3>课程大纲</h3>
-            <p>{{details.course_outline}}</p>
+            <p v-for='(outline,index) in details.course_outline' :key='index'>
+              {{outline.content}}</p>
 
             <h3>学完收获</h3>
             <p>{{details.harvest}}</p>
@@ -107,7 +112,7 @@
             <h3
               style="border-left: 2px solid rgb(239, 53, 53); text-align: left; text-indent: 6px;"
             >课程推荐</h3>
-            <div v-if='details.recommend_course.length !== 0'>
+            <div v-if="details.recommend_course !== 0">
               <div
                 v-for="(course,index) in details.recommend_course"
                 :key="index"
@@ -117,11 +122,11 @@
                 <p>{{teacher.title}}</p>
                 <p>{{teacher.brief}}</p>
                 <p>{{course.point}}</p>
-              </div>              
+              </div>
             </div>
             <div v-else>
-              <p>暂无课程推荐</p>  
-              </div>
+              <p>暂无课程推荐</p>
+            </div>
           </div>
         </div>
       </div>
@@ -155,12 +160,20 @@ export default {
   data() {
     return {
       details: "",
-      courseInfo:'',
-      courseChapter:'',
-      courseComment:'',
-      CourseQuestion:''
+      courseInfo: "",
+      courseChapter: "",
+      courseComment: "",
+      CourseQuestion: "",
+      isShow: true,
+      tab: [
+        { id: 0, title: "课程概述", field: "overview" },
+        { id: 1, title: "课程章节", field: "chapter" },
+        { id: 2, title: "学员评价", field: "comment" },
+        { id: 3, title: "常见问题", field: "question" }
+      ]
     };
   },
+
   methods: {
     // 课程详情
     getcourseDetail() {
@@ -169,7 +182,7 @@ export default {
         .then(res => {
           if (!res.error) {
             this.details = res.data[0];
-            console.log(this.details)
+            console.log(this.details);
           }
         })
         .catch(error => {
@@ -177,52 +190,56 @@ export default {
         });
     },
     // 课程概述信息
-    getcourseInfo(){
-      this.getcourseDetail()
-    },
-    // 课程评论
-    getcourseComment() {
-      this.$http
-        .comment(this.$route.params.detailId)
-        .then(res => {
-          if (!res.error) {
-            this.courseComment = res.data;
-            console.log(this.courseComment)
-          }
-        })
-        .catch(error => {
-          error.error;
-        });
-    },
-    // 课程常见问题
-    getcourseQuestion() {
-      this.$http
-        .commonquestion(this.$route.params.detailId)
-        .then(res => {
-          if (!res.error) {
-            this.CourseQuestion = res.data;
-            console.log(this.CourseQuestion)
-          }
-        })
-        .catch(error => {
-          error.error;
-        });
-    },
+    getcourseInfo(field) {
+      this.isShow = false;
+      this.$router.push({
+        name: "CourseDetailTab",
+        query: { sub: field }
+      });
+    }
+    // // 课程评论
+    // getcourseComment() {
+    //   this.$http
+    //     .comment(this.$route.params.detailId)
+    //     .then(res => {
+    //       if (!res.error) {
+    //         this.courseComment = res.data;
+    //         console.log(this.courseComment);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       error.error;
+    //     });
+    // },
+    // // 课程常见问题
+    // getcourseQuestion() {
+    //   this.$http
+    //     .commonquestion(this.$route.params.detailId)
+    //     .then(res => {
+    //       if (!res.error) {
+    //         this.CourseQuestion = res.data;
+    //         console.log(this.CourseQuestion);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       error.error;
+    //     });
+    // },
 
-    //课程章节
-    getcourseChapter() {
-      this.$http
-        .chapter(this.$route.params.detailId)
-        .then(res => {
-          if (!res.error) {
-            this.courseChapter = res.data;
-            console.log(this.courseChapter)
-          }
-        })
-        .catch(error => {
-          error.error;
-        });
-    },
+    // //课程章节
+    // getcourseChapter() {
+    //   this.$http
+    //     .chapter(this.$route.params.detailId)
+    //     .then(res => {
+    //       if (!res.error) {
+    //         this.courseChapter = res.data;
+    //         console.log(this.courseChapter);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       error.error;
+    //     });
+    // }
   },
   filters: {
     filterImg(value) {
@@ -232,6 +249,13 @@ export default {
   },
   created() {
     this.getcourseDetail();
+    console.log(this.details)
+  },
+  mounted() {
+    if(this.$route.query.sub){
+      this.getcourseInfo(this.$route.query.sub);
+    }
+    
   }
 };
 </script>
@@ -261,9 +285,7 @@ export default {
 } */
 
 .course-top {
-  border: 1px solid #cecdcd57;
   display: flex;
-  box-shadow: 1px 0px 5px #cecdcd57;
 }
 
 .title {
@@ -416,7 +438,6 @@ export default {
 .course-review {
   width: 100%;
   height: 80px;
-  background: #fafbfc;
   border-top: 1px solid #e8e8e8;
   box-shadow: 0 1px 0 0 #e8e8e8;
 }
@@ -425,6 +446,7 @@ export default {
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  margin-left: 100px;
 }
 .review-head-wrap .head-item {
   height: 80px;

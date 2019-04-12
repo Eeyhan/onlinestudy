@@ -7,8 +7,8 @@ export const category = () =>{
 }
 
 // 课程分类下对应的课程 categoryId为0时默认取全部课程
-export const categoryTocourse = (categoryId) =>{
-    return Axios.get("/course?cid=" + categoryId).then(res=>res)
+export const categoryTocourse = (categoryId,query) =>{
+    return Axios.get(`/course?cid=${categoryId}&query=${query}`).then(res=>res)
 }
 
 // 筛选条件的课程

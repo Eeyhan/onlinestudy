@@ -82,9 +82,8 @@ class CourseDetailView(APIView):
     """课程详情"""
 
     def get(self, request, pk):
-        courseDetail = models.CourseDetail.objects.filter(course_id=pk)
-        # courseDetail = models.CourseDetail.objects.all()
-        res = serializers.CourseDetailSerializer(courseDetail, many=True)
+        course_detail = models.CourseDetail.objects.filter(course_id=pk)
+        res = serializers.CourseDetailSerializer(course_detail, many=True)
         return Response(res.data)
 
 

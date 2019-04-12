@@ -39,8 +39,20 @@ export const commonquestion = (courseId) =>{
     return Axios.get(`/commonquestion/${courseId}`).then(res=>res)
 }
 
+// 登录
+export const login = (params) =>{
+    return Axios.post('/login',params).then(res=>res)
+}
 
-// 购物车
-export const shopping = () =>{
+// 注册
+export const register = (params) =>{
+    return Axios.post('/register',params).then(res=>res)
+}
+// 购物车列表数据
+export const shoppingList = () =>{
     return Axios.get(`/shopping`).then(res=>res)
+}
+// 加入购物车
+export const shopping = (params) =>{
+    return Axios.post(`/shopping`,params).then(res=>res)
 }

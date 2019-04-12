@@ -6,6 +6,8 @@ import CourseDetail from '@/components/Course/CourseDetail'
 import CourseDetailTab from '@/components/Course/CourseDetailTab'
 import LightCourse from '@/components/LightCourse/LightCourse'
 import Degree from '@/components/Degree/Degree'
+import Register from  '@/components/Person/Register'
+import Login from  '@/components/Person/Login'
 import ShopCart from '@/components/ShopCart/ShopCart'
 
 
@@ -55,6 +57,16 @@ export default new Router({
       path: '/Degree',
       name: 'Degree',
       component: Degree
+    },
+    {
+      path: '/Register',
+      name: 'Register',
+      component: Register
+    },
+    {
+      path: '/Login',
+      name: 'Login',
+      component: Login
     },
     {
       path: '/ShopCart',

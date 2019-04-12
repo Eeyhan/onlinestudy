@@ -100,7 +100,7 @@ export default {
 <style lang="css" scoped>
 .el-header {
   border-bottom: #c9c9c9;
-  box-shadow: 0 0.5px 0.5px 0 #c9c9c9;
+  box-shadow: 0 0.5px 0.5px 0 #e3e3e3;
 }
 .header {
   width: 1200px;
@@ -146,7 +146,7 @@ export default {
 }
 .nav-center ul li a.is-active {
   color: #4a4a4a;
-  border-bottom: 4px solid #ffc210;
+  border-bottom: 4px solid #409eff;
 }
 .nav-right {
   float: right;
@@ -198,7 +198,4 @@ export default {
   color: red;
 }
 
-.nav-center ul li a.router-link-exact-active {
-  border-bottom: 2px solid #409eff;
-}
 </style>

@@ -13,3 +13,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 package-lock.json
+__pycache__

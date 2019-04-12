@@ -27,8 +27,8 @@
             <p class="course-title"></p>
             <div class="course-buy">
               <p>
-                <el-button type="danger">立即购买</el-button>
-                <el-button type="primary" plain>免费试学</el-button>
+                <el-button type="danger" @click="toPrice">立即购买</el-button>
+                <el-button type="primary" plain @click="toStudy">免费试学</el-button>
               </p>
               <p class="shopping">
                 <i class="el-icon-goods"></i>
@@ -55,10 +55,11 @@
       <ul class="review-head-wrap">
         <li
           class="head-item"
-          @click="getcourseInfo(item.field)"
+          @click="getcourseInfo(item.field,item.id)"
           v-for="item in tab"
           :key="item.id"
-        >课程概述</li>
+          :class="{active:current_tab_id==item.id}"
+        >{{item.title}}</li>
       </ul>
     </div>
     <!-- 课程详情 -->
@@ -87,8 +88,7 @@
             <p>{{details.feature}}</p>
 
             <h3>课程大纲</h3>
-            <p v-for='(outline,index) in details.course_outline' :key='index'>
-              {{outline.content}}</p>
+            <p v-for="(outline,index) in details.course_outline" :key="index">{{outline.content}}</p>
 
             <h3>学完收获</h3>
             <p>{{details.harvest}}</p>
@@ -112,17 +112,18 @@
             <h3
               style="border-left: 2px solid rgb(239, 53, 53); text-align: left; text-indent: 6px;"
             >课程推荐</h3>
-            <div v-if="details.recommend_course !== 0">
-              <div
+            <div v-if="details.recommend_course !== null">
+              <li
                 v-for="(course,index) in details.recommend_course"
                 :key="index"
                 class="teacher-info"
               >
-                <img :src="course.course_img">
-                <p>{{teacher.title}}</p>
-                <p>{{teacher.brief}}</p>
-                <p>{{course.point}}</p>
-              </div>
+                <div class="recommend_course clearfix">
+                  <img :src="course.course_img|filterImg">
+                  <p>{{course.title}}</p>
+                  <p>{{course.brief}}</p>
+                </div>
+              </li>
             </div>
             <div v-else>
               <p>暂无课程推荐</p>
@@ -131,25 +132,25 @@
         </div>
       </div>
     </div>
-    <div class="course-price">
-      <!-- <div class="container">
-        <span>可以根据不同的学习情况购买不一样的学习套餐哦！</span>
+    <div class="course-price" id="position-price">
+      <div class="container">
+        <span>根据您的学习情况购买适合您的学习套餐哦</span>
         <ul class="course-price-item">
           <li
-            v-for="(item,index) in detail.prices"
+            v-for="(item,index) in details.prices"
             :key="item.id"
-            :class="{active:index===currentIndex}"
+            :class="{active:index===currentPriceIndex}"
             @click="priceClick(index)"
           >
-            <p class="price" :class="{active:index===currentIndex}">¥{{item.price}}</p>
-            <p class="time" :class="{active:index===currentIndex}">有效期{{item.valid_period_name}}</p>
+            <p class="price" :class="{active:index===currentPriceIndex}">¥{{item.price}}</p>
+            <p class="time" :class="{active:index===currentPriceIndex}">有效期{{item.valid_period}}</p>
           </li>
         </ul>
         <div class="course-action">
           <button class="left">购买</button>
           <button class="right" @click="addShopCart">加入购物车</button>
         </div>
-      </div>-->
+      </div>
     </div>
   </div>
 </template>
@@ -159,18 +160,21 @@ export default {
   name: "CourseDetail",
   data() {
     return {
-      details: "",
-      courseInfo: "",
-      courseChapter: "",
-      courseComment: "",
-      CourseQuestion: "",
-      isShow: true,
+      details: "", // 课程详情数据
+      courseInfo: "", // 课程概述
+      courseChapter: "", // 课程章节
+      courseComment: "", // 课程评价
+      CourseQuestion: "", // 课程常见问题
+      isShow: true, // 默认课程概述部分显示标志位
+      current_tab_id: 0, // 选项卡默认id
       tab: [
+        // 中部选项卡
         { id: 0, title: "课程概述", field: "overview" },
         { id: 1, title: "课程章节", field: "chapter" },
         { id: 2, title: "学员评价", field: "comment" },
         { id: 3, title: "常见问题", field: "question" }
-      ]
+      ],
+      currentPriceIndex: 0 // 课程套餐
     };
   },
 
@@ -189,13 +193,39 @@ export default {
           error.error;
         });
     },
-    // 课程概述信息
-    getcourseInfo(field) {
+    // 跳转到购买区域
+    toPrice() {
+      document.getElementById("position-price").scrollIntoView();
+    },
+
+    // 选项卡切换到章节
+    toStudy() {
+      this.current_tab_id = 1;
+      this.getcourseInfo("chapter", this.current_tab_id);
+    },
+
+    // 切换页面中部选项卡
+    getcourseInfo(field, id) {
       this.isShow = false;
+      this.current_tab_id = id;
       this.$router.push({
         name: "CourseDetailTab",
         query: { sub: field }
       });
+    },
+    // 价格策略选择
+    priceClick(index) {
+      this.currentPriceIndex = index;
+    },
+
+    // 加入购物车
+    addShopCart() {
+      this.$http.shopping()
+      .then(res=>{
+        if(!res.error){
+          
+        }
+      })
     }
     // // 课程评论
     // getcourseComment() {
@@ -249,13 +279,18 @@ export default {
   },
   created() {
     this.getcourseDetail();
-    console.log(this.details)
+    console.log(this.details);
   },
   mounted() {
-    if(this.$route.query.sub){
-      this.getcourseInfo(this.$route.query.sub);
+    // 当刷新页面时，中部选项卡保持数据还在
+    if (this.$route.query.sub) {
+      this.tab.forEach((item, index) => {
+        if (this.$route.query.sub == item.field) {
+          this.current_tab_id = item.id;
+        }
+      });
+      this.getcourseInfo(this.$route.query.sub, this.current_tab_id);
     }
-    
   }
 };
 </script>
@@ -263,6 +298,10 @@ export default {
 <style lang="css" scoped>
 .wrap {
   width: 100%;
+}
+
+li {
+  list-style-type: none;
 }
 .web-course-banner {
   width: 100%;
@@ -412,6 +451,7 @@ export default {
   margin-left: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
+  width: 380px;
 }
 
 .course-list {
@@ -455,6 +495,12 @@ export default {
   color: #555;
   cursor: pointer;
 }
+
+.review-head-wrap .head-item.active {
+  color: #4a4a4a;
+  border-bottom: 4px solid #409eff;
+}
+
 .course-detail {
   width: 100%;
 }
@@ -475,7 +521,7 @@ export default {
   margin-bottom: 10px;
 }
 .course-detail-text p {
-  width: 100%;
+  width: 80%;
   font-size: 14px;
   color: #4a4a4a;
   letter-spacing: 1.83px;
@@ -485,10 +531,38 @@ export default {
   text-indent: 10px;
   border-bottom: 1px inset #cdcdcd;
   padding: 20px;
+  font-weight: bold;
 }
+
+.recommend_course {
+  position: relative;
+  width: 300px;
+}
+.clearfix {
+  clear: both;
+  content: "";
+}
+.recommend_course img {
+  width: 100px;
+  height: 50px;
+  left: 2px;
+  position: absolute;
+}
+
+.recommend_course p {
+  margin-left: 120px;
+}
+
+.recommend_course p:last-child {
+  font-size: 12px;
+  color: #979797;
+}
+
 .course-price {
   width: 100%;
   background: #fafafa;
+  border-top: 2px solid #e9e4eddd;
+  padding-top: 20px;
 }
 .course-price .container {
   width: 1200px;
@@ -496,16 +570,15 @@ export default {
   text-align: center;
 }
 .course-price span {
-  font-size: 12px;
   color: #9b9b9b;
   letter-spacing: 1.57px;
   display: inline-block;
   margin-top: 102px;
+  font-weight: bold;
 }
 .course-price ul {
-  /*width: 800px;*/
+  width: 1000px;
   margin: 50px auto;
-
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -514,9 +587,10 @@ export default {
   width: 200px;
   height: 112px;
   border: 1px solid #979797;
+  border-radius: 3px;
 }
 .course-price ul li.active {
-  background: #00cd23;
+  background: #409eff;
 }
 .course-price ul li p:first-child {
   font-size: 24px;
@@ -533,12 +607,13 @@ export default {
 .course-price ul li p.active {
   color: #fff;
 }
-.course-action {
-  width: 1000px;
-  margin: 0 auto;
-  padding-bottom: 80px;
-  display: flex;
-  justify-content: center;
+
+.course-action{
+	width: 1000px;
+	margin: 0 auto;
+	padding-bottom: 80px;
+	display: flex;
+	justify-content: center;
 }
 .course-action button {
   border: none;
@@ -553,6 +628,7 @@ export default {
   text-align: center;
   background: #f5a623;
   border-radius: 82px;
+
 }
 .course-action button.left {
   background: #7ed321;

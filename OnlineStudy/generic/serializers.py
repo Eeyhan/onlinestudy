@@ -44,15 +44,19 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     study_number = serializers.CharField(source='course.study_number')
     difficult = serializers.CharField(source='course.get_difficult_display')
     teacher = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
+    prices = serializers.SerializerMethodField()
     course_outline = serializers.SerializerMethodField()
     recommend_course = serializers.SerializerMethodField()
 
     def get_recommend_course(self, obj):
         """推荐课程"""
-        print(obj.recommend_course.all())
-        return [{'title': course.title, 'brief': course.brief, 'course_img': course.course_img} for course in
-                obj.recommend_course.all()]
+        res = obj.recommend_course.all()
+        if len(res):
+            return [{'title': course.title, 'brief': course.coursedetail.brief, 'course_img': str(course.course_img)}
+                    for course in
+                    obj.recommend_course.all()]
+        else:
+            pass
 
     def get_teacher(self, obj):
         """讲师"""
@@ -61,9 +65,11 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                  'teacher_img': str(teacher.teacher_img)}
                 for teacher in res]
 
-    def get_price(self, obj):
+    def get_prices(self, obj):
         """价格"""
-        return obj.course.price_policy.all().order_by('price').first().price
+        res = obj.course.price_policy.all().order_by('price')
+        return [{"valid_period": price.get_valid_period_display(), 'price': price.price} for price in res]
+        # return obj.course.price_policy.all().order_by('price')
 
     def get_course_outline(self, obj):
         """大纲"""
@@ -72,7 +78,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CourseDetail
-        fields = ['title', 'course_img', 'course_review', 'study_number', 'difficult', 'price',
+        fields = ['title', 'course_img', 'course_review', 'study_number', 'difficult', 'prices',
                   'lesson', 'teacher', 'brief', 'why_study', 'slogan', 'feature',
                   'point', 'course_outline', 'harvest', 'object_person', 'recommend_course',
                   'prerequisite']

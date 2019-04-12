@@ -75,7 +75,7 @@ class CourseDetail(models.Model):
     teacher = models.ManyToManyField(to='Teacher', verbose_name='授课讲师')
     recommend_course = models.ManyToManyField(to='Course', related_name='recommend_by',
                                               verbose_name='推荐课程')
-    course_review = models.FloatField(null=True,blank=True,verbose_name='课程评分')
+    course_review = models.FloatField(null=True, blank=True, verbose_name='课程评分')
 
     def __str__(self):
         return self.course.title
@@ -320,12 +320,10 @@ class PricePolicy(models.Model):
     content_type = models.ForeignKey(to=ContentType, on_delete='cascade')
     object_id = models.PositiveIntegerField(verbose_name='课程对象')
     content_object = GenericForeignKey('content_type', 'object_id')
-    valid_period_choices = ((1, '1天'), (3, '3天'),
-                            (7, '1周'), (14, '2周'),
-                            (30, '1个月'), (60, '2个月'),
-                            (90, '3个月'), (120, '4个月'),
-                            (180, '6个月'), (210, '12个月'),
-                            (540, '18个月'), (720, '24个月'),
+    valid_period_choices = ((1, '1天'), (3, '3天'), (7, '1周'), (14, '2周'),
+                            (30, '1个月'), (60, '2个月'), (90, '3个月'),
+                            (120, '4个月'), (150, '五个月'), (180, '6个月'),
+                            (210, '12个月'), (540, '18个月'), (720, '24个月'),
                             (722, '24个月'), (723, '24个月'),
                             )
     valid_period = models.SmallIntegerField(choices=valid_period_choices, verbose_name='课程有效期')
@@ -368,7 +366,7 @@ class OrderDetail(models.Model):
     order = models.ForeignKey(to="Order", on_delete='cascade')
     original_price = models.FloatField(verbose_name="课程原价")
     price = models.FloatField(verbose_name="折后价格")
-    valid_period_display = models.CharField(verbose_name="有效期在订单页显示", max_length=32,null=True,blank=True)
+    valid_period_display = models.CharField(verbose_name="有效期在订单页显示", max_length=32, null=True, blank=True)
     valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)")
     memo = models.CharField(max_length=255, blank=True, null=True, verbose_name="订单交易备注")
     content_type = models.ForeignKey(ContentType, on_delete='cascade', verbose_name='关联普通课程或学位')

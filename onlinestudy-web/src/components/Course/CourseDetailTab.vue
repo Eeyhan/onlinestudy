@@ -211,7 +211,7 @@ export default {
   margin-bottom: 10px;
 }
 .course-detail-text p {
-  width: 100%;
+  width: 80%;
   font-size: 14px;
   color: #4a4a4a;
   letter-spacing: 1.83px;
@@ -221,6 +221,7 @@ export default {
   text-indent: 10px;
   border-bottom: 1px inset #cdcdcd;
   padding: 20px;
+  font-weight: bold;
 }
 li {
   list-style-type: none;

@@ -60,6 +60,7 @@ class LoginView(APIView):
             token = uuid.uuid4()
             RedisConn.set(str(token), user_obj.id)
             res.data = token
+            # 头像，购物车数据，token,用户名
         except Exception as e:
             print('........', e)
             res.code = 1031

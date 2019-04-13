@@ -16,14 +16,18 @@
 
         <!-- <el-dropdown> -->
 
-        <div class="nav-right" @mouseenter="enterHandler" @mouseleave="leaveHandler">
-          <span class="el-dropdown-link">购物车</span>
+        <div
+          class="nav-right"
+          v-if="userInfo.access_token"
+          @mouseenter="enterHandler"
+          @mouseleave="leaveHandler"
+        >
           <span class="el-dropdown-link">学习中心</span>
-          <!-- <span class="user">{{userInfo.username}}</span> -->
-          <!-- <img :src="userInfo.avatar" alt> -->
+          <span class="user">{{userInfo.username}}</span>
+          <img :src="userInfo.avatar" alt>
           <ul class="my_account" v-show="isShow">
             <li>
-              个人主页
+              我的账户
               <i>></i>
             </li>
             <li>
@@ -41,7 +45,7 @@
             </li>
             <li @click="shopCartInfo">
               购物车
-              <!-- <span class="count">({{userInfo.shop_cart_num}})</span> -->
+              <span class="count">({{userInfo.shop_cart_num}})</span>
               <i>></i>
             </li>
             <li>
@@ -51,10 +55,10 @@
           </ul>
         </div>
         <!-- </el-dropdown> -->
-        <div class="nav-right">
-          <span>登录</span>
+        <div class="nav-right" v-else>
+          <span @click="loginHander">登录</span>
           &nbsp;| &nbsp;
-          <span>注册</span>
+          <span @click="registerHander">注册</span>
         </div>
       </div>
     </el-header>
@@ -86,6 +90,21 @@ export default {
     },
     leaveHandler() {
       this.isShow = false;
+    },
+    loginHander() {
+      this.$router.push({
+        name: "Login"
+      });
+    },
+    registerHander() {
+      this.$router.push({
+        name: "Register"
+      });
+    }
+  },
+  computed: {
+    userInfo() {
+      return this.$store.state.userInfo;
     }
   }
   //   computed: {
@@ -197,5 +216,4 @@ export default {
   margin-left: -100px;
   color: red;
 }
-
 </style>

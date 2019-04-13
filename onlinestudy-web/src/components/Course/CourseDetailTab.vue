@@ -168,32 +168,7 @@ export default {
       console.log(to);
       console.log(form);
       this.routerHander();
-
-      //   if (this.$route.query.sub === "overview") {
-      //     this.msg = `<h3>课程背景</h3>
-      // 			<p>{{details.why_study}}</p>
-
-      // 			<h3>学前准备</h3>
-      // 			<p>{{details.prerequisite}}</p>
-
-      // 			<h3>课程概述</h3>
-      // 			<p>{{details.brief}}</p>
-
-      // 			<h3>适合人群</h3>
-      // 			<p>{{details.object_person}}</p>
-
-      // 			<h3>课程覆盖知识点</h3>
-      // 			<p>{{details.point}}</p>
-
-      // 			<h3>课程特点</h3>
-      // 			<p>{{details.feature}}</p>
-
-      // 			<h3>课程大纲</h3>
-      // 			<p>{{details.course_outline}}</p>
-
-      // 			<h3>学完收获</h3>
-      // 			<p>{{details.harvest}}</p>`;
-      //   }
+      
     }
   }
 };

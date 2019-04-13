@@ -186,7 +186,6 @@ export default {
         .then(res => {
           if (!res.error) {
             this.details = res.data[0];
-            console.log(this.details);
           }
         })
         .catch(error => {
@@ -220,56 +219,11 @@ export default {
 
     // 加入购物车
     addShopCart() {
-      this.$http.shopping()
-      .then(res=>{
-        if(!res.error){
-          
+      this.$http.shopping().then(res => {
+        if (!res.error) {
         }
-      })
+      });
     }
-    // // 课程评论
-    // getcourseComment() {
-    //   this.$http
-    //     .comment(this.$route.params.detailId)
-    //     .then(res => {
-    //       if (!res.error) {
-    //         this.courseComment = res.data;
-    //         console.log(this.courseComment);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       error.error;
-    //     });
-    // },
-    // // 课程常见问题
-    // getcourseQuestion() {
-    //   this.$http
-    //     .commonquestion(this.$route.params.detailId)
-    //     .then(res => {
-    //       if (!res.error) {
-    //         this.CourseQuestion = res.data;
-    //         console.log(this.CourseQuestion);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       error.error;
-    //     });
-    // },
-
-    // //课程章节
-    // getcourseChapter() {
-    //   this.$http
-    //     .chapter(this.$route.params.detailId)
-    //     .then(res => {
-    //       if (!res.error) {
-    //         this.courseChapter = res.data;
-    //         console.log(this.courseChapter);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       error.error;
-    //     });
-    // }
   },
   filters: {
     filterImg(value) {
@@ -279,7 +233,9 @@ export default {
   },
   created() {
     this.getcourseDetail();
-    console.log(this.details);
+
+    // course组件跳转过来会保持原来的滚动条位置，所以在创建时移动滚动条到根节点上
+    document.getElementById("app").scrollIntoView();
   },
   mounted() {
     // 当刷新页面时，中部选项卡保持数据还在
@@ -503,6 +459,7 @@ li {
 
 .course-detail {
   width: 100%;
+  min-height: 350px;
 }
 .course-detail .container {
   width: 1200px;
@@ -608,12 +565,12 @@ li {
   color: #fff;
 }
 
-.course-action{
-	width: 1000px;
-	margin: 0 auto;
-	padding-bottom: 80px;
-	display: flex;
-	justify-content: center;
+.course-action {
+  width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+  display: flex;
+  justify-content: center;
 }
 .course-action button {
   border: none;
@@ -628,7 +585,6 @@ li {
   text-align: center;
   background: #f5a623;
   border-radius: 82px;
-
 }
 .course-action button.left {
   background: #7ed321;

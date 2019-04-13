@@ -76,7 +76,6 @@
             </div>
           </dd>
         </dl>
-        <!-- <router-view></router-view> -->
       </div>
     </div>
   </div>
@@ -150,7 +149,6 @@ export default {
       
     },
     coursedetail(courseid) {
-      console.log(courseid);
       this.$router.push({
         name: "CourseDetail",
         params: { detailId: courseid }
@@ -200,10 +198,12 @@ export default {
   },
   created() {
     this.Getcategory()
+    
+    
+  },
+  mounted(){
     // 默认选中全部
     this.GetcategoryTocourse(0)
-    
-    
   }
 };
 </script>

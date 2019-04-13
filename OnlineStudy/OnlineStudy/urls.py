@@ -19,6 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(('generic.urls', 'generic'))),      # 主业务
-    path('auth/', include(('LoginAuth.urls', 'LoginAuth'))),    # 登录认证
+    path('api/v1/auth/', include(('LoginAuth.urls', 'LoginAuth'))),    # 登录认证
     path('pay/', include(('Alipay.urls', 'Alipay'))),           # 支付宝支付
 ]

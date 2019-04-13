@@ -41,13 +41,20 @@ export const commonquestion = (courseId) =>{
 
 // 登录
 export const login = (params) =>{
-    return Axios.post('/login',params).then(res=>res)
+    return Axios.post('/auth/login',params).then(res=>res)
 }
 
 // 注册
 export const register = (params) =>{
-    return Axios.post('/register',params).then(res=>res)
+    return Axios.post('/auth/register',params).then(res=>res)
 }
+
+// 获取验证码
+export const geetest = () =>{
+    return Axios.get("/auth/auth?t=" + (new Date()).getTime()).then(res=>res.data) // 加随机数防止缓存
+}
+
+
 // 购物车列表数据
 export const shoppingList = () =>{
     return Axios.get(`/shopping`).then(res=>res)
@@ -56,3 +63,5 @@ export const shoppingList = () =>{
 export const shopping = (params) =>{
     return Axios.post(`/shopping`,params).then(res=>res)
 }
+
+

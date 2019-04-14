@@ -45,10 +45,11 @@
             </li>
             <li @click="shopCartInfo">
               购物车
-              <span class="count">({{userInfo.shop_cart_num}})</span>
+              <span class="count" v-if="userInfo.shop_cart_num == 0">(0)</span>
+              <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span>
               <i>></i>
             </li>
-            <li>
+            <li @click="logout">
               退出
               <i>></i>
             </li>
@@ -100,19 +101,44 @@ export default {
       this.$router.push({
         name: "Register"
       });
+    },
+
+    // 退出
+    logout() {
+      this.$store.dispatch("deleteUserInfo");
+      console.log(this.$store.state.isRemember)
+      // 如果记住密码标志位为false就在退出的同时删除用户信息，否则就不删除
+      if(!this.$store.state.isRemember){
+        localStorage.clear();         
+      }
+      
     }
   },
   computed: {
     userInfo() {
       return this.$store.state.userInfo;
     }
+  },
+
+  watch: {
+    $route(to, form) {
+      // 从登录组件过来的，恢复导航栏显示
+      if (form.path == "/Login") {
+        document
+          .getElementsByClassName("el-container")[0]
+          .setAttribute("style", "");
+      }
+    }
   }
-  //   computed: {
-  //     userInfo() {
-  //       console.log(this.$store.state.userInfo);
-  //       return this.$store.state.userInfo;
-  //     }
-  //   }
+
+  // mounted() {
+
+  //   console.log(document.getElementsByClassName("el-container")[0]);
+  //   // 登录过来跳转的，把顶部的导航栏显示
+  //   document
+  //     .getElementsByClassName("el-container")[0]
+  //     .setAttribute("style", "");
+  // }
 };
 </script>
 

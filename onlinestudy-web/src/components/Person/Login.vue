@@ -1,6 +1,8 @@
 <template>
   <div class="box">
-    <img src="http://wx1.sinaimg.cn/mw690/b099ab84gy1g213rb2t15j21hc0u0qko.jpg" alt>
+    <img src="https://s2.ax1x.com/2019/04/14/AOarGT.jpg" alt>
+    <el-button :plain="true" @click="open3"></el-button>
+    <el-button :plain="true" @click="open4"></el-button>
     <div class="login">
       <div class="login-title">
         <p>机会永远只留给有准备的人</p>
@@ -13,17 +15,16 @@
           <span>短信登录</span>
         </div>
         <div class="inp">
-          <input v-model="username" type="text" placeholder="用户名 / 手机号码" class="user">
+          <input v-model="username" type="text" placeholder="用户名" class="user">
           <input v-model="password" type="password" name class="pwd" placeholder="密码">
           <div id="geetest"></div>
           <div class="rember">
-            <p>
-              <input type="checkbox" class="no" name="a">
-              <el-checkbox v-model="checked">记住密码</el-checkbox>
+            <p @click="rememberMe">
+              <el-checkbox>记住密码</el-checkbox>
             </p>
             <p>忘记密码</p>
           </div>
-          <button class="login_btn" @click="loginHandler">登录</button>
+          <button class="login_btn" @click="loginHandler">立即登录</button>
           <p class="go_login">
             没有账号?
             <span @click="toRegister">立即注册</span>
@@ -41,49 +42,76 @@ export default {
     return {
       username: "",
       password: "",
-
-      checked:'',
+      checked: "",
       validateResult: {} //验证成功之后返回的结果，它用于服务端sdk的二次验证
     };
   },
 
   methods: {
-    loginHandler() {
-      let params = {
-        username: this.username,
-        passwd: this.password,
-        geetest_challenge: this.validateResult.geetest_challenge,
-        geetest_validate: this.validateResult.geetest_validate,
-        geetest_seccode: this.validateResult.geetest_seccode
-      };
-      this.$http
-        .login(params)
-        .then(res => {
-          console.log(res);
-          if (!res.error) {
-            this.$router.push({
-              name: "Home"
-            });
-            localStorage.setItem("access_token", res.data.data);
-            localStorage.setItem("username", this.username);
-            localStorage.setItem("avatar", res.data.avatar);
-            localStorage.setItem("shop_cart_num", res.data.shop_cart_num);
-
-            // dispacth action的行为
-            this.$store.dispatch("getUserInfo", res.data);
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    open3() {
+      this.$message({
+        message: "请先点击验证按钮进行验证",
+        type: "warning",
+        center: true
+      });
     },
+
+    open4() {
+      this.$message({
+        message: "请先输入账号密码",
+        type: "error",
+        center: true
+      });
+    },
+
+    loginHandler() {
+      if (!this.validateResult.geetest_challenge) {
+        this.open3();
+      } else if (!this.username && !this.password) {
+        this.open4();
+      } else {
+        let params = {
+          username: this.username,
+          passwd: this.password,
+          geetest_challenge: this.validateResult.geetest_challenge,
+          geetest_validate: this.validateResult.geetest_validate,
+          geetest_seccode: this.validateResult.geetest_seccode
+        };
+        this.$http
+          .login(params)
+          .then(res => {
+            if (!res.error) {
+              this.$router.push({
+                name: "Home"
+              });
+              localStorage.setItem("access_token", res.data.access_token);
+              localStorage.setItem("username", res.data.username);
+              localStorage.setItem("avatar", res.data.avatar);
+              localStorage.setItem("shop_cart_num", res.data.shop_cart_num);
+
+              // dispacth action的行为
+              this.$store.dispatch("getUserInfo", res.data);
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    },
+
+    // 记住密码
+    rememberMe() {
+      console.log("test.......");
+      this.$store.dispatch("rememberUserInfo");
+    },
+
+    // 极验
     getGeetest() {
       this.$http
         .geetest()
         .then(res => {
-          console.log(res);
-          let data = res
-          var _this = this;
+          let data = res;
+          var that = this;
           //请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
           initGeetest(
             {
@@ -105,7 +133,6 @@ export default {
                 .onSuccess(() => {
                   var result = captchaObj.getValidate();
                   this.validateResult = result;
-                  console.log(this);
                 })
                 .onError(() => {});
             }
@@ -115,21 +142,22 @@ export default {
           console.log(err);
         });
     },
-    toRegister(){
+    toRegister() {
       this.$router.push({
-        name:'Register'
-      })
+        name: "Register"
+      });
     }
   },
   created() {
     this.getGeetest();
   },
+
   mounted() {
     // 把顶部的导航栏去掉
     document
       .getElementsByClassName("el-container")[0]
       .setAttribute("style", "display:none");
-  },
+  }
 };
 </script>
 
@@ -148,7 +176,7 @@ export default {
   top: 50%;
   left: 50%;
   margin-left: -250px;
-  margin-top: -300px;  
+  margin-top: -300px;
   opacity: 0.9;
 }
 .login .login-title {
@@ -233,8 +261,6 @@ export default {
   letter-spacing: 0.19px;
   cursor: pointer;
 }
-
-
 
 .inp .rember p span {
   display: inline-block;

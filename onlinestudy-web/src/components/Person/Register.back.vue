@@ -1,6 +1,6 @@
 <template>
   <div class="person-wrap">
-    <img src="http://wx1.sinaimg.cn/mw690/b099ab84gy1g213rb2t15j21hc0u0qko.jpg" alt>
+    <img src="https://s2.ax1x.com/2019/04/14/AOarGT.jpg" alt>
     <div class="person">
       <h3 style=" text-indent: 70px;">机会永远只留给有准备的人</h3>
       <br>
@@ -27,9 +27,7 @@
         </el-form-item>
         <el-form-item id="embed-captcha" style="margin-left: 100px;" prop="geetest"></el-form-item>
         <p id="wait" class="show" ref="wait">正在加载验证码......</p>
-        <p id="notice" class="hide" ref="notice">请先拖动验证码到相应位置</p>
         <br>
-
         <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')" ref="btn">点我注册</el-button>
           <el-button @click="toLogin">已有账号？</el-button>
@@ -120,37 +118,44 @@ export default {
     },
 
     // 获取极验验证码
-    geetest() {
-      this.$http.geetest().then(data => {
-        var that = this;
-        console.log(data)
-        initGeetest(
-          {
-            gt: data.gt,
-            challenge: data.challenge,
-            product: "embed", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
-            offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
-            // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
-          },
-          function(captchaObj) {
-            let validate = captchaObj.getValidate();
-            if (!validate) {
-              that.$refs.notice.className = "show";
-              setTimeout(function() {
-                that.$refs.notice.className = "hide";
-              }, 2000);
-              that.$refs.btn.preventDefault;
-            }
-            // 将验证码加到id为captcha的元素里，同时会有三个input的值：geetest_challenge, geetest_validate, geetest_seccode
-            console.log(captchaObj);
-            captchaObj.appendTo("#embed-captcha");
-            captchaObj.onReady(function() {
+    getGeetest() {
+      this.$http
+        .geetest()
+        .then(res => {
+          console.log(res);
+          let data = res;
+          var that = this;
+          //请检测data的数据结构， 保证data.gt, data.challenge, data.success有值
+          initGeetest(
+            {
+              // 以下配置参数来自服务端 SDK
+              gt: data.gt,
+              challenge: data.challenge,
+              offline: !data.success,
+              new_captcha: true,
+              product: "popup",
+              width: "100%"
+            },
+            captchaObj => {
+              // 这里可以调用验证实例 captchaObj 的实例方法
+              captchaObj.appendTo("#embed-captcha"); //将验证按钮插入到宿主页面中captchaBox元素内
               that.$refs.wait.className = "hide";
-            });
-            // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
-          }
-        );
-      });
+              captchaObj
+                .onReady(() => {
+                  //your code
+                })
+                .onSuccess(() => {
+                  var result = captchaObj.getValidate();
+                  this.validateResult = result;
+                  console.log(this);
+                })
+                .onError(() => {});
+            }
+          );
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
 
@@ -161,7 +166,7 @@ export default {
       .setAttribute("style", "display:none");
   },
   created() {
-    this.geetest();
+    this.getGeetest();
   }
 };
 </script>

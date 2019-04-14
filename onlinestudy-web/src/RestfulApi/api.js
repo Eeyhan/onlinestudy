@@ -41,12 +41,12 @@ export const commonquestion = (courseId) =>{
 
 // 登录
 export const login = (params) =>{
-    return Axios.post('/auth/login',params).then(res=>res)
+    return Axios.post('/auth/login',params).then(res=>res.data)
 }
 
 // 注册
 export const register = (params) =>{
-    return Axios.post('/auth/register',params).then(res=>res)
+    return Axios.post('/auth/register',params).then(res=>res.data)
 }
 
 // 获取验证码

@@ -233,10 +233,11 @@ class Account(models.Model):
     """用户表"""
     username = models.CharField(max_length=32, verbose_name='用户名')
     passwd = models.CharField(max_length=32, verbose_name='密码')
-    brief = models.CharField(max_length=64, verbose_name='学员简介')
+    email = models.EmailField(max_length=32, verbose_name='邮箱', null=True, blank=True)
+    brief = models.CharField(max_length=64, verbose_name='学员简介', null=True, blank=True)
     CHOICES = ((0, '大专'), (1, '本科'), (2, '研究生'), (3, '博士'), (4, '硕士'), (5, '其他'))
-    education = models.IntegerField(choices=CHOICES, default=5, verbose_name='学历')
-    career = models.CharField(max_length=32, verbose_name='目前职业/最近一次从事职业')
+    education = models.IntegerField(choices=CHOICES,  verbose_name='学历', null=True, blank=True)
+    career = models.CharField(max_length=32, verbose_name='目前职业/最近一次从事职业', null=True, blank=True)
     balance = models.IntegerField(verbose_name='账户余额', default=0)
 
     def __str__(self):
@@ -322,7 +323,7 @@ class PricePolicy(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     valid_period_choices = ((1, '1天'), (3, '3天'), (7, '1周'), (14, '2周'),
                             (30, '1个月'), (60, '2个月'), (90, '3个月'),
-                            (120, '4个月'), (150, '五个月'), (180, '6个月'),
+                            (120, '4个月'), (150, '5个月'), (180, '6个月'),
                             (210, '12个月'), (540, '18个月'), (720, '24个月'),
                             (722, '24个月'), (723, '24个月'),
                             )

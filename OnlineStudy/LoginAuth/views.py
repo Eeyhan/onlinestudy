@@ -3,11 +3,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.geetest import GeetestLib
-from django.shortcuts import render
 from django.shortcuts import HttpResponse
 from utils.redis_pool import POOL
 from utils.BaseResponse import BaseResponse
 from LoginAuth.serializers import RegisterSerializer
+from generic.views import ShoppingView
 from generic.models import Account
 from utils.Auther import Auther
 import redis
@@ -59,7 +59,14 @@ class LoginView(APIView):
         try:
             token = uuid.uuid4()
             RedisConn.set(str(token), user_obj.id)
-            res.data = token
+            shop_cart = ShoppingView().get(request)  # 购物车数据
+            print(shop_cart.data)
+            res.data = {
+                'access_token': token,
+                'avatar': 'http://127.0.0.1:8000/media/avatar.png',  # 真实部署时改成公网地址
+                'username': user_obj.username,
+                'shop_cart_num': shop_cart.data.get('data')
+            }
             # 头像，购物车数据，token,用户名
         except Exception as e:
             print('........', e)

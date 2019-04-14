@@ -147,7 +147,7 @@
           </li>
         </ul>
         <div class="course-action">
-          <button class="left">购买</button>
+          <button class="left" @click="toBuy">购买</button>
           <button class="right" @click="addShopCart">加入购物车</button>
         </div>
       </div>
@@ -219,10 +219,32 @@ export default {
 
     // 加入购物车
     addShopCart() {
-      this.$http.shopping().then(res => {
-        if (!res.error) {
+      console.log(this.currentPriceIndex);
+      if (this.details.prices[this.currentPriceIndex]) {
+        if (localStorage.getItem("access_token")) {
+          let product = {
+            "course": this.$route.params.detailId,
+            "price_policy": this.details.prices[this.currentPriceIndex].id
+          };
+          console.log(product)
+          this.$http.shopping(product).then(res => {
+            if (!res.error) {
+              console.log(res);
+              this.$message('购物车');
+            }
+          });
         }
-      });
+        // 未登录，跳转到登录页面
+        else(
+          this.$router.push({
+            name:'Login'
+          })
+        )
+      }
+    },
+    toBuy() {
+      console.log(this.currentPriceIndex);
+      console.log(this.details.prices[this.currentPriceIndex]);
     }
   },
   filters: {

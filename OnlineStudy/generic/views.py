@@ -160,7 +160,7 @@ class ShoppingView(APIView):
         for key in all_keys:
             course_info.append(CONN.hgetall(key))
         if len(course_info) == 0:
-            res.data = '您的购物车空空如也哦~'
+            res.data = 0
         else:
             res.data = course_info
         # 返回给前端
@@ -169,6 +169,7 @@ class ShoppingView(APIView):
     def post(self, request):
         res = BaseResponse()
         # 拿到前端传过来的数据
+        print(request.data)
         course_id = request.data.get('course')
         price_policy_id = request.data.get('price_policy')
         user = request.user

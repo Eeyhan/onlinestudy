@@ -68,7 +68,8 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     def get_prices(self, obj):
         """价格"""
         res = obj.course.price_policy.all().order_by('price')
-        return [{"valid_period": price.get_valid_period_display(), 'price': price.price} for price in res]
+        return [{"valid_period": price.get_valid_period_display(), 'price': price.price, 'id': price.id} for price in
+                res]
         # return obj.course.price_policy.all().order_by('price')
 
     def get_course_outline(self, obj):

@@ -81,16 +81,22 @@ export default {
           .login(params)
           .then(res => {
             if (!res.error) {
-              this.$router.push({
-                name: "Home"
-              });
+              // this.$router.push({
+              //   name: "Home"
+              // });
+              
               localStorage.setItem("access_token", res.data.access_token);
               localStorage.setItem("username", res.data.username);
               localStorage.setItem("avatar", res.data.avatar);
               localStorage.setItem("shop_cart_num", res.data.shop_cart_num);
-
+              
               // dispacth action的行为
               this.$store.dispatch("getUserInfo", res.data);
+              this.$router.go(-1)
+
+              // // 为axios添加默认的请求头 token
+              // console.log(this.axios)
+              // this.axios.defaults.headers.common['AUTHENTICATION'] = res.data.access_token
             }
           })
           .catch(err => {

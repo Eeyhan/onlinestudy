@@ -10,7 +10,6 @@ from utils.BaseResponse import BaseResponse
 import redis
 import json
 import time
-from collections import OrderedDict
 
 
 # Create your views here.
@@ -52,6 +51,7 @@ class CourseView(APIView):
                 else:
                     continue
             return Response(temp)
+
         return Response(res.data)
 
     def order_query(self, query, course):
@@ -162,34 +162,41 @@ class ShoppingView(APIView):
         if len(course_info) == 0:
             res.data = 0
         else:
+
+            for index, item in enumerate(course_info):
+                course_info[index]['price_policy_dict'] = json.loads(item['price_policy_dict'])
+
             res.data = course_info
+
         # 返回给前端
+
         return Response(res.dict)
 
     def post(self, request):
         res = BaseResponse()
-        # 拿到前端传过来的数据
-        print(request.data)
-        course_id = request.data.get('course')
-        price_policy_id = request.data.get('price_policy')
-        user = request.user
-        multi = request.data.get('multi')  # 传来多个课程参数
-
-        # 检测数据合法
         try:
+            # 拿到前端传过来的数据
+            course_id = request.data.get('course')
+            price_policy_id = request.data.get('price_policy')
+            current_price = request.data.get('price')
+            user = request.user
+            multi = request.data.get('multi')  # 传来多个课程参数
+
+            # 检测数据合法
+
             # 这里可以判断是一个课程还是多个课程
 
             # 如果前端传来单个课程参数
             if not multi:
                 # {"course": 1, "price_policy": 1}
-                res = self.post_func(res, course_id, price_policy_id, user)
+                res = self.post_func(res, course_id, price_policy_id, user, current_price)
             # 如果前端传来多个课程参数
             else:
                 for item in multi:
                     # {"multi":[{"course":2,"price_policy":10},{"course":3,"price_policy":4}]}
                     course = item['course']
                     price_policy = item['price_policy']
-                    ret = self.post_func(res, course, price_policy, user)
+                    ret = self.post_func(res, course, price_policy, user, current_price)
 
         except Exception as e:
             print(e)
@@ -200,7 +207,7 @@ class ShoppingView(APIView):
             res.data = '加入购物车成功'
             return Response(res.dict)
 
-    def post_func(self, res, course_id, price_policy_id, user):
+    def post_func(self, res, course_id, price_policy_id, user, current_price):
         # 加入购物车函数，通用部分
         course_obj = models.Course.objects.filter(id=course_id).first()
         if not course_obj:
@@ -211,6 +218,7 @@ class ShoppingView(APIView):
         price_policy_dict = {}
         for price_policy in price_queryset:
             price_policy_dict[price_policy.id] = {
+                'id': price_policy.id,
                 'price': price_policy.price,
                 'valid_period': price_policy.valid_period,
                 'valid_period_display': price_policy.get_valid_period_display()
@@ -229,6 +237,7 @@ class ShoppingView(APIView):
         course_info = {
             'id': course_obj.id,
             'title': course_obj.title,
+            'current_price': current_price,
             'course_img': str(course_obj.course_img),
             'price_policy_dict': json.dumps(price_policy_dict, ensure_ascii=False),
             'default_price_policy': price_policy_id
@@ -277,6 +286,7 @@ class ShoppingView(APIView):
         res = BaseResponse()
         # 拿到前端传过来的数据
         course_list = request.data.get('course')
+        print(request.data)
         user = request.user
 
         # 检测是否有该课程
@@ -300,6 +310,7 @@ class ShoppingView(APIView):
     def delete_func(self, user, course, res):
         # 删除函数，通用部分
         key = SHOPPING_KEY % (user.id, course)
+        print(key)
         if not CONN.exists(key):
             res.code = 1060
             res.error = '选中课程不合法'

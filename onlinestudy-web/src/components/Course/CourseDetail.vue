@@ -221,36 +221,37 @@ export default {
     addShopCart() {
       console.log(this.currentPriceIndex);
       if (this.details.prices[this.currentPriceIndex]) {
-        if (localStorage.getItem("access_token")) {
+        let access_token = localStorage.getItem("access_token");
+        if (access_token) {
           let product = {
-            "course": this.$route.params.detailId,
-            "price_policy": this.details.prices[this.currentPriceIndex].id
+            course: this.$route.params.detailId,
+            price_policy: this.details.prices[this.currentPriceIndex].id,
+            price:this.details.prices[this.currentPriceIndex].price
           };
-          console.log(product)
+
+          console.log(access_token);
           this.$http.shopping(product).then(res => {
             if (!res.error) {
               console.log(res);
-              this.$message('购物车');
+              this.$message({
+                message: this.details.title + ` 已加入购物车`,
+                center: true
+              });
             }
           });
         }
         // 未登录，跳转到登录页面
-        else(
+        else {
           this.$router.push({
-            name:'Login'
-          })
-        )
+            name: "Login"
+          });
+        }
       }
     },
+    // 去购买页面
     toBuy() {
       console.log(this.currentPriceIndex);
       console.log(this.details.prices[this.currentPriceIndex]);
-    }
-  },
-  filters: {
-    filterImg(value) {
-      // 拼接图片地址
-      return `https://${value}`;
     }
   },
   created() {

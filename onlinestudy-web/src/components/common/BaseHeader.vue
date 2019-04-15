@@ -83,7 +83,7 @@ export default {
   methods: {
     shopCartInfo() {
       this.$router.push({
-        name: "purchase.shop"
+        name: "ShopCart"
       });
     },
     enterHandler() {

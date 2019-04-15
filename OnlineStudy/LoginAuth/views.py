@@ -13,6 +13,7 @@ from utils.Auther import Auther
 import redis
 import json
 import uuid
+import hashlib
 
 pc_geetest_id = "64936e8e1ad53dad8bbee6f96224e7d0"
 pc_geetest_key = "8322ed330d370a704a77d8205c94d20f"
@@ -24,6 +25,7 @@ RedisConn = redis.Redis(connection_pool=POOL)
 
 
 class IndexView(APIView):
+    """这是后端测试的接口"""
     authentication_classes = [Auther, ]
 
     def get(self, request):
@@ -52,7 +54,12 @@ class LoginView(APIView):
         res = BaseResponse()
         username = request.data.get('username')
         passwd = request.data.get('passwd')
-        user_obj = Account.objects.filter(username=username, passwd=passwd).first()
+        print(request.data)
+        # 密码加盐
+        hash_key = 'password'
+        passwd = passwd + hash_key
+        passwd_md5 = hashlib.md5(passwd.encode()).hexdigest()
+        user_obj = Account.objects.filter(username=username, passwd=passwd_md5).first()
         if not user_obj:
             res.code = 1030
             res.error = '用户名密码不匹配'

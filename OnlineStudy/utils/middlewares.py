@@ -5,6 +5,6 @@ class MyCors(MiddlewareMixin):
     def process_response(self, requesst, response):
         response['Access-Control-Allow-Origin'] = '*'
         if requesst.method == 'OPTIONS':
-            response["Access-Control-Allow-Headers"] = "content-type"
+            response["Access-Control-Allow-Headers"] = "*"
             response['Access-Control-Allow-Methods'] = 'PUT,DELETE'
         return response

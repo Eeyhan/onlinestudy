@@ -91,4 +91,41 @@ export const settlement = (params) =>{
     return Axios.post('/settlement',params).then(res=>res)
 }
 
+// 结算中心列表数据
+export const settlementList = () =>{
+    return Axios.get('/settlement').then(res=>res.data)
+}
 
+// 更新结算中心数据,选择优惠券
+
+export const Updatesettlement = (params) =>{
+    return Axios.put('/settlment',params).then(res=>res.data)
+}
+
+
+// 虎丘优惠券
+
+export const couponList = () =>{
+    return Axios.get('/coupon').then(res=>res.data)
+}
+
+// 领取优惠券
+
+export const coupon = (params) =>{
+    return Axios.post('/coupon',params).then(res=>res.data)
+}
+
+
+// 删除结算中心,后端已有该接口,不过暂时不需要手动删除
+
+
+// 支付
+export const Payment = (params) =>{
+    return Axios.post('/payment',params).then(res=>res.data)
+}
+
+
+// 删除订单
+export const delPayment = (params) =>{
+    return Axios.delete('/payment',{data:params}).then(res=>res.data)
+}

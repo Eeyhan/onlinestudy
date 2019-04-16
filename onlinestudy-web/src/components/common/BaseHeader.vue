@@ -22,7 +22,10 @@
           @mouseenter="enterHandler"
           @mouseleave="leaveHandler"
         >
-          <span class="el-dropdown-link">学习中心</span>
+          <!-- <span class="count" v-if="userInfo.shop_cart_num == 0">(0)</span>
+          <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span> -->
+          <span class="count" @click="toShoppingCart">购物车</span>
+          <!-- <span class="el-dropdown-link">学习中心</span> -->
           <span class="user">{{userInfo.username}}</span>
           <img :src="userInfo.avatar" alt>
           <ul class="my_account" v-show="isShow">
@@ -43,11 +46,9 @@
               <span class="msg">(40)</span>
               <i>></i>
             </li>
-            <li @click="shopCartInfo">
-              购物车
-              <span class="count" v-if="userInfo.shop_cart_num == 0">(0)</span>
-              <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span>
-              <i>></i>
+            <li @click="toPayment">
+              我的账单
+              
             </li>
             <li @click="logout">
               退出
@@ -81,11 +82,7 @@ export default {
     };
   },
   methods: {
-    shopCartInfo() {
-      this.$router.push({
-        name: "ShopCart"
-      });
-    },
+    
     enterHandler() {
       this.isShow = true;
     },
@@ -103,15 +100,27 @@ export default {
       });
     },
 
+    toShoppingCart(){
+      this.$router.push({
+        name:'ShopCart'
+      })
+    },
+  
+    // 账单中心
+    toPayment(){
+      this.$router.push({
+        name:'Payment'
+      })
+    },
+
     // 退出
     logout() {
       this.$store.dispatch("deleteUserInfo");
-      console.log(this.$store.state.isRemember)
+      console.log(this.$store.state.isRemember);
       // 如果记住密码标志位为false就在退出的同时删除用户信息，否则就不删除
-      if(!this.$store.state.isRemember){
-        localStorage.clear();         
+      if (!this.$store.state.isRemember) {
+        localStorage.clear();
       }
-      
     }
   },
   computed: {

@@ -6,9 +6,12 @@ import CourseDetail from '@/components/Course/CourseDetail'
 import CourseDetailTab from '@/components/Course/CourseDetailTab'
 import LightCourse from '@/components/LightCourse/LightCourse'
 import Degree from '@/components/Degree/Degree'
-import Login from  '@/components/Person/Login' 
-import Register from  '@/components/Person/Register'
-import ShopCart from '@/components/ShopCart/ShopCart'
+import Login from '@/components/Person/Login'
+import Register from '@/components/Person/Register'
+import ShopCart from '@/components/Transaction/ShopCart'
+import Settlement from '@/components/Transaction/Settlement'
+import Payment from '@/components/Transaction/Payment'
+import Coupon from '@/components/Transaction/Coupon'
 
 
 Vue.use(Router)
@@ -62,17 +65,33 @@ export default new Router({
       path: '/Register',
       name: 'Register',
       component: Register
-    },   
+    },
     {
       path: '/Login',
       name: 'Login',
       component: Login
-    }, 
+    },
     {
       path: '/ShopCart',
       name: 'ShopCart',
-      component: ShopCart
+      component: ShopCart,
+
     },
+    {
+      path: '/Settlement',
+      name: 'Settlement',
+      component: Settlement
+    },
+    {
+      path: '/Payment',
+      name: 'Payment',
+      component: Payment
+    },
+    {
+      path:'/coupon',
+      name:'Coupon',
+      component:Coupon
+    }
 
   ]
 })

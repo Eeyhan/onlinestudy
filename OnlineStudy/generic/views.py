@@ -399,6 +399,8 @@ class SettlementView(APIView):
                 valid_period = price_policy_dict[default_price_policy_id]['valid_period']
                 # 拿到价格
                 price = price_policy_dict[default_price_policy_id]['price']
+                # 拿到有效期描述
+                valid_period_display = price_policy_dict[default_price_policy_id]['valid_period_display']
 
                 settlement_info = {
                     'id': course_info['id'],
@@ -406,6 +408,7 @@ class SettlementView(APIView):
                     'course_img': course_info['course_img'],
                     'price': price,
                     'valid_period': valid_period,
+                    'valid_period_display': valid_period_display,
                     'course_coupon_dict': json.dumps(user_coupon_dict, ensure_ascii=False),
                 }
 
@@ -422,7 +425,7 @@ class SettlementView(APIView):
                     CONN.hmset(user_global_coupons, global_settlement_info)
 
                 # 删除购物车数据
-                CONN.delete(key)
+                # CONN.delete(key)
         except Exception as e:
             print(e)
             res.code = 1071
@@ -568,16 +571,21 @@ class PaymentView(APIView):
         balance = request.data.get('balance')
         price = request.data.get('price')
         user = request.user
-        if int(balance) > request.user.balance:
+        if balance and int(balance) > request.user.balance:
             res.code = 1100
             res.error = '抵扣贝里失败，贝里余额不足'
             return Response(res.dict)
+
+        if price:
+            price = eval(price)
+
         user_key = SETTLEMENT_KEY % (user.id, "*")
         user_settlements = CONN.scan_iter(user_key)
 
         total_price = 0
         user_coupon_dict = {}
         global_coupon_dict = {}
+        global_coupon_key = None
         for item in user_settlements:
             settlement_info = CONN.hgetall(item)
             course_id = settlement_info['id']
@@ -623,6 +631,7 @@ class PaymentView(APIView):
         #   1.当前用户本来就没有领取全局优惠券
         #   2.当前用户有全局优惠券但和redis里的数据不匹配
         #   3.正常使用优惠券
+
         # 判断用户是否有优惠券
 
         user_global_coupon = models.CouponDetail.objects.all().filter(account_id=user.id, coupon__coupon_type=0)
@@ -670,6 +679,7 @@ class PaymentView(APIView):
             total_price = 0
         total_price = float('%.2f' % total_price)
         # 最后的检验
+        print(type(price), type(total_price))
         if price != total_price:  # price是前端传来的总价格
             # 说明前端传来的数据不正确
             res.code = 1107
@@ -693,7 +703,8 @@ class PaymentView(APIView):
         for item in user_settlements:
             product.append(CONN.hgetall(item))
             CONN.delete(item)
-        CONN.delete(global_coupon_key)  # 此处不用判断是否有优惠券，redis删除，如果没有值不会报错
+        if global_coupon_key:
+            CONN.delete(global_coupon_key)  # 此处不用判断是否有优惠券，redis删除，如果没有值不会报错
 
         # 更新数据库信息
         user_obj = models.Account.objects.filter(id=user.id)
@@ -787,8 +798,8 @@ class PaymentView(APIView):
 
 
 class CouponDistributionView(APIView):
-    authentication_classes = [Auther, ]
     """优惠券发放接口"""
+    authentication_classes = [Auther, ]
 
     # 优惠券对于用户来说只有查看和获取的功能
 

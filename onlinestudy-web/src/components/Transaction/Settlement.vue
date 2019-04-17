@@ -106,6 +106,7 @@
       <el-button type="primary" @click="toPayment()">立即支付</el-button>
       <h3>总计: ¥{{totalPrice}}</h3>
     </div>
+    <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
   </div>
 </template>
 <script>
@@ -147,7 +148,6 @@ export default {
       }
     },
     isShowHander() {
-      console.log("test");
       this.isShow = !this.isShow;
     },
 
@@ -159,8 +159,7 @@ export default {
       };
     
         // 支付
-      this.$http.Payment(params).then(res => {  
-          console.log(res);        
+      this.$http.Payment(params).then(res => {        
           if(!res.error){
               this.$router.push({
                 name: "Payment"

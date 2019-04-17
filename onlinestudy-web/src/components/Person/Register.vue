@@ -63,7 +63,6 @@ export default {
       },
 
     ReigsterHandler() {
-      console.log(this.validateResult);
       if (this.password !== this.password2) {
         this.open4()
       }else if (!this.validateResult.geetest_challenge) {

@@ -32,7 +32,7 @@
               </p>
               <p class="shopping">
                 <i class="el-icon-goods"></i>
-                <span>加入购物车</span>
+                <span @click="toPrice">加入购物车</span>
               </p>
             </div>
           </div>
@@ -174,7 +174,8 @@ export default {
         { id: 2, title: "学员评价", field: "comment" },
         { id: 3, title: "常见问题", field: "question" }
       ],
-      currentPriceIndex: 0 // 课程套餐
+      currentPriceIndex: 0, // 课程套餐
+      
     };
   },
 
@@ -219,7 +220,6 @@ export default {
 
     // 加入购物车
     addShopCart() {
-      console.log(this.currentPriceIndex);
       if (this.details.prices[this.currentPriceIndex]) {
         let access_token = localStorage.getItem("access_token");
         if (access_token) {
@@ -229,10 +229,8 @@ export default {
             price:this.details.prices[this.currentPriceIndex].price
           };
 
-          console.log(access_token);
           this.$http.shopping(product).then(res => {
             if (!res.error) {
-              console.log(res);
               this.$message({
                 message: this.details.title + ` 已加入购物车`,
                 center: true

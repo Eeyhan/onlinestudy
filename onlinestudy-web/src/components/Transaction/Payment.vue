@@ -2,48 +2,63 @@
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">
       我的订单 &nbsp;
-      <small>共{{this.settlementProduct.length}}门课程</small>
     </h3>
     <div class="row">
       <el-table
         ref="multipleTable"
-        :data="settlementProduct"
+        :data="PaymentOrder"
         tooltip-effect="dark"
         style="width: 100%"
-        @selection-change="handleSelectionChange"
+        
       >
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column label="课程" width="400">
-          <template slot-scope="scope">
-            <img :src="scope.row.course_img" alt>
-            <a href="javascript:void(0);">{{ scope.row.title}}</a>
+        <el-table-column label="商品" width="200">
+          <template >
+            <template slot-scope="scope">
+              {{scope.row}}
+              <img :src="scope.row.course_img" alt>
+              <a href="javascript:void(0);">{{ products.title}}</a>
+            </template>
+            <img :src="products.course_img" alt>
+            <a href="javascript:void(0);">{{ products.title}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="有效期" width="240">
-          <template slot-scope="scope">
-            {{scope.row.valid_period_display}}(此处不能修改套餐)            
-          </template>
+        
+        <el-table-column prop="money" label="交易金额" show-overflow-tooltip width="130">
+          <template >¥{{products.price}}</template>
         </el-table-column>
-        <el-table-column prop="address" label="单价" show-overflow-tooltip width="120">
-          <template slot-scope="scope">¥{{scope.row.price}}</template>
+        <el-table-column prop="valid" label="有效期" show-overflow-tooltip width="130">
+          <template >{{products.valid_period_display}}</template>
         </el-table-column>
 
-        <el-table-column prop="name" label="订单号" width="120">
+        <el-table-column prop="name" label="提交订单时间" width="130">
           <template slot-scope="scope">
-            {{scope.row.valid_period_display}}          
+            {{scope.row.pay_success_time|formatTime}}         
+          </template>
+        </el-table-column>
+        <el-table-column prop="date" label="交易时间" width="130">
+          <template slot-scope="scope">
+            {{scope.row.order_date|formatTime}}           
+          </template>
+        </el-table-column>
+        
+
+        <el-table-column prop="order" label="订单号" width="130">
+          <template slot-scope="scope">
+            {{scope.row.transaction_number}}          
           </template>
         </el-table-column>
 
-        <el-table-column prop="name" label="收货地址" width="120">
+        <el-table-column prop="name" label="收货地址" width="130">
           <template slot-scope="scope">
-            {{scope.row.valid_period_display}}          
+            {{scope.row.user_address}}          
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="操作" width="120">
+        <el-table-column fixed="right" label="操作" width="130">
           <template slot-scope="scope">
             <el-button
-              @click.native.prevent="deleteRow(scope.$index, settlementProduct)"
+              @click.native.prevent="deleteRow(scope.$index, PaymentOrder)"
               type="text"
               size="small"
             >删除</el-button>
@@ -51,10 +66,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="total">
-      <el-button type="primary" @click="buy()">去支付</el-button>
-      <h3>总计: ¥{{totalPrice}}</h3>
-    </div>
+    <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
   </div>
 </template>
 
@@ -66,22 +78,21 @@ export default {
       multipleSelection: [], //存放选中的当前数据
       currentVal: "",
       PaymentOrder: [], // 结算中心订单
-      global_coupon_dict:'',// 全局的优惠券
-      course_coupon_dict:'',// 专项的优惠券
+      products:[]
     };
   },
-  computed: {
-    totalPrice() {
-      let total = 0;
-      this.multipleSelection.forEach((item, index) => {
-        total += parseFloat(item.price);
-      });
-      console.log(total);
-      return total.toFixed(2);
-    }
-  },
+  // computed: {
+  //   totalPrice() {
+  //     let total = 0;
+  //     this.multipleSelection.forEach((item, index) => {
+  //       total += parseFloat(item.price);
+  //     });
+  //     console.log(total);
+  //     return total.toFixed(2);
+  //   }
+  // },
   methods: {
-    // 删除课程
+    // 删除账单
     deleteRow(index, rows) {
       this.$confirm("你确定要删除该订单吗？", "提示", {
         confirmButtonText: "确定",
@@ -92,7 +103,7 @@ export default {
         let params = {
           course: parseInt(rows[index].id)
         };
-        this.$http.delShopping(params).then(res => {
+        this.$http.delPayment(params).then(res => {
           if (!res.error) {
             this.$message({
               message: ` ${res.data}`,
@@ -106,34 +117,25 @@ export default {
       });
     },
 
-    //买东西
-    buy(price, index, shopCartList) {
-      let courseIds = [];
-      this.multipleSelection.forEach((item, index) => {
-        courseIds.push(item.id);
-      });
-
-      let course_list = {
-        course_list: courseIds
-      };
-      // 加入支付中心
-      // this.$http.settlement(course_list).then(res => {
-      //   if (!res.error) {
-      //     // 获取支付中心未支付商品
-      //     this.getSettlement()
-      //   }
-      // });
-    },
     
-    // 获取订单中心列表
-    getsettlementList() {
+    
+    // 获取账单列表
+    getPaymentList() {
       this.$http
-        .settlementList()
+        .PaymentList()
         .then(res => {
           if (!res.error) {
             if(res.data !== 0){              
-              this.settlementProduct = res.data.settlement_info;
-              this.global_coupon_dict = res.data.global_coupon_dict
+              this.PaymentOrder =  Object.values(res.data);
+              this.PaymentOrder.forEach((items,index)=>{
+
+                Object.values(items).forEach((item,i)=>{
+                  if(typeof item == 'object'){
+                    this.products = item
+                  }
+                })
+                
+              })
             }            
           }
         })
@@ -142,14 +144,15 @@ export default {
         });
     },
 
-    // 计算加入的购物车数据
-    handleSelectionChange(val) {
-      console.log(val);
-      this.multipleSelection = val;
+  },
+
+  filters:{
+    formatTime(value){
+      return value.replace("T",' ').split('.')[0]
     }
   },
   created() {
-    this.getsettlementList();
+    this.getPaymentList();
   }
 };
 </script>

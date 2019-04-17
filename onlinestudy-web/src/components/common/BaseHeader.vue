@@ -34,10 +34,6 @@
               <i>></i>
             </li>
             <li>
-              我的订单
-              <i>></i>
-            </li>
-            <li>
               我的优惠券
               <i>></i>
             </li>
@@ -74,9 +70,9 @@ export default {
     return {
       headerList: [
         { id: "1", name: "Home", title: "首页" },
-        { id: "2", name: "Course", title: "体验课程" },
-        { id: "3", name: "LightCourse", title: "专项轻课" },
-        { id: "4", name: "Degree", title: "学位课程" }
+        { id: "2", name: "Course", title: "体验课程" },        
+        { id: "3", name: "Degree", title: "学位课程" },
+        { id: "4", name: "LightCourse", title: "线下面授" },
       ],
       isShow: false
     };
@@ -141,13 +137,13 @@ export default {
   }
 
   // mounted() {
-
   //   console.log(document.getElementsByClassName("el-container")[0]);
   //   // 登录过来跳转的，把顶部的导航栏显示
   //   document
   //     .getElementsByClassName("el-container")[0]
   //     .setAttribute("style", "");
   // }
+  
 };
 </script>
 

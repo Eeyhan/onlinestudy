@@ -107,7 +107,6 @@ export default {
 
     // 记住密码
     rememberMe() {
-      console.log("test.......");
       this.$store.dispatch("rememberUserInfo");
     },
 

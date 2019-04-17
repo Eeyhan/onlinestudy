@@ -1,5 +1,5 @@
 <template>
-  <div class="course-detail-text">
+  <div class="course-detail-text" v-loading="loading">
     <div v-if="courseinfo">
       <h3>课程背景</h3>
       <p>{{courseinfo.why_study}}</p>
@@ -68,7 +68,8 @@ export default {
       courseinfo: "",
       coursechapter: "",
       coursecomment: "",
-      Coursequestion: ""
+      Coursequestion: "",
+      loading:true,
     };
   },
   created() {
@@ -82,7 +83,6 @@ export default {
         .then(res => {
           if (!res.error) {
             this.courseinfo = res.data[0];
-            console.log(this.courseinfo);
           }
         })
         .catch(error => {
@@ -96,7 +96,6 @@ export default {
         .then(res => {
           if (!res.error) {
             this.coursechapter = res.data;
-            console.log(this.coursechapter);
           }
         })
         .catch(error => {
@@ -111,7 +110,6 @@ export default {
         .then(res => {
           if (!res.error) {
             this.coursecomment = res.data;
-            console.log(this.coursecomment);
           }
         })
         .catch(error => {
@@ -125,7 +123,6 @@ export default {
         .then(res => {
           if (!res.error) {
             this.Coursequestion = res.data;
-            console.log(this.Coursequestion);
           }
         })
         .catch(error => {
@@ -159,14 +156,13 @@ export default {
         this.coursecomment = "";
         this.getcourseDetailQuestion();
       }
+      this.loading = false
     }
   },
 
   watch: {
     $route(to, form) {
       // 课程概述
-      console.log(to);
-      console.log(form);
       this.routerHander();
       
     }

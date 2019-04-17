@@ -30,13 +30,13 @@
       </div>
 
       <!-- 课程 -->
-      <div class="course-list" v-loading="loading">
+      <div class="course-list">
         <!-- 这里绑定key为index时因为后端从不同表中传来多个相同的id值的数据，绑定id为有冲突 -->
         <dl v-for="(course,index) in courses" :key="index" @click="coursedetail(course.id)">
           <dt>
             <img :src="course.course_img|filterImg" class="image">
           </dt>
-          <dd>
+          <dd >
             <!-- 课程名 -->
             <div class="name">
               <p>{{course.title}}</p>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -98,8 +98,7 @@ export default {
         { id: 2, title: "价格", query: "price" }
       ],
       category_id: 0,
-      condition_id: 0,
-      loading: true
+      condition_id: 0
     };
   },
   filters: {
@@ -124,17 +123,17 @@ export default {
         // 价格升序
         if (query == "price") {
           // 当筛选条件为price时
-
+          
           // 修改三角形按钮样式
           this.$refs.spantop[0].className = "condtion-i i-top";
           this.$refs.spanbuttom[0].className = "condtion-i i-buttom active";
-        } else {
+        }else {
           this.query_isup = query; // 如果筛选条件不为价格，为hot,做条件缓存
         }
+        
       } else if (this.query_isup == query) {
         //this.query_isup = price  query = price
-        if (query == "price") {
-          // 如果筛选条件为价格,做条件缓存
+        if (query == "price") {  // 如果筛选条件为价格,做条件缓存
           // 价格降序
           this.query_isup = "-price"; // this.query_isup变为初始值
 
@@ -147,7 +146,8 @@ export default {
       }
 
       //最请求后端接口
-      this.GetconditionCourse(this.category_id, this.query_isup);
+      this.GetconditionCourse(this.category_id,this.query_isup)
+      
     },
     coursedetail(courseid) {
       this.$router.push({
@@ -157,39 +157,46 @@ export default {
     },
 
     // 获取分类标签分类
-    Getcategory() {
-      this.$http
-        .category()
-        .then(res => {
-          if (!res.error) {
-            this.categorys = res.data;
-            this.categorys.unshift({ id: 0, title: "全部" });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+    Getcategory(){
+      this.$http.category()
+	  	.then(res=>{
+	  		if (!res.error) {
+          this.categorys = res.data;            			
+	  			this.categorys.unshift({ id: 0, title: "全部" });
+	  		}
+	  	})
+	  	.catch(error=>{
+	  		console.log(error);
+	  	});
     },
 
-    // 获取课程分类下的对应课程
-    GetcategoryTocourse(id) {
-      this.category_id = id;
-      this.$http
-        .categoryTocourse(id, this.query)
-        .then(res => {
-          this.courses = res.data;
-          this.loading = false;
-        })
-        .catch(error => {
-          console.log(error);
+    // 通知
+    open() {
+        const h = this.$createElement;
+
+        this.$notify.info({
+          title: '通知',
+          message:  '学位课程与体验课程的区别就是，你可以学得更好，有导师服务，有问题快速解决',
+          position: 'top-left'
         });
+      },
+
+    // 获取课程分类下的对应课程
+    GetcategoryTocourse(id){
+      this.category_id = id;
+      this.$http.categoryToDegreecourse(id,this.query)
+      .then(res => {
+        this.courses = res.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
     },
 
     // 筛选课程
 
-    GetconditionCourse(category_id, query_isup) {
-      this.$http
-        .conditionCourse(category_id, query_isup)
+    GetconditionCourse(category_id,query_isup){
+      this.$http.conditionDegreeCourse(category_id,query_isup)
         .then(res => {
           this.courses = res.data;
         })
@@ -197,13 +204,18 @@ export default {
           console.log(error);
         });
     }
+
   },
   created() {
-    this.Getcategory();
+    this.Getcategory()
+    
+    
+    
   },
-  mounted() {
+  mounted(){
     // 默认选中全部
-    this.GetcategoryTocourse(0);
+    this.GetcategoryTocourse(0)
+    this.open()
   }
 };
 </script>

@@ -49,7 +49,7 @@
       <el-button type="primary" @click="toSettle()">提交订单</el-button>
       <h3>总计: ¥{{totalPrice}}</h3>
     </div>   
-    
+    <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
   </div>
 </template>
 
@@ -69,7 +69,6 @@ export default {
       this.multipleSelection.forEach((item, index) => {
         total += parseFloat(item.current_price);
       });
-      console.log(total);
       return total.toFixed(2);
     }
   },
@@ -141,7 +140,6 @@ export default {
 
     // 计算加入的购物车数据
     handleSelectionChange(val) {
-      console.log(val);
       this.multipleSelection = val;
     }
   },

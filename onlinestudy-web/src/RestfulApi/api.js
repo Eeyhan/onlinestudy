@@ -28,10 +28,23 @@ export const categoryTocourse = (categoryId, query) => {
     return Axios.get(`/course?cid=${categoryId}&query=${query}`).then(res => res)
 }
 
+
 // 筛选条件的课程
 export const conditionCourse = (category_id, query_isup) => {
     return Axios.get(`/course?cid=${category_id}&query=${query_isup}`).then(res => res)
 }
+
+
+// 课程分类下对应的学位课程 categoryId为0时默认取全部课程
+export const categoryToDegreecourse = (categoryId, query) => {
+    return Axios.get(`/degree?cid=${categoryId}&query=${query}`).then(res => res)
+}
+
+// 筛选条件的学位课程
+export const conditionDegreeCourse = (category_id, query_isup) => {
+    return Axios.get(`/degree?cid=${category_id}&query=${query_isup}`).then(res => res)
+}
+
 
 // 课程详情
 
@@ -103,7 +116,7 @@ export const Updatesettlement = (params) =>{
 }
 
 
-// 虎丘优惠券
+// 获取优惠券
 
 export const couponList = () =>{
     return Axios.get('/coupon').then(res=>res.data)
@@ -125,7 +138,13 @@ export const Payment = (params) =>{
 }
 
 
-// 删除订单
+// 获取账单
+
+export const PaymentList = () =>{
+    return Axios.get('/payment').then(res=>res.data)
+}
+
+// 删除账单
 export const delPayment = (params) =>{
     return Axios.delete('/payment',{data:params}).then(res=>res.data)
 }

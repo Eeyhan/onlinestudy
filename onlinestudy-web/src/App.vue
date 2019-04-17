@@ -2,15 +2,18 @@
   <div id="app">
     <BaseHeader />
     <router-view/>
+    <BaseFooter/>
   </div>
 </template>
 
 <script>
 import BaseHeader from "@/components/common/BaseHeader"; //  导航栏
+import BaseFooter from "@/components/common/BaseFooter"; //  底部栏
 export default {
   name: "App",
   components: {
-    BaseHeader
+    BaseHeader,
+    BaseFooter
   }
 };
 </script>

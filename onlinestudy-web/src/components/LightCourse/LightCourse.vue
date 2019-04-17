@@ -1,5 +1,5 @@
 <template>
-  <h3>专项课程内容</h3>
+  <h3>线下面授，请拨打热线电话：1XXXXXX</h3>
 
 </template>
 

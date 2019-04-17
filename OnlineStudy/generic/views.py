@@ -34,10 +34,11 @@ class CourseView(APIView):
             cid = eval(cid)
         # 是否有课程分类id
         if cid == 0:
-            course = models.Course.objects.all()
+            course = models.Course.objects.filter(degree_course__isnull=True).all()
             course = self.order_query(query, course)
         else:
-            course = models.Course.objects.filter(category_id=cid).all().order_by('category_id')
+            course = models.Course.objects.filter(category_id=cid, degree_course__isnull=True).all().order_by(
+                'category_id')
             course = self.order_query(query, course)
         res = serializers.CourseSerializer(course, many=True)
 
@@ -70,12 +71,51 @@ class CourseView(APIView):
 
 
 class DegreeView(APIView):
-    """课程"""
+    """学位课程"""
 
     def get(self, request):
-        course = models.Course.objects.filter(degree_course__isnull=False).all().order_by('category_id')
+
+        cid = request.query_params.get('cid')
+        query = request.query_params.get('query')
+
+        if cid:
+            cid = eval(cid)
+        # 是否有课程分类id
+        if cid == 0:
+            course = models.Course.objects.filter(degree_course__isnull=False).all()
+            course = self.order_query(query, course)
+        else:
+            course = models.Course.objects.filter(category_id=cid, degree_course__isnull=False).all().order_by(
+                'category_id')
+            course = self.order_query(query, course)
         res = serializers.CourseSerializer(course, many=True)
+
+        # 针对mysql数据库数据去重
+        if query:
+            temp = res.data
+            temp.clear()
+            for item in res.data:
+                if item not in temp:
+                    temp.append(item)
+                else:
+                    continue
+            return Response(temp)
+
         return Response(res.data)
+
+    def order_query(self, query, course):
+        """去重，mysql对distinct不能加参数"""
+        if query:
+            if query == 'hot':
+                course = course.order_by('-study_number')
+            elif query == 'price':
+                course = course.order_by('price_policy__price').distinct()  # 跨表排序升序
+
+            elif query == '-price':
+                course = course.order_by('price_policy__price').distinct()  # 跨表排序降序
+                course = course.reverse()
+                # 拆分去重代码
+        return course
 
 
 class CourseDetailView(APIView):
@@ -559,8 +599,9 @@ class PaymentView(APIView):
                         pay_dict[trade.id]['pay_date'] = order_menu[order_id]['pay_date']
                     res.data = pay_dict
             pay_dict[trade.id]['transaction_number'] = trade.transaction_number
-            pay_dict[trade.id]['user_address'] = trade.user_address
+            pay_dict[trade.id]['user_address'] = str(trade.user_address)
             pay_dict[trade.id]['pay_success_time'] = trade.date
+            pay_dict[trade.id]['id'] = trade.id
 
         return Response(res.dict)
 
@@ -576,8 +617,11 @@ class PaymentView(APIView):
             res.error = '抵扣贝里失败，贝里余额不足'
             return Response(res.dict)
 
-        if price:
+        if price and isinstance(price,str):
+            print(price,type(price))
             price = eval(price)
+
+        # 购买有两种情况，一种直接购买，一种是添加购物车之后购买
 
         user_key = SETTLEMENT_KEY % (user.id, "*")
         user_settlements = CONN.scan_iter(user_key)
@@ -679,7 +723,6 @@ class PaymentView(APIView):
             total_price = 0
         total_price = float('%.2f' % total_price)
         # 最后的检验
-        print(type(price), type(total_price))
         if price != total_price:  # price是前端传来的总价格
             # 说明前端传来的数据不正确
             res.code = 1107
@@ -791,8 +834,9 @@ class PaymentView(APIView):
         return Response(res.dict)
 
     def delete_func(self, user, orders, res):
-        # models.OrderDetail.objects.filter(order__account=user).all().filter(order_id=orders).delete()
-        models.TradeRecord.objects.filter(account=user).all().filter()
+        # 只删交易记录，不删账户余额使用情况，可以正常查询用户的账户余额走向
+        models.OrderDetail.objects.filter(order__account=user).all().filter(order_id=orders).delete()
+        # models.TradeRecord.objects.filter(account=user).all().filter()
         # print(tet)
         return res
 

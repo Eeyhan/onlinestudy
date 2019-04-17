@@ -115,7 +115,7 @@ export default {
   data() {
     return {
       settlements: [],
-      totalPrice: "",
+      totalPrice: 0,
       golbalCoupon: [],
       coupon: [],
       isShow: false,
@@ -131,7 +131,7 @@ export default {
           this.golbalCoupon = res.data.global_coupon_dict;
           //   this.coupon =
           this.settlements.forEach((item, index) => {
-            this.totalPrice += item.price;
+            this.totalPrice += parseFloat(item.price) ;
             this.coupon.push(item.course_coupon_dict);
           });
         }

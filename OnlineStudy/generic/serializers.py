@@ -18,6 +18,17 @@ class CourseSerializer(serializers.ModelSerializer):
     teacher = serializers.SerializerMethodField()
     free_course = serializers.SerializerMethodField()
 
+    """
+    course_img本来可以直接获取，但是django配置了media文件夹+model表设置了ImageField字段
+    在取图片时会自动添加[media/]路径 
+    在真实部署时，注释掉这个部分       
+    """
+    course_img = serializers.SerializerMethodField()
+
+    def get_course_img(self, obj):
+        """获取课程图片"""
+        return str(obj.course_img)
+
     def get_price(self, obj):
         """返回最低价"""
         return obj.price_policy.all().order_by('price').first().price

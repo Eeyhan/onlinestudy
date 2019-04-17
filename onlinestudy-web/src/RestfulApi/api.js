@@ -137,6 +137,11 @@ export const Payment = (params) =>{
     return Axios.post('/payment',params).then(res=>res.data)
 }
 
+// 支付宝支付
+
+export const Alipay = (params) =>{
+    return Axios.post('/pay/pay',params).then(res=>res.data)
+}
 
 // 获取账单
 

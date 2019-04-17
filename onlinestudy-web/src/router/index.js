@@ -40,8 +40,7 @@ export default new Router({
       component: CourseDetail,
       children: [
         {
-          path: '/',
-          name: 'CourseDetailTab',
+          path: '',
           component: CourseDetailTab
         },
         {

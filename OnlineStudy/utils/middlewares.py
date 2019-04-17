@@ -6,5 +6,5 @@ class MyCors(MiddlewareMixin):
         response['Access-Control-Allow-Origin'] = '*'
         if requesst.method == 'OPTIONS':
             response["Access-Control-Allow-Headers"] = "*"
-            response['Access-Control-Allow-Methods'] = 'PUT,DELETE'
+            response['Access-Control-Allow-Methods'] = '*'
         return response

@@ -250,6 +250,20 @@ export default {
     toBuy() {
       console.log(this.currentPriceIndex);
       console.log(this.details.prices[this.currentPriceIndex]);
+      // let params = {
+      //     balance : 0,
+      //     price : this.totalPrice
+      // };
+    
+      //   // 支付
+      // this.$http.Payment(params).then(res => {        
+      //     if(!res.error){
+      //         this.$router.push({
+      //           name: "Payment"
+      //       });
+      //     }
+      // })
+
     }
   },
   created() {

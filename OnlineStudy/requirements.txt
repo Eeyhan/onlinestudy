@@ -1,2 +1,6 @@
 social_django
 django
+djangorestframework
+redis
+geetest
+

@@ -62,9 +62,9 @@ class AlipayView(APIView):
         request = AlipayTradePagePayRequest(biz_model=model)
         # 得到构造的请求，如果http_method是GET，则是一个带完成请求参数的url，如果http_method是POST，则是一段HTML表单片段
         # get请求 用户支付成功后返回的页面请求地址
-        request.return_url = "http://127.0.0.1:8000/alipay_handler"
+        request.return_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
         # post请求 用户支付成功通知商户的请求地址
-        request.notify_url = "http://127.0.0.1:8000/alipay_handler"
+        request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
         response = client.page_execute(request, http_method="GET")
         print("alipay.trade.page.pay response:" + response)
         return redirect(response)

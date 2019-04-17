@@ -1,58 +1,36 @@
 <template>
   <div class="shopping-cart-wrap">
-    <h3 class="shopping-cart-tit">
-      我的订单 &nbsp;
-    </h3>
-    <div class="row">
-      <el-table
-        ref="multipleTable"
-        :data="PaymentOrder"
-        tooltip-effect="dark"
-        style="width: 100%"
-        
-      >
+    <h3 class="shopping-cart-tit">我的订单 &nbsp;</h3>
+    <div class="row">     
+      <el-table ref="multipleTable" :data="PaymentOrder" tooltip-effect="dark" style="width: 100%">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column label="商品" width="200">
-          <template >
+        <el-table-column label="商品" width="450">
+          <el-table-column>
             <template slot-scope="scope">
-              {{scope.row}}
-              <img :src="scope.row.course_img" alt>
-              <a href="javascript:void(0);">{{ products.title}}</a>
+              <div v-for='(item,index) in scope.row' :key="index" v-if="typeof item == 'object'">
+                <img :src="item.course_img" alt>
+                <a href="javascript:void(0);">{{item.title}}</a>
+                <span>单价：￥{{item.price}}</span>
+                <span>有效期{{item.valide_period_display}}</span>
+              </div> 
             </template>
-            <img :src="products.course_img" alt>
-            <a href="javascript:void(0);">{{ products.title}}</a>
-          </template>
-        </el-table-column>
-        
-        <el-table-column prop="money" label="交易金额" show-overflow-tooltip width="130">
-          <template >¥{{products.price}}</template>
-        </el-table-column>
-        <el-table-column prop="valid" label="有效期" show-overflow-tooltip width="130">
-          <template >{{products.valid_period_display}}</template>
+          </el-table-column>
+          
         </el-table-column>
 
         <el-table-column prop="name" label="提交订单时间" width="130">
-          <template slot-scope="scope">
-            {{scope.row.pay_success_time|formatTime}}         
-          </template>
+          <template slot-scope="scope">{{scope.row.pay_success_time|formatTime}}</template>
         </el-table-column>
         <el-table-column prop="date" label="交易时间" width="130">
-          <template slot-scope="scope">
-            {{scope.row.order_date|formatTime}}           
-          </template>
+          <template slot-scope="scope">{{scope.row.order_date|formatTime}}</template>
         </el-table-column>
-        
 
         <el-table-column prop="order" label="订单号" width="130">
-          <template slot-scope="scope">
-            {{scope.row.transaction_number}}          
-          </template>
+          <template slot-scope="scope">{{scope.row.transaction_number}}</template>
         </el-table-column>
 
         <el-table-column prop="name" label="收货地址" width="130">
-          <template slot-scope="scope">
-            {{scope.row.user_address}}          
-          </template>
+          <template slot-scope="scope">{{scope.row.user_address}}</template>
         </el-table-column>
 
         <el-table-column fixed="right" label="操作" width="130">
@@ -77,8 +55,7 @@ export default {
     return {
       multipleSelection: [], //存放选中的当前数据
       currentVal: "",
-      PaymentOrder: [], // 结算中心订单
-      products:[]
+      PaymentOrder: [] // 结算中心订单
     };
   },
   // computed: {
@@ -94,6 +71,7 @@ export default {
   methods: {
     // 删除账单
     deleteRow(index, rows) {
+      console.log(index, rows);
       this.$confirm("你确定要删除该订单吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -101,15 +79,16 @@ export default {
         center: true
       }).then(() => {
         let params = {
-          course: parseInt(rows[index].id)
+          order: parseInt(rows[index].id)
         };
+        console.log(params,rows[index])
         this.$http.delPayment(params).then(res => {
+          console.log(res)
           if (!res.error) {
             this.$message({
               message: ` ${res.data}`,
               center: true
             });
-
             // 先删除后端的数据再删除前端数据
             rows.splice(index, 1);
           }
@@ -117,38 +96,29 @@ export default {
       });
     },
 
-    
-    
     // 获取账单列表
     getPaymentList() {
       this.$http
         .PaymentList()
         .then(res => {
           if (!res.error) {
-            if(res.data !== 0){              
-              this.PaymentOrder =  Object.values(res.data);
-              this.PaymentOrder.forEach((items,index)=>{
-
-                Object.values(items).forEach((item,i)=>{
-                  if(typeof item == 'object'){
-                    this.products = item
-                  }
-                })
-                
-              })
-            }            
+            if (res.data !== 0) {
+              console.log(res.data);
+              this.PaymentOrder = Object.values(res.data);
+            }
           }
+          console.log(this.products);
         })
         .catch(err => {
           console.log(err);
         });
-    },
-
+    }
   },
 
-  filters:{
-    formatTime(value){
-      return value.replace("T",' ').split('.')[0]
+  filters: {
+    //格式化时间
+    formatTime(value) {
+      return value.replace("T", " ").split(".")[0];
     }
   },
   created() {

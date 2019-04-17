@@ -13,4 +13,5 @@ __pycache__
 *.njsproj
 *.sln
 package-lock.json
+.gitignore
 

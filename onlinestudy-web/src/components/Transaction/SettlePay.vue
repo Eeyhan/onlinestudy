@@ -126,7 +126,7 @@
     </div>
 
     <div class="total">
-      <el-button type="primary" @click="toPayment()">立即支付</el-button>
+      <el-button type="primary" @click="toPayment(totalPrice)">立即支付</el-button>
       <h3>总计: ¥{{totalPrice}}</h3>
     </div>
     <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
@@ -216,7 +216,7 @@ export default {
       this.multipleSelection = val;
     },
     // 支付
-    toPayment() {
+    toPayment(totalPrice) {
       let params = {
         balance: 0,
         price: this.totalPrice
@@ -225,9 +225,9 @@ export default {
         money: this.totalPrice
       };
       // 支付
-      this.$http.Alipay(params).then(res => {
+      this.$http.Alipay(aliparams).then(res => {
         console.log(res.data);
-        // location.href = res.data
+        // location.href = res
         // if (!res.error) {
         //   this.$http.Alipay(aliparams).then(res => {
         //     console.log(res.data);

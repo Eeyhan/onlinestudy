@@ -77,7 +77,8 @@ class AlipayView(APIView):
         request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
         response = client.page_execute(request, http_method="GET")
         print("alipay.trade.page.pay response:" + response)
-        return redirect(response)
+        # return redirect(response)
+        return HttpResponse(response)
 
 
 class PayHandlerView(APIView):

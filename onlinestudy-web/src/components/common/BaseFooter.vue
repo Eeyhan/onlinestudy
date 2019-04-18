@@ -23,6 +23,7 @@ export default {
   /* background: #9a9d9a; */
   margin-top: 20px;
   min-height: 170px;
-  padding-top: 20px
+  padding-top: 20px;
+  background: #ede8e8;
 }
 </style>

@@ -91,7 +91,7 @@ export const shoppingList = () => {
 }
 // 加入购物车
 export const shopping = (params) =>{
-    return Axios.post(`/shopping`,params).then(res=>res)
+    return Axios.post(`/shopping`,params).then(res=>res.data)
 }
 
 // 删除购物车
@@ -112,7 +112,13 @@ export const settlementList = () =>{
 // 更新结算中心数据,选择优惠券
 
 export const Updatesettlement = (params) =>{
-    return Axios.put('/settlment',params).then(res=>res.data)
+    return Axios.put('/settlement',params).then(res=>res.data)
+}
+
+// 删除结算中心订单
+
+export const delSettlement = (params) =>{
+    return Axios.delete('/settlement',{data:params}).then(res=>res.data)
 }
 
 
@@ -129,8 +135,6 @@ export const coupon = (params) =>{
 }
 
 
-// 删除结算中心,后端已有该接口,不过暂时不需要手动删除
-
 
 // 支付
 export const Payment = (params) =>{
@@ -138,10 +142,15 @@ export const Payment = (params) =>{
 }
 
 // 支付宝支付
-
 export const Alipay = (params) =>{
-    return Axios.post('/pay/pay',params).then(res=>res.data)
+    return Axios.post('/pay/pay/',params).then(res=>res.data)
 }
+
+// 微信支付 后续完善
+// export const Wechat = (params) =>{
+//     return Axios.post('',params).then(res=>res.data)
+// }
+
 
 // 获取账单
 

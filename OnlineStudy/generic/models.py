@@ -370,6 +370,14 @@ class OrderDetail(models.Model):
     valid_period_display = models.CharField(verbose_name="有效期在订单页显示", max_length=32, null=True, blank=True)
     valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)")
     memo = models.CharField(max_length=255, blank=True, null=True, verbose_name="订单交易备注")
+
+    transaction_type_choices = ((0, '收入'), (1, '支出'), (2, '退款'), (3, "提现"))  # 2 为了处理订单过期未支付时，锁定其余额的回退
+    transaction_type = models.SmallIntegerField(choices=transaction_type_choices, verbose_name='交易类型',default=1)
+    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128)
+    product = models.CharField(max_length=2048, verbose_name='商品名',
+                               null=True, blank=True,
+                               help_text='如果是支出和退款一定写入购买的商品')
+
     content_type = models.ForeignKey(ContentType, on_delete='cascade', verbose_name='关联普通课程或学位')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -377,8 +385,14 @@ class OrderDetail(models.Model):
     def __str__(self):
         return "%s - %s - %s" % (self.order, self.content_type, self.price)
 
+    def save(self, *args, **kwargs):
+        if self.transaction_type not in [1, 2]:
+            if self.product:
+                raise ValueError('支出和退款必须写入购买退款的商品名')
+        super(OrderDetail, self).save(*args, **kwargs)
+
     class Meta:
-        verbose_name = '订单详细'
+        verbose_name = '账单详细'
         verbose_name_plural = "DB_OrderDetail"
         db_table = verbose_name_plural
 
@@ -386,15 +400,9 @@ class OrderDetail(models.Model):
 class TradeRecord(models.Model):
     """余额交易记录表"""
     account = models.ForeignKey(to=Account, on_delete='cascade', verbose_name='用户')
-    amount = models.FloatField(verbose_name="交易金额")
+    amount = models.FloatField(verbose_name="使用账户余额")
     balance = models.FloatField(verbose_name="账户余额")
-    transaction_type_choices = ((0, '收入'), (1, '支出'), (2, '退款'), (3, "提现"))  # 2 为了处理订单过期未支付时，锁定其余额的回退
-    transaction_type = models.SmallIntegerField(choices=transaction_type_choices, verbose_name='交易类型')
-    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128)
     date = models.DateTimeField(auto_now_add=True, verbose_name='交易时间')
-    product = models.CharField(max_length=2048, verbose_name='商品名',
-                               null=True, blank=True,
-                               help_text='如果是支出和退款一定写入购买的商品')
     user_address = models.CharField(max_length=512, verbose_name='收获地址', null=True, blank=True)
     memo = models.CharField(max_length=128, blank=True, null=True, verbose_name="交易备注")
 
@@ -404,10 +412,6 @@ class TradeRecord(models.Model):
         db_table = verbose_name_plural
 
     def __str__(self):
-        return "%s" % self.transaction_number
+        return "%s - %s " % (self.amount,self.balance)
 
-    def save(self, *args, **kwargs):
-        if self.transaction_type not in [1, 2]:
-            if self.product:
-                raise ValueError('支出和退款必须写入购买退款的商品名')
-        super(TradeRecord, self).save(*args, **kwargs)
+

@@ -7,7 +7,7 @@ from alipay.aop.api.request.AlipayTradePagePayRequest import AlipayTradePagePayR
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import render, redirect, HttpResponse
-
+from utils.BaseResponse import BaseResponse
 
 
 def alipayclient():
@@ -43,9 +43,14 @@ class AlipayView(APIView):
 
     def post(self, request):
         money = request.data.get('money')
-        if not money.isdigit():
+        try:
+            if isinstance(money, str):
+                money = float('%.2f' % float(money))
+
+        except Exception as e:
+            print(e)
             return Response('错误，只能是数字')
-        money = int(money)
+
         client = alipayclient()
 
         """
@@ -61,9 +66,14 @@ class AlipayView(APIView):
         model.product_code = "FAST_INSTANT_TRADE_PAY"
         request = AlipayTradePagePayRequest(biz_model=model)
         # 得到构造的请求，如果http_method是GET，则是一个带完成请求参数的url，如果http_method是POST，则是一段HTML表单片段
+
         # get请求 用户支付成功后返回的页面请求地址
-        request.return_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
+        # request.return_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
+        request.return_url = "http://localhost:8080/Order"
+
         # post请求 用户支付成功通知商户的请求地址
+        # request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
+
         request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
         response = client.page_execute(request, http_method="GET")
         print("alipay.trade.page.pay response:" + response)
@@ -73,10 +83,10 @@ class AlipayView(APIView):
 class PayHandlerView(APIView):
     def get(self, request):
         # return_url的回调地址
-        print(request.data)
+        print('get', request.data)
         # 用户支付成功之后回到哪
         return HttpResponse("用户支付成功")
 
     def post(self, request):
-        print(request.data)
+        print('post0', request.data)
         return HttpResponse("notify_url")

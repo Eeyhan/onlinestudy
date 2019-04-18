@@ -1,8 +1,11 @@
 <template>
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">
-      我的购物车 &nbsp;
-      <small>共{{this.shopCartList.length}}门课程</small>
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item :to="{ path: '/ShopCart' }">我的购物车</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/SettlePay' }">结算中心</el-breadcrumb-item>
+      </el-breadcrumb>
+      <small>共{{this.shopCartList.length}}个商品</small>
     </h3>
     <div class="row">
       <el-table
@@ -40,16 +43,22 @@
               @click.native.prevent="deleteRow(scope.$index, shopCartList)"
               type="text"
               size="small"
-            >删除</el-button>
+            >
+              <i class="el-icon-delete"></i>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-row class="demo-autocomplete">
+        <el-input :span="12" v-model="address" placeholder="请输入收货地址"></el-input>
+        <el-input :span="12" v-model="phone" placeholder="请输入联系电话"></el-input>
+      </el-row>
     </div>
+
     <div class="total">
       <el-button type="primary" @click="toSettle()">提交订单</el-button>
       <h3>总计: ¥{{totalPrice}}</h3>
-    </div>   
-    <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
+    </div>
   </div>
 </template>
 
@@ -60,7 +69,9 @@ export default {
     return {
       multipleSelection: [], //存放选中的当前数据
       shopCartList: [],
-      currentVal: ""
+      currentVal: "",
+      address: "",
+      phone: ""
     };
   },
   computed: {
@@ -85,8 +96,8 @@ export default {
           course: parseInt(rows[index].id)
         };
         this.$http.delShopping(params).then(res => {
-          
           if (!res.error) {
+            console.log(res)
             this.$message({
               message: ` ${res.data}`,
               center: true
@@ -99,7 +110,7 @@ export default {
       });
     },
 
-    //买东西
+    //去结算中心
     toSettle(price, index, shopCartList) {
       let courseIds = [];
       this.multipleSelection.forEach((item, index) => {
@@ -115,8 +126,7 @@ export default {
         if (!res.error) {
           // 去结算中心组件
           this.$router.push({
-            name: "Settlement"           
-
+            name: "SettlePay"
           });
         }
       });
@@ -187,7 +197,7 @@ select {
 .total {
   width: 1200px;
   margin: 0 auto;
-  /*display: flex;*/
+  margin-bottom: 82px;
   /*justify-content:flex-end;*/
 }
 .shopping-cart-wrap .total button {
@@ -201,5 +211,14 @@ select {
   width: 100px;
   height: 30px;
   margin-top: 30px;
+}
+
+.el-input {
+  width: 600px !important;
+  margin: 22px auto;
+}
+
+.el-breadcrumb{
+  margin-left: 40px;
 }
 </style>

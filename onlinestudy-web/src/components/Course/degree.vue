@@ -176,7 +176,7 @@ export default {
 
         this.$notify.info({
           title: '通知',
-          message:  '学位课程与体验课程的区别就是，你可以学得更好，有导师服务，有问题快速解决',
+          message:  '学位课程与体验课程的区别就是，课程是零基础开始的，知识点比较系统，你可以学得更好，有导师服务，有问题快速解决',
           position: 'top-left'
         });
       },

@@ -24,7 +24,7 @@
         >
           <!-- <span class="count" v-if="userInfo.shop_cart_num == 0">(0)</span>
           <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span> -->
-          <span class="count" @click="toShoppingCart">购物车</span>
+          <span class="count" @click="toShoppingCart"> <i class="el-icon-goods"></i> 购物车</span>
           <!-- <span class="el-dropdown-link">学习中心</span> -->
           <span class="user">{{userInfo.username}}</span>
           <img :src="userInfo.avatar" alt>
@@ -42,7 +42,7 @@
               <span class="msg">(40)</span>
               <i>></i>
             </li>
-            <li @click="toPayment">
+            <li @click="toOrder">
               我的账单
               
             </li>
@@ -103,9 +103,9 @@ export default {
     },
   
     // 账单中心
-    toPayment(){
+    toOrder(){
       this.$router.push({
-        name:'Payment'
+        name:'Order'
       })
     },
 

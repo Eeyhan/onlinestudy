@@ -361,7 +361,7 @@ class ShoppingView(APIView):
 
 
 class SettlementView(APIView):
-    """结算"""
+    """订单结算"""
     authentication_classes = [Auther, ]
 
     def get(self, request):
@@ -389,83 +389,16 @@ class SettlementView(APIView):
         res = BaseResponse()
         # 拿到前端传来的课程id数据
         course_list = request.data.get('course_list')
+        print(course_list)
         user = request.user
         try:
-            for course_id in course_list:
-                # 检验redis数据库里是否存在，如果存在取出对应优惠券
-                key = SHOPPING_KEY % (user.id, course_id)
-                if not CONN.exists(key):
-                    res.code = 1070
-                    res.error = '课程id不合法'
-                    return Response(res.dict)
-                user_coupons = models.CouponDetail.objects.filter(
-                    account_id=user.id,
-                    status=0,
-                    coupon__start_time__lte=now(),
-                    coupon__end_time__gte=now(),
-                ).all()
-                # 构建数据
-                user_coupon_dict = {}
-                user_global_coupon_dict = {}
-                # 筛选优惠券是全局优惠券还是专项优惠券
-                for coupon_record in user_coupons:
-                    coupon = coupon_record.coupon
-                    if coupon.object_id == course_id:  # 专项优惠券
-                        user_coupon_dict[coupon.id] = {
-                            'id': coupon.id,
-                            'title': coupon.title,
-                            'coupon_type': coupon.get_coupon_type_display(),
-                            'equal_money': coupon.equal_money,
-                            'off_percent': coupon.off_percent,
-                            'minimum_consume': coupon.minimum_consume
-                        }
+            # 因为前段传来的有单个和多个，所以做了解耦
+            if isinstance(course_list, int):
+                res = self.post_func(user.id, course_list, res)
+            else:
+                for course_id in course_list:
+                    res = self.post_func(user.id, course_id, res)
 
-                    elif coupon.object_id is None:  # 全局优惠券
-                        user_global_coupon_dict[coupon.id] = {
-                            'id': coupon.id,
-                            'title': coupon.title,
-                            'coupon_type': coupon.get_coupon_type_display(),
-                            'equal_money': coupon.equal_money,
-                            'off_percent': coupon.off_percent,
-                            'minimum_consume': coupon.minimum_consume
-                        }
-                # 去购物车信息里取对应课程信息
-                course_info = CONN.hgetall(key)
-                # 拿到价格策略字典
-                price_policy_dict = json.loads(course_info['price_policy_dict'])
-                # 拿到默认选中价格策略
-                default_price_policy_id = course_info['default_price_policy']
-                # 拿到有效期
-                valid_period = price_policy_dict[default_price_policy_id]['valid_period']
-                # 拿到价格
-                price = price_policy_dict[default_price_policy_id]['price']
-                # 拿到有效期描述
-                valid_period_display = price_policy_dict[default_price_policy_id]['valid_period_display']
-
-                settlement_info = {
-                    'id': course_info['id'],
-                    'title': course_info['title'],
-                    'course_img': course_info['course_img'],
-                    'price': price,
-                    'valid_period': valid_period,
-                    'valid_period_display': valid_period_display,
-                    'course_coupon_dict': json.dumps(user_coupon_dict, ensure_ascii=False),
-                }
-
-                # 存入redis数据
-                user_settlements = SETTLEMENT_KEY % (user.id, course_id)
-                user_global_coupons = GLOBAL_COUPON_KEY % user.id
-                CONN.hmset(user_settlements, settlement_info)
-
-                if user_global_coupon_dict:
-                    # 多套了一层，不然redis报错，不能内层直接套一个字典
-                    global_settlement_info = {
-                        'global_course_coupon_dict': json.dumps(user_global_coupon_dict, ensure_ascii=False)
-                    }
-                    CONN.hmset(user_global_coupons, global_settlement_info)
-
-                # 删除购物车数据
-                # CONN.delete(key)
         except Exception as e:
             print(e)
             res.code = 1071
@@ -474,6 +407,87 @@ class SettlementView(APIView):
         else:
             res.data = '加入结算中心成功'
             return Response(res.dict)
+
+    def post_func(self, user_id, course_id, res):
+
+        """post方法的公共操作"""
+
+        # 检验redis数据库里是否存在，如果存在取出对应优惠券
+        key = SHOPPING_KEY % (user_id, course_id)
+        if not CONN.exists(key):
+            res.code = 1070
+            res.error = '课程id不合法'
+            return Response(res.dict)
+        user_coupons = models.CouponDetail.objects.filter(
+            account_id=user_id,
+            status=0,
+            coupon__start_time__lte=now(),
+            coupon__end_time__gte=now(),
+        ).all()
+        # 构建数据
+        user_coupon_dict = {}
+        user_global_coupon_dict = {}
+        # 筛选优惠券是全局优惠券还是专项优惠券
+        for coupon_record in user_coupons:
+            coupon = coupon_record.coupon
+            if coupon.object_id == course_id:  # 专项优惠券
+                user_coupon_dict[coupon.id] = {
+                    'id': coupon.id,
+                    'title': coupon.title,
+                    'coupon_type': coupon.get_coupon_type_display(),
+                    'equal_money': coupon.equal_money,
+                    'off_percent': coupon.off_percent,
+                    'minimum_consume': coupon.minimum_consume
+                }
+
+            elif coupon.object_id is None:  # 全局优惠券
+                user_global_coupon_dict[coupon.id] = {
+                    'id': coupon.id,
+                    'title': coupon.title,
+                    'coupon_type': coupon.get_coupon_type_display(),
+                    'equal_money': coupon.equal_money,
+                    'off_percent': coupon.off_percent,
+                    'minimum_consume': coupon.minimum_consume
+                }
+        # 去购物车信息里取对应课程信息
+        course_info = CONN.hgetall(key)
+        # 拿到价格策略字典
+        price_policy_dict = json.loads(course_info['price_policy_dict'])
+        # 拿到默认选中价格策略
+        default_price_policy_id = course_info['default_price_policy']
+        # 拿到有效期
+        valid_period = price_policy_dict[default_price_policy_id]['valid_period']
+        # 拿到价格
+        price = price_policy_dict[default_price_policy_id]['price']
+        # 拿到有效期描述
+        valid_period_display = price_policy_dict[default_price_policy_id]['valid_period_display']
+
+        settlement_info = {
+            'id': course_info['id'],
+            'title': course_info['title'],
+            'course_img': course_info['course_img'],
+            'price': price,
+            'valid_period': valid_period,
+            'valid_period_display': valid_period_display,
+            'course_coupon_dict': json.dumps(user_coupon_dict, ensure_ascii=False),
+        }
+
+        # 存入redis数据
+        user_settlements = SETTLEMENT_KEY % (user_id, course_id)
+        user_global_coupons = GLOBAL_COUPON_KEY % user_id
+        CONN.hmset(user_settlements, settlement_info)
+
+        if user_global_coupon_dict:
+            # 多套了一层，不然redis报错，不能内层直接套一个字典
+            global_settlement_info = {
+                'global_course_coupon_dict': json.dumps(user_global_coupon_dict, ensure_ascii=False)
+            }
+            CONN.hmset(user_global_coupons, global_settlement_info)
+
+        # 删除购物车数据
+        CONN.delete(key)
+
+        return res
 
     def put(self, request):
         res = BaseResponse()
@@ -512,6 +526,7 @@ class SettlementView(APIView):
         res = BaseResponse()
         user_id = request.user.pk
         course_list = request.data.get('course')
+        print(course_list)
         if not isinstance(course_list, int):
             for course in course_list:
                 res = self.delete_func(user_id, course, res)
@@ -532,10 +547,10 @@ class SettlementView(APIView):
             CONN.delete(key)
 
         if global_key:
-            if not CONN.exists(global_key):
-                res.code = 1091
-                res.error = '全局优惠券id不合法'
-            CONN.delete(global_key)
+            if CONN.exists(global_key):
+                # res.code = 1091
+                # res.error = '全局优惠券id不合法'
+                CONN.delete(global_key)
         return res
 
 
@@ -569,40 +584,36 @@ class PaymentView(APIView):
 
         res = BaseResponse()
         user_trades = models.TradeRecord.objects.filter(account=request.user).all()
-        user_order = models.OrderDetail.objects.filter(order__account=request.user).all()
+        user_orders = models.OrderDetail.objects.filter(order__account=request.user).all()
 
         pay_dict = {}
         # 商品数量
-        order_menu = {}
-        for order in user_order:
-            order_menu[order.object_id] = {
-                'real_price': order.price,
-                'order_date': order.order.date,
-                'pay_date': order.order.pay_time
-            }
-
+        trade_menu = {}
         for trade in user_trades:
-            product = eval(trade.product)
-
+            trade_menu[trade.id] = {
+                'user_address': trade.user_address,
+                'use_balance': trade.amount,
+                'pay_date': trade.date
+            }
+        for order in user_orders:
+            product = eval(order.product)
             # print(product)
-            pay_dict[trade.id] = {}
+            pay_dict[order.id] = {}
             for item in product:
                 brief = models.Course.objects.filter(id=int(item['id'])).first().coursedetail.brief
+                pay_dict[order.id][item['id']] = item
+                pay_dict[order.id][item['id']]['brief'] = brief
 
-                pay_dict[trade.id][item['id']] = item
-                pay_dict[trade.id][item['id']]['brief'] = brief
+                for trade_id in trade_menu:
+                    pay_dict[order.id][item['id']]['use_balance'] = trade_menu[trade_id]['use_balance']
+                    pay_dict[order.id]['user_address'] = str(trade_menu[trade_id]['user_address'])
 
-                for order_id in order_menu:
-                    if int(order_id) == int(item['id']):
-                        pay_dict[trade.id][item['id']]['real_price'] = order_menu[order_id]['real_price']
-                        pay_dict[trade.id]['order_date'] = order_menu[order_id]['order_date']
-                        pay_dict[trade.id]['pay_date'] = order_menu[order_id]['pay_date']
-                    res.data = pay_dict
-            pay_dict[trade.id]['transaction_number'] = trade.transaction_number
-            pay_dict[trade.id]['user_address'] = str(trade.user_address)
-            pay_dict[trade.id]['pay_success_time'] = trade.date
-            pay_dict[trade.id]['id'] = trade.id
-
+            pay_dict[order.id]['transaction_number'] = order.transaction_number
+            pay_dict[order.id]['create_order_time'] = order.order.date
+            pay_dict[order.id]['pay_time'] = order.order.pay_time
+            pay_dict[order.id]['id'] = order.id
+        res.data = pay_dict
+        print(res.data)
         return Response(res.dict)
 
     def post(self, request):
@@ -617,8 +628,8 @@ class PaymentView(APIView):
             res.error = '抵扣贝里失败，贝里余额不足'
             return Response(res.dict)
 
-        if price and isinstance(price,str):
-            print(price,type(price))
+        if price and isinstance(price, str):
+            print(price, type(price))
             price = eval(price)
 
         # 购买有两种情况，一种直接购买，一种是添加购物车之后购买
@@ -755,11 +766,12 @@ class PaymentView(APIView):
 
         # 用余额交易
         models.TradeRecord.objects.create(account_id=user.id, amount=balance,
-                                          transaction_type=1, balance=user_obj.first().balance,
-                                          transaction_number='pay' + str(time.time()), product=product)
+                                          balance=user_obj.first().balance,
+                                          )
         # 用其他方式交易
         # 获取交易类型
-        order_obj = models.Order.objects.create(payment_type=0, account_id=user.id, payment_amount=total_price,
+        order_obj = models.Order.objects.create(payment_type=0, account_id=user.id,
+                                                payment_amount=total_price,
                                                 status=0, pay_time=now())
 
         for item in product:
@@ -772,14 +784,18 @@ class PaymentView(APIView):
                     real_price = price - value['equal_money']
                 models.OrderDetail.objects.create(order=order_obj, original_price=item['price'],
                                                   price=real_price,
+                                                  transaction_type=1,
+                                                  transaction_number='pay' + str(time.time()),
                                                   valid_period=item['valid_period'],
-                                                  content_object=pay_course_obj)
+                                                  content_object=pay_course_obj, product=product)
             # 没有优惠券
             else:
                 models.OrderDetail.objects.create(order=order_obj, original_price=item['price'],
                                                   price=price,
+                                                  transaction_type=1,
+                                                  transaction_number='pay' + str(time.time()),
                                                   valid_period=item['valid_period'],
-                                                  content_object=pay_course_obj)
+                                                  content_object=pay_course_obj, product=product)
 
         return Response(res.dict)
 
@@ -824,20 +840,22 @@ class PaymentView(APIView):
         """删除账单"""
         res = BaseResponse()
         orders = request.data.get('order')
+        print(orders)
         user = request.user
         if not isinstance(orders, int):
             for order_id in orders:
                 res = self.delete_func(user, order_id, res)
         else:
+
             res = self.delete_func(user, orders, res)
         res.data = '账单删除成功'
         return Response(res.dict)
 
     def delete_func(self, user, orders, res):
-        # 只删交易记录，不删账户余额使用情况，可以正常查询用户的账户余额走向
-        models.OrderDetail.objects.filter(order__account=user).all().filter(order_id=orders).delete()
+        """只删交易记录，不删账户余额使用情况，可以正常查询用户的账户余额走向"""
+        models.OrderDetail.objects.filter(order__account=user).all().filter(id=orders).delete()
         # models.TradeRecord.objects.filter(account=user).all().filter()
-        # print(tet)
+
         return res
 
 

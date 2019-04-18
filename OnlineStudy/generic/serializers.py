@@ -15,6 +15,7 @@ class CourseSerializer(serializers.ModelSerializer):
     status = serializers.CharField(source='get_status_display')
     lesson = serializers.CharField(source='coursedetail.lesson')
     price = serializers.SerializerMethodField()
+    price_policy = serializers.SerializerMethodField()
     teacher = serializers.SerializerMethodField()
     free_course = serializers.SerializerMethodField()
 
@@ -24,6 +25,10 @@ class CourseSerializer(serializers.ModelSerializer):
     在真实部署时，注释掉这个部分       
     """
     course_img = serializers.SerializerMethodField()
+
+    def get_price_policy(self, obj):
+        """获取价格策略"""
+        return obj.price_policy.all().order_by('price').first().id
 
     def get_course_img(self, obj):
         """获取课程图片"""
@@ -45,7 +50,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Course
         fields = ['id', 'title', 'course_img', 'status', 'study_number', 'price',
-                  'lesson', 'teacher', 'free_course']
+                  'price_policy', 'lesson', 'teacher', 'free_course']
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):

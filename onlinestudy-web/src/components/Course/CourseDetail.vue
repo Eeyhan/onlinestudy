@@ -119,7 +119,7 @@
                 class="teacher-info"
               >
                 <div class="recommend_course clearfix">
-                  <img :src="course.course_img|filterImg">
+                  <img :src="course.course_img">
                   <p>{{course.title}}</p>
                   <p>{{course.brief}}</p>
                 </div>
@@ -174,8 +174,7 @@ export default {
         { id: 2, title: "学员评价", field: "comment" },
         { id: 3, title: "常见问题", field: "question" }
       ],
-      currentPriceIndex: 0, // 课程套餐
-      
+      currentPriceIndex: 0 // 课程套餐
     };
   },
 
@@ -226,7 +225,7 @@ export default {
           let product = {
             course: this.$route.params.detailId,
             price_policy: this.details.prices[this.currentPriceIndex].id,
-            price:this.details.prices[this.currentPriceIndex].price
+            price: this.details.prices[this.currentPriceIndex].price
           };
 
           this.$http.shopping(product).then(res => {
@@ -246,24 +245,43 @@ export default {
         }
       }
     },
+
     // 去购买页面
     toBuy() {
-      console.log(this.currentPriceIndex);
-      console.log(this.details.prices[this.currentPriceIndex]);
-      // let params = {
-      //     balance : 0,
-      //     price : this.totalPrice
-      // };
-    
-      //   // 支付
-      // this.$http.Payment(params).then(res => {        
-      //     if(!res.error){
-      //         this.$router.push({
-      //           name: "Payment"
-      //       });
-      //     }
-      // })
+      if (this.details.prices[this.currentPriceIndex]) {
+        let access_token = localStorage.getItem("access_token");
+        if (access_token) {
+          let product = {
+            course: this.$route.params.detailId,
+            price_policy: this.details.prices[this.currentPriceIndex].id,
+            price: this.details.prices[this.currentPriceIndex].price
+          };
+          this.$http.shopping(product).then(res => {
+            if (!res.error) {
+              let course_list = {
+                course_list: this.$route.params.detailId,
+              };
 
+              console.log(course_list)
+              // 支付
+              this.$http.settlement(course_list).then(res => {
+                if (!res.error) {
+                  // 去结算中心组件
+                  this.$router.push({
+                    name: "SettlePay"
+                  });
+                }
+              });
+            }
+          });
+        }
+        // 未登录，跳转到登录页面
+        else {
+          this.$router.push({
+            name: "Login"
+          });
+        }
+      }
     }
   },
   created() {

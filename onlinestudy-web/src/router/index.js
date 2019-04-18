@@ -9,8 +9,8 @@ import Degree from '@/components/Course/Degree'
 import Login from '@/components/Person/Login'
 import Register from '@/components/Person/Register'
 import ShopCart from '@/components/Transaction/ShopCart'
-import Settlement from '@/components/Transaction/Settlement'
-import Payment from '@/components/Transaction/Payment'
+import SettlePay from '@/components/Transaction/SettlePay'
+import Order from '@/components/Transaction/Order'
 import Coupon from '@/components/Transaction/Coupon'
 
 
@@ -77,14 +77,14 @@ export default new Router({
 
     },
     {
-      path: '/Settlement',
-      name: 'Settlement',
-      component: Settlement
+      path: '/SettlePay',
+      name: 'SettlePay',
+      component: SettlePay
     },
     {
-      path: '/Payment',
-      name: 'Payment',
-      component: Payment
+      path: '/Order',
+      name: 'Order',
+      component: Order
     },
     {
       path:'/coupon',

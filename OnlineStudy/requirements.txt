@@ -3,4 +3,6 @@ django
 djangorestframework
 redis
 geetest
+alipay-sdk-python
+django-cors-headers
 

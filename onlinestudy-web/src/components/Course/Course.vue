@@ -32,20 +32,20 @@
       <!-- 课程 -->
       <div class="course-list" v-loading="loading">
         <!-- 这里绑定key为index时因为后端从不同表中传来多个相同的id值的数据，绑定id为有冲突 -->
-        <dl v-for="(course,index) in courses" :key="index" @click="coursedetail(course.id)">
-          <dt>
+        <dl v-for="(course,index) in courses" :key="index">
+          <dt  @click="coursedetail(course.id)">
             <img :src="course.course_img|filterImg" class="image">
           </dt>
           <dd>
             <!-- 课程名 -->
-            <div class="name">
+            <div class="name"  @click="coursedetail(course.id)">
               <p>{{course.title}}</p>&nbsp;&nbsp;&nbsp;&nbsp;
               <p>
                 <span>{{course.status}}</span>
               </p>
             </div>
 
-            <div class="teacher">
+            <div class="teacher"  @click="coursedetail(course.id)">
               <p v-for="teacher in course.teacher" :key="teacher.id">
                 {{teacher.username}}
                 {{teacher.title}}
@@ -54,7 +54,7 @@
                 <span>总课时:{{course.lesson}}&nbsp;学习人数:{{course.study_number}}</span>
               </p>
             </div>
-            <div>
+            <div  @click="coursedetail(course.id)">
               <ul>
                 <li v-for="(free,index) in course.free_course" :key="free.id">
                   <p>
@@ -66,13 +66,13 @@
                 </li>
               </ul>
             </div>
-            <span></span>
-            <div></div>
+            <span  @click="coursedetail(course.id)"></span>
+            <div  @click="coursedetail(course.id)"></div>
             <div class="price">
-              <span class="discount" v-if="course.price==0">限时免费</span>
-              <span class="discount" v-else>限时折扣</span>
-              <span class="present-price">￥ {{course.price}}</span>
-              <span class="discount-pay">立即购买</span>
+              <span class="discount" v-if="course.price==0"  @click="coursedetail(course.id)">限时免费</span>
+              <span class="discount" v-else  @click="coursedetail(course.id)">限时折扣</span>
+              <span class="present-price"  @click="coursedetail(course.id)">￥ {{course.price}}</span>
+              <span class="discount-pay" @click="toBuy(course)">立即购买</span>
             </div>
           </dd>
         </dl>
@@ -149,6 +149,8 @@ export default {
       //最请求后端接口
       this.GetconditionCourse(this.category_id, this.query_isup);
     },
+
+    // 跳转到课程
     coursedetail(courseid) {
       this.$router.push({
         name: "CourseDetail",
@@ -196,6 +198,42 @@ export default {
         .catch(error => {
           console.log(error);
         });
+    },
+
+    // 跳转购买
+    toBuy(course) {
+      let access_token = localStorage.getItem("access_token");
+      if (access_token) {
+        let product = {
+          course: course.id,
+          price_policy: course.price_policy,
+          price: course.price
+        };
+        this.$http.shopping(product).then(res => {
+          if (!res.error) {
+            console.log(res);
+            let course_list = {
+              course_list: course.id
+            };
+            console.log(course_list);
+            // 支付
+            this.$http.settlement(course_list).then(res => {
+              if (!res.error) {
+                // 去结算中心组件
+                this.$router.push({
+                  name: "SettlePay"
+                });
+              }
+            });
+          }
+        });
+      }
+      // 未登录，跳转到登录页面
+      else {
+        this.$router.push({
+          name: "Login"
+        });
+      }
     }
   },
   created() {

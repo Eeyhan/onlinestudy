@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<form method="post">
+<form method="post" action="http://127.0.0.1:8000/api/v1/pay/pay/">
     {% csrf_token %}
     <label for="money">金额：</label>
     <input type="text" placeholder="请输入充值金额" id="money" name="money">

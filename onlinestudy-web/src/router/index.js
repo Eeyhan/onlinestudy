@@ -79,7 +79,8 @@ export default new Router({
     {
       path: '/SettlePay',
       name: 'SettlePay',
-      component: SettlePay
+      component: SettlePay,
+
     },
     {
       path: '/Order',
@@ -87,9 +88,9 @@ export default new Router({
       component: Order
     },
     {
-      path:'/coupon',
-      name:'Coupon',
-      component:Coupon
+      path: '/coupon',
+      name: 'Coupon',
+      component: Coupon
     }
 
   ]

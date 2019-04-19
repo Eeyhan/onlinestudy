@@ -34,9 +34,7 @@
               @click.native.prevent="deleteRow(scope.$index, settlements)"
               type="text"
               size="small"
-            >
-              取消订单
-            </el-button>
+            >取消订单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -126,9 +124,17 @@
     </div>
 
     <div class="total">
-      <el-button type="primary" @click="toPayment(totalPrice)">立即支付</el-button>
-      <h3>总计: ¥{{totalPrice}}</h3>
+      <form method="post" action="http://127.0.0.1:8000/api/v1/pay/pay/">
+        <!-- <el-button type="primary" @click="toPayment(totalPrice)">立即支付</el-button>
+
+        <h3>总计: ¥{{totalPrice}}</h3>-->
+        <label for="money">总计：￥</label>
+        <el-input type="text" name="money" :value="totalPrice" id="money"></el-input>
+        <el-button type="primary" native-type="submit" @click="onsumbit">立即支付</el-button>
+      </form>
     </div>
+    <router-view></router-view>
+
     <el-pagination background layout="prev, pager, next" :total="80"></el-pagination>
   </div>
 </template>
@@ -143,7 +149,8 @@ export default {
       multipleSelection: [], //存放选中的当前数据
       isShow: false,
       imgIsShow1: true,
-      imgIsShow2: false
+      imgIsShow2: false,
+      alipaylink: ""
     };
   },
   computed: {
@@ -156,14 +163,13 @@ export default {
     }
   },
   methods: {
-
     // 获取订单中心数据
     getSettlement() {
       this.$http.settlementList().then(res => {
         if (!res.error) {
           this.settlements = res.data.settlement_info;
           this.golbalCoupon = res.data.global_coupon_dict;
-          
+
           //   当前用户获得的优惠券
           this.settlements.forEach((item, index) => {
             this.coupon.push(item.course_coupon_dict);
@@ -173,7 +179,7 @@ export default {
     },
 
     deleteRow(index, rows) {
-      console.log(index,rows)
+      console.log(index, rows);
       this.$confirm("你确定要取消订单吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -185,7 +191,7 @@ export default {
         };
         this.$http.delSettlement(params).then(res => {
           if (!res.error) {
-            console.log(res)
+            console.log(res);
             this.$message({
               message: ` ${res.data}`,
               center: true
@@ -216,26 +222,16 @@ export default {
       this.multipleSelection = val;
     },
     // 支付
-    toPayment(totalPrice) {
+    onsumbit(totalPrice) {
       let params = {
         balance: 0,
         price: this.totalPrice
       };
-      let aliparams = {
-        money: this.totalPrice
-      };
+
       // 支付
-      this.$http.Alipay(aliparams).then(res => {
-        console.log(res.data);
-        // location.href = res
-        // if (!res.error) {
-        //   this.$http.Alipay(aliparams).then(res => {
-        //     console.log(res.data);
-        //     this.$router.push({
-        //       name: "Order"
-        //     });
-        //   });
-        // }
+
+      this.$http.Payment(params).then(res => {
+        console.log(res);
       });
     }
   },
@@ -284,6 +280,7 @@ select {
 .total {
   width: 1200px;
   margin: 0 auto;
+  margin-bottom: 100px;
   /*display: flex;*/
   /*justify-content:flex-end;*/
 }
@@ -353,6 +350,30 @@ select {
 
 .el-breadcrumb {
   margin-left: 40px;
+}
+
+form {
+  width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+form label {
+  position: absolute;
+  margin-left: 350px;
+  margin-top: 31px;
+}
+.el-input {
+  margin-left: 391px;
+  min-width: 96px;
+  position: absolute;
+  margin-top: 20px;
+  font-size: 19px;
+  max-width: 100px;
+}
+
+.el-input input {
+  color: red;
 }
 </style>
 

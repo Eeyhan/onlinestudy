@@ -42,6 +42,7 @@ class AlipayView(APIView):
         return render(request, 'pay.html')
 
     def post(self, request):
+        print(request.data)
         money = request.data.get('money')
         try:
             if isinstance(money, str):
@@ -50,7 +51,7 @@ class AlipayView(APIView):
         except Exception as e:
             print(e)
             return Response('错误，只能是数字')
-
+        print(money)
         client = alipayclient()
 
         """
@@ -68,26 +69,26 @@ class AlipayView(APIView):
         # 得到构造的请求，如果http_method是GET，则是一个带完成请求参数的url，如果http_method是POST，则是一段HTML表单片段
 
         # get请求 用户支付成功后返回的页面请求地址
-        # request.return_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
-        request.return_url = "http://localhost:8080/Order"
+        request.return_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
+        # request.return_url = "http://localhost:8080/Order"
 
         # post请求 用户支付成功通知商户的请求地址
-        # request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
-
         request.notify_url = "http://127.0.0.1:8000/api/v1/pay/alipay_handler"
+
+        # request.notify_url = "http://localhost:8080/Order"
         response = client.page_execute(request, http_method="GET")
         print("alipay.trade.page.pay response:" + response)
-        # return redirect(response)
-        return HttpResponse(response)
+        return redirect(response)
+        # return HttpResponse(response)
 
 
 class PayHandlerView(APIView):
     def get(self, request):
         # return_url的回调地址
-        print('get', request.data)
+        print('get...', request.data)
         # 用户支付成功之后回到哪
-        return HttpResponse("用户支付成功")
+        return HttpResponse("<h3>支付成功</h3><a href='http://localhost:8080/Order' >查看我的账单</a>")
 
     def post(self, request):
-        print('post0', request.data)
+        print('post..', request.data)
         return HttpResponse("notify_url")

@@ -1,15 +1,8 @@
 <template>
- <div class="shopping-cart-wrap">
-    <h3 class="shopping-cart-tit">
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <router-link :to="{ path: '/ShopCart' }">我的购物车</router-link> > 
-        <router-link :to="{ path: '/Coupon' }">领券中心</router-link> > 
-        <router-link :to="{ path: '/SettlePay' }">结算中心</router-link>
-      </el-breadcrumb>
-      <p>领券中心</p>
-    </h3>
+  <div>
     <div class="row">
-      <el-table ref="multipleTable" :data="coupons" tooltip-effect="dark" style="width: 100%">
+      <h3>我的优惠券</h3>
+      <el-table ref="multipleTable" :data="usercoupons" tooltip-effect="dark" style="width: 100%">
         <el-table-column label="优惠券名" width="250">
           <template slot-scope="scope">
             <span>{{ scope.row.title}}</span>
@@ -33,15 +26,6 @@
         <el-table-column prop="address" label="优惠券有效期" show-overflow-tooltip>
           <template slot-scope="scope">{{scope.row.period}}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="120">
-          <template slot-scope="scope">
-            <el-button
-              @click.native.prevent="getCupon(scope.$index, coupons)"
-              type="text"
-              size="small"
-            >立即领取</el-button>
-          </template>
-        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -52,26 +36,13 @@ export default {
   name: "Coupon",
   data() {
     return {
-      coupons: []
+      usercoupons: []
     };
   },
   methods: {
     getCouponList() {
-      this.$http.couponList().then(res => {
-        this.coupons = Object.values(res.data);
-      });
-    },
-
-    // 领取优惠券
-    getCupon(index, rows) {
-      let params = {
-        coupon: rows[index].id
-      };
-      this.$http.coupon(params).then(res => {
-        this.$message({
-          message: ` ${res.data}`,
-          center: true
-        });
+      this.$http.userCouponList().then(res => {
+        this.usercoupons = Object.values(res.data);
       });
     }
   },
@@ -83,30 +54,14 @@ export default {
 
 <style lang="css" scoped>
 
-
-.shopping-cart-wrap {
-  width: 100%;
-}
-.shopping-cart-wrap h3,
 .row {
   width: 1200px;
-  margin: 0 auto;
-}
-.shopping-cart-wrap h3 {
-  padding: 50px 0;
+  margin: 40px auto;
 }
 
-
-.el-breadcrumb {
-  margin-left: 40px;
-  width: 222px;
-  color: #22c8c5;
+.row h3 {
+  margin-bottom: 20px;
 }
-
-.el-breadcrumb a {
-  color: #409EFF;
-}
-
 
 .el-table .warning-row {
   background: #22c8c5;
@@ -137,6 +92,8 @@ select {
   margin-bottom: 82px;
   /*justify-content:flex-end;*/
 }
+
+
 
 .el-input {
   width: 600px !important;

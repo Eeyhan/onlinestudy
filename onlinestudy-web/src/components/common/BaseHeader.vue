@@ -23,8 +23,10 @@
           @mouseleave="leaveHandler"
         >
           <!-- <span class="count" v-if="userInfo.shop_cart_num == 0">(0)</span>
-          <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span> -->
-          <span class="count" @click="toShoppingCart"> <i class="el-icon-goods"></i> 购物车</span>
+          <span class="count" v-else>({{userInfo.shop_cart_num.length}})</span>-->
+          <span class="count" @click="toShoppingCart">
+            <i class="el-icon-goods"></i> 购物车
+          </span>
           <!-- <span class="el-dropdown-link">学习中心</span> -->
           <span class="user">{{userInfo.username}}</span>
           <img :src="userInfo.avatar" alt>
@@ -33,7 +35,7 @@
               我的账户
               <i>></i>
             </li>
-            <li>
+            <li @click="toCoupon">
               我的优惠券
               <i>></i>
             </li>
@@ -42,10 +44,7 @@
               <span class="msg">(40)</span>
               <i>></i>
             </li>
-            <li @click="toOrder">
-              我的账单
-              
-            </li>
+            <li @click="toOrder">我的账单</li>
             <li @click="logout">
               退出
               <i>></i>
@@ -60,6 +59,14 @@
         </div>
       </div>
     </el-header>
+
+    <!-- 购物车 -->
+    <div class="totop" @click="toTop">
+      <i class="el-icon-caret-top"></i>
+    </div>
+    <div class="toShop" @click="toShoppingCart">
+      <span>购物车</span>
+    </div>
   </el-container>
 </template>
 
@@ -70,15 +77,14 @@ export default {
     return {
       headerList: [
         { id: "1", name: "Home", title: "首页" },
-        { id: "2", name: "Course", title: "体验课程" },        
+        { id: "2", name: "Course", title: "体验课程" },
         { id: "3", name: "Degree", title: "学位课程" },
-        { id: "4", name: "LightCourse", title: "线下面授" },
+        { id: "4", name: "LightCourse", title: "线下面授" }
       ],
       isShow: false
     };
   },
   methods: {
-    
     enterHandler() {
       this.isShow = true;
     },
@@ -95,18 +101,30 @@ export default {
         name: "Register"
       });
     },
-
-    toShoppingCart(){
-      this.$router.push({
-        name:'ShopCart'
-      })
+    // 去顶部
+    toTop() {
+      document.getElementById("app").scrollIntoView();
     },
-  
-    // 账单中心
-    toOrder(){
+
+    // 去购物车
+    toShoppingCart() {
       this.$router.push({
-        name:'Order'
-      })
+        name: "ShopCart"
+      });
+    },
+
+    // 去优惠券
+    toCoupon() {
+      this.$router.push({
+        name: "Usercoupon"
+      });
+    },
+
+    // 去账单中心
+    toOrder() {
+      this.$router.push({
+        name: "Order"
+      });
     },
 
     // 退出
@@ -143,7 +161,6 @@ export default {
   //     .getElementsByClassName("el-container")[0]
   //     .setAttribute("style", "");
   // }
-  
 };
 </script>
 
@@ -246,5 +263,53 @@ export default {
 .nav-right ul li span.count {
   margin-left: -100px;
   color: red;
+}
+
+.totop {
+  background-color: #fff;
+  position: fixed;
+  right: 16px;
+  bottom: 202px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  cursor: pointer;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+  z-index: 5;
+}
+
+.totop i {
+  color: #409eff;
+  display: block;
+  line-height: 40px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.toShop {
+  position: fixed;
+  right: 8px;
+  bottom: 150px;
+  width: 56px;
+  height: 50px;
+  border-radius: 30px;
+  cursor: pointer;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+  z-index: 5;
+  background: #f34475;
+  color: white;
+}
+
+.toShop span {
+  display: block;
+  line-height: 50px;
+  text-align: center;
+  font-size: 14px;
 }
 </style>

@@ -12,6 +12,7 @@ import ShopCart from '@/components/Transaction/ShopCart'
 import SettlePay from '@/components/Transaction/SettlePay'
 import Order from '@/components/Transaction/Order'
 import Coupon from '@/components/Transaction/Coupon'
+import Usercoupon from '@/components/Transaction/UserCoupon'
 
 
 Vue.use(Router)
@@ -91,7 +92,11 @@ export default new Router({
       path: '/coupon',
       name: 'Coupon',
       component: Coupon
-    }
-
+    },
+    {
+      path: '/Usercoupon',
+      name: 'Usercoupon',
+      component: Usercoupon
+    },
   ]
 })

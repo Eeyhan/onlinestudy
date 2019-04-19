@@ -122,7 +122,7 @@ export const delSettlement = (params) =>{
 }
 
 
-// 获取优惠券
+// 获取全部优惠券
 
 export const couponList = () =>{
     return Axios.get('/coupon').then(res=>res.data)
@@ -134,6 +134,11 @@ export const coupon = (params) =>{
     return Axios.post('/coupon',params).then(res=>res.data)
 }
 
+// 获取用户优惠券
+
+export const userCouponList = () =>{
+    return Axios.get('/usercoupon').then(res=>res.data)
+}
 
 
 // 支付

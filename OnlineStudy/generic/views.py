@@ -873,8 +873,10 @@ class CouponDistributionView(APIView):
         for item in all_coupon:
             coupon_dict[item.id] = {
                 'id': item.id,
+                'object_id':item.object_id,
                 'title': item.title,
                 'brief': item.brief,
+                'equal_money': item.equal_money,
                 'coupon_type': item.coupon_type,
                 'coupon_type_display': item.get_coupon_type_display(),
                 'grant_begin_time': item.grant_begin_time,
@@ -904,3 +906,32 @@ class CouponDistributionView(APIView):
 
         res.data = '优惠券领取成功'
         return Response(res.dict)
+
+
+class UserCouponView(APIView):
+    """用户的优惠券接口"""
+    authentication_classes = [Auther, ]
+
+    def get(self, request):
+        res = BaseResponse()
+        user_coupons = models.Coupon.objects.filter(coupondetail__account=request.user).all()
+        coupon_dict = {}
+        for item in user_coupons:
+            coupon_dict[item.id] = {
+                'id': item.id,
+                'object_id': item.object_id,
+                'title': item.title,
+                'brief': item.brief,
+                'equal_money':item.equal_money,
+                'coupon_type': item.coupon_type,
+                'coupon_type_display': item.get_coupon_type_display(),
+                'grant_begin_time': item.grant_begin_time,
+                'grant_end_time': item.grant_end_time,
+                'start_time': item.start_time,
+                'end_time': item.end_time,
+                'period': item.date
+            }
+        res.data = coupon_dict
+        return Response(res.dict)
+
+

@@ -2,8 +2,9 @@
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item :to="{ path: '/ShopCart' }">我的购物车</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/SettlePay' }">结算中心</el-breadcrumb-item>
+        <router-link :to="{ path: '/ShopCart' }">我的购物车</router-link> > 
+        <router-link :to="{ path: '/Coupon' }">领券中心</router-link> > 
+        <router-link :to="{ path: '/SettlePay' }">结算中心</router-link>
       </el-breadcrumb>
       <small>共{{this.shopCartList.length}}个商品</small>
     </h3>
@@ -97,7 +98,7 @@ export default {
         };
         this.$http.delShopping(params).then(res => {
           if (!res.error) {
-            console.log(res)
+            console.log(res);
             this.$message({
               message: ` ${res.data}`,
               center: true
@@ -218,7 +219,13 @@ select {
   margin: 22px auto;
 }
 
-.el-breadcrumb{
+.el-breadcrumb {
   margin-left: 40px;
+  width: 222px;
+  color: #22c8c5
+}
+
+.el-breadcrumb a{
+  color: #409EFF;
 }
 </style>

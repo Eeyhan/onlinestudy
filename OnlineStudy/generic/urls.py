@@ -12,5 +12,6 @@ urlpatterns = [
     path('shopping', views.ShoppingView.as_view()),
     path('settlement', views.SettlementView.as_view()),
     path('payment', views.PaymentView.as_view()),
-    path('coupon', views.CouponDistributionView.as_view())
+    path('coupon', views.CouponDistributionView.as_view()),
+    path('usercoupon', views.UserCouponView.as_view())
 ]

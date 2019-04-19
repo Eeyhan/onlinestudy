@@ -2,8 +2,9 @@
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item :to="{ path: '/ShopCart' }">我的购物车</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/SettlePay' }">结算中心</el-breadcrumb-item>
+        <router-link :to="{ path: '/ShopCart' }">我的购物车</router-link>>
+        <router-link :to="{ path: '/Coupon' }">领券中心</router-link>>
+        <router-link :to="{ path: '/SettlePay' }">结算中心</router-link>
       </el-breadcrumb>
       <p>您即将获得最好的服务，最好的教育方式</p>
     </h3>
@@ -56,8 +57,9 @@
               alt
               @click="isShowHander"
             >
-            <span class="coupon-num" v-if="golbalCoupon !== [] && settlements !== []">有0张可用</span>
-            <span class="coupon-num" v-else>有{{}}张可用</span>
+
+            <span class="coupon-num" v-if="countCoupon != 0">对应商品有{{countCoupon}}张可用</span>
+            <span class="coupon-num" v-else>有0张可用</span>
           </div>
 
           <p class="sum-price-wrap" style="margin-right: 45px">
@@ -76,10 +78,29 @@
       >
         <ul class="coupon-list" style="display: none;"></ul>
         <div
+          v-if="countCoupon == 0"
           style="text-align: center;width: 1200px;padding: 50px 0px;align-items: center;justify-content: center;border-bottom: 1px solid rgb(232, 232, 232);margin: 0 auto;"
         >
           <span style="font-size: 16px; color: #9b9b9b">暂无可用优惠券</span>
           <router-link :to="{name:'Coupon'}" style="font-size: 16px; ">领取优惠券</router-link>
+        </div>
+        <div v-else style="margin: 20px auto;width: 800px;text-align: center;">
+          <!-- 优惠券逻辑 -->
+          <el-table ref="multipleTable" :data="coupon" tooltip-effect="dark" style="width: 100%">
+            <el-table-column label="优惠券名(优惠券请对应指定商品使用)" width="400">
+              <template slot-scope="scope">
+                <span>{{ scope.row.title}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="400">
+              <template slot-scope="scope">
+                <span @click="userROw(scope.$index, coupon)">
+                  <el-checkbox>选择</el-checkbox>
+                </span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <!-- 优惠券逻辑 -->
         </div>
       </div>
       <div
@@ -150,7 +171,11 @@ export default {
       isShow: false,
       imgIsShow1: true,
       imgIsShow2: false,
-      alipaylink: ""
+      alipaylink: "",
+      checked: false,
+      currentIndex: 0,
+      use_coupon_id:0, // 用户选择的优惠券ID
+      course_id:[] //课程id
     };
   },
   computed: {
@@ -160,19 +185,41 @@ export default {
         total += parseFloat(item.price);
       });
       return total.toFixed(2);
+    },
+    countCoupon() {
+      let total = 0;
+      if (this.coupon != []) {
+        total += this.coupon.length;
+      }
+      if (this.golbalCoupon != []) {
+        total += this.golbalCoupon.length;
+      }
+      return total;
     }
   },
   methods: {
     // 获取订单中心数据
     getSettlement() {
+
+      // 先获取用户的优惠券
+      this.getUserCoupon();
       this.$http.settlementList().then(res => {
         if (!res.error) {
           this.settlements = res.data.settlement_info;
-          this.golbalCoupon = res.data.global_coupon_dict;
+          let global_coupon_dict = Object.values(res.data.global_coupon_dict);
+
+          if (global_coupon_dict.length != 0) {
+            console.log(global_coupon_dict);
+            this.golbalCoupon = global_coupon_dict;
+          }
 
           //   当前用户获得的优惠券
           this.settlements.forEach((item, index) => {
-            this.coupon.push(item.course_coupon_dict);
+            this.course_id.push(item.id)
+            if (item.course_coupon_dict != "{}") {
+              this.coupon.push(item.course_coupon_dict);
+            }
+            
           });
         }
       });
@@ -191,7 +238,6 @@ export default {
         };
         this.$http.delSettlement(params).then(res => {
           if (!res.error) {
-            console.log(res);
             this.$message({
               message: ` ${res.data}`,
               center: true
@@ -221,8 +267,39 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
+
+    // 获取用户优惠券
+    getUserCoupon() {
+      this.$http.userCouponList().then(res => {
+        // console.log(res);
+        this.coupon = Object.values(res.data);
+      });
+    },
+
+    // 使用优惠券
+    userROw(index, rows) {
+      console.log(rows[index].equal_money)
+      this.use_coupon_id = rows[index].id
+      
+    },
+
+    // 点击按钮时，一边页面跳转到支付宝支付页面，一边这里后台自动发出支付请求
     // 支付
     onsumbit(totalPrice) {
+      
+      // 支付之前，先更新后端的结算中心数据，选择优惠券
+      if(this.use_coupon_id !=0){
+        // 使用优惠券
+        let coupon_params = {
+          course:this.course_id,
+          coupon:this.use_coupon_id,
+          globalcoupon:''
+        }
+        this.$http.Updatesettlement(coupon_params).then(res=>{
+          console.log(res)
+        })
+      }
+
       let params = {
         balance: 0,
         price: this.totalPrice
@@ -238,6 +315,7 @@ export default {
 
   created() {
     this.getSettlement();
+    
   }
 };
 </script>
@@ -350,6 +428,12 @@ select {
 
 .el-breadcrumb {
   margin-left: 40px;
+  width: 222px;
+  color: #22c8c5;
+}
+
+.el-breadcrumb a {
+  color: #409eff;
 }
 
 form {

@@ -301,7 +301,7 @@ class CouponDetail(models.Model):
     number = models.CharField(max_length=64, unique=True, verbose_name='优惠券流水记录')
     account = models.ForeignKey(to='Account', verbose_name='优惠券拥有者', on_delete='cascade')
     status_choices = ((0, '未使用'), (1, '已使用'), (2, '已过期'))
-    status = models.SmallIntegerField(choices=status_choices, default=0)
+    status = models.IntegerField(choices=status_choices, default=0)
     get_time = models.DateTimeField(verbose_name='用户领取时间')
     use_time = models.DateTimeField(verbose_name='用户使用时间', blank=True, null=True)
     order = models.ForeignKey(to='Order', on_delete='cascade', blank=True, null=True, verbose_name='关联订单',

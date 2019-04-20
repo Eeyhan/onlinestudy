@@ -92,6 +92,10 @@ export default {
               
               // dispacth action的行为
               this.$store.dispatch("getUserInfo", res.data);
+
+              
+              // 注册过来的，登录成功之后跳转会到注册页面
+
               this.$router.go(-1)
 
               // // 为axios添加默认的请求头 token

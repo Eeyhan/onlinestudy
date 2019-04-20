@@ -213,6 +213,7 @@ class ShoppingView(APIView):
         return Response(res.dict)
 
     def post(self, request):
+        """添加商品"""
         res = BaseResponse()
         try:
             # 拿到前端传过来的数据
@@ -244,16 +245,20 @@ class ShoppingView(APIView):
             res.error = '操作失败，请重试'
             return Response(res.dict)
         else:
+            if res.code == 1044:
+                return Response(res.dict)
             res.data = '加入购物车成功'
             return Response(res.dict)
 
     def post_func(self, res, course_id, price_policy_id, user, current_price):
         # 加入购物车函数，通用部分
+
         course_obj = models.Course.objects.filter(id=course_id).first()
         if not course_obj:
             res.code = 1040
             res.error = '不存在该课程'
             return Response(res.dict)
+
         price_queryset = course_obj.price_policy.all()
         price_policy_dict = {}
         for price_policy in price_queryset:
@@ -269,8 +274,9 @@ class ShoppingView(APIView):
             res.code = 1041
             res.error = '课程价格不合法'
             return Response(res.dict)
+
         # redis的key
-        key = SHOPPING_KEY % (user.id, course_id)
+        redis_key = SHOPPING_KEY % (user.id, course_id)
 
         # redis的课程key对应的数据
         # image类型和dict都需要处理一下才行，不然无法存入数据库
@@ -283,16 +289,27 @@ class ShoppingView(APIView):
             'default_price_policy': price_policy_id
         }
 
-        # 存入redis里面
-        CONN.hmset(key, course_info)
-        return res
+        """判断购物车里是否已有该数据,如果已存在则修改价格策略数据"""
 
-    def put(self, request):
-        res = BaseResponse()
-        # 拿到前端传过来的新的数据  {"course": 1, "price_policy": 16}
-        course_id = request.data.get('course')
-        price_policy_id = request.data.get('price_policy')
-        user = request.user
+        key = SHOPPING_KEY % (user.id, '*')
+        # 找到跟当前用户相关的所有购物车数据的key
+        all_keys = CONN.scan_iter(key)
+
+        course_info_exist = []
+        for key in all_keys:
+            course_info_exist.append(CONN.hgetall(key))
+
+        for index, item in enumerate(course_info_exist):
+            if int(item['id']) == course_info['id']:  # 已存在
+                res = self.put(course_id, price_policy_id, user, res)
+
+        else:  # 不存在，直接存入redis里面
+            CONN.hmset(redis_key, course_info)
+            return res
+
+    def put(self, course_id, price_policy_id, user, res):
+        """修改商品的价格套餐"""
+
         # 检测是否有该课程
         course_obj = models.Course.objects.filter(id=course_id).first()
         if not course_obj:
@@ -300,8 +317,6 @@ class ShoppingView(APIView):
             res.error = '课程id不合法，不存在该课程'
         try:
             key = SHOPPING_KEY % (user.id, course_id)
-            print(key)
-            print(course_obj)
             if not CONN.exists(key):
                 res.code = 1050
                 res.error = '课程id不合法，购物车内没有该课程数据'
@@ -319,10 +334,12 @@ class ShoppingView(APIView):
             res.error = '操作失败，请重试'
             return Response(res.dict)
         else:
-            res.data = '修改成功'
-            return Response(res.dict)
+            res.data = '修改套餐成功'
+            res.code = 1044
+            return res
 
     def delete(self, request):
+        """删除购物车数据"""
         res = BaseResponse()
         # 拿到前端传过来的数据
         course_list = request.data.get('course')
@@ -365,6 +382,7 @@ class SettlementView(APIView):
     authentication_classes = [Auther, ]
 
     def get(self, request):
+        """获取订单数据"""
         res = BaseResponse()
         # 获取redis里的数据
         user_id = request.user.pk
@@ -386,18 +404,21 @@ class SettlementView(APIView):
         # 返回给前端展示
 
     def post(self, request):
+        """创建订单"""
         res = BaseResponse()
         # 拿到前端传来的课程id数据
         course_list = request.data.get('course_list')
-        print(course_list)
+
         user = request.user
         try:
-            # 因为前段传来的有单个和多个，所以做了解耦
-            if isinstance(course_list, int):
-                res = self.post_func(user.id, course_list, res)
-            else:
+            # 因为前段传来的有单个和多个，所以作解耦
+            if isinstance(course_list, list):
                 for course_id in course_list:
+                    course_id = int(course_id)
                     res = self.post_func(user.id, course_id, res)
+            else:
+                course_id = int(course_list)  # 传来一个数据
+                res = self.post_func(user.id, course_id, res)
 
         except Exception as e:
             print(e)
@@ -418,12 +439,15 @@ class SettlementView(APIView):
             res.code = 1070
             res.error = '课程id不合法'
             return Response(res.dict)
+
+        # 去数据库里取当前用户的优惠券数据
         user_coupons = models.CouponDetail.objects.filter(
             account_id=user_id,
             status=0,
             coupon__start_time__lte=now(),
             coupon__end_time__gte=now(),
         ).all()
+
         # 构建数据
         user_coupon_dict = {}
         user_global_coupon_dict = {}
@@ -472,11 +496,12 @@ class SettlementView(APIView):
             'course_coupon_dict': json.dumps(user_coupon_dict, ensure_ascii=False),
         }
 
-        # 存入redis数据
+        # 存入数据到redis
+
         user_settlements = SETTLEMENT_KEY % (user_id, course_id)
-        user_global_coupons = GLOBAL_COUPON_KEY % user_id
         CONN.hmset(user_settlements, settlement_info)
 
+        user_global_coupons = GLOBAL_COUPON_KEY % user_id
         if user_global_coupon_dict:
             # 多套了一层，不然redis报错，不能内层直接套一个字典
             global_settlement_info = {
@@ -490,34 +515,49 @@ class SettlementView(APIView):
         return res
 
     def put(self, request):
+        """设置订单中商品的优惠券"""
+
         res = BaseResponse()
         # 获取前端传来的数据
-        course_id = request.data.get('course')
-        course_coupon_id = request.data.get('coupon')
+        # {"course_id1":{'course':xx,'coupon':xx},"course_id2":{'course':xx,'coupon':xx},global_coupon:''}
+        # 例：{'1': {'course': 1, 'coupon': 5}, '4': {'course': 4, 'coupon': 2}, 'global_coupon': 4}
         global_coupon_id = request.data.get('global_coupon')
-        user_id = request.user.pk
-        key = SETTLEMENT_KEY % (user_id, course_id)
-        global_key = GLOBAL_COUPON_KEY % user_id
-        # 验证数据合法
-        if course_id:
-            if not CONN.exists(key):
-                res.code = 1080
-                res.error = '课程id不合法'
-                return Response(res.dict)
-        if course_coupon_id:
-            user_coupon_dict = json.loads(CONN.hget(key, 'course_coupon_dict'))
-            if str(course_coupon_id) not in user_coupon_dict:
-                res.code = 1081
-                res.error = '课程优惠券id不合法'
-                return Response(res.dict)
-            CONN.hset(key, 'default_coupon_id', course_coupon_id)
+        request_data = dict(request.data)
+        courses = []
+        for value in request_data.values():
+            if isinstance(value, dict):
+                courses.append(value)
 
-        if global_coupon_id:
-            if not CONN.exists(global_key):
-                res.code = 1082
-                res.error = '全局优惠券id不合法'
-                return Response(res.dict)
-            CONN.hset(global_key, 'default_global_coupon_id', global_coupon_id)
+        for course_coupon in courses:
+            course_id = course_coupon.get('course')
+            course_coupon_id = course_coupon.get('coupon')
+
+            user_id = request.user.pk
+            key = SETTLEMENT_KEY % (user_id, course_id)  # 订单数据
+            global_key = GLOBAL_COUPON_KEY % user_id
+
+            # 验证数据合法
+            if course_id:
+                if not CONN.exists(key):
+                    res.code = 1080
+                    res.error = '课程id不合法'
+                    return Response(res.dict)
+            if course_coupon_id:
+                user_coupon_dict = json.loads(CONN.hget(key, 'course_coupon_dict'))
+
+                if str(course_coupon_id) not in user_coupon_dict:
+                    res.code = 1081
+                    res.error = '课程优惠券id不合法'
+                    return Response(res.dict)
+                CONN.hset(key, 'default_coupon_id', course_coupon_id)
+
+            if global_coupon_id:
+                if not CONN.exists(global_key):
+                    res.code = 1082
+                    res.error = '全局优惠券id不合法'
+                    return Response(res.dict)
+                CONN.hset(global_key, 'default_global_coupon_id', global_coupon_id)
+
         res.data = '已选择优惠券'
         return Response(res.dict)
 
@@ -526,7 +566,6 @@ class SettlementView(APIView):
         res = BaseResponse()
         user_id = request.user.pk
         course_list = request.data.get('course')
-        print(course_list)
         if not isinstance(course_list, int):
             for course in course_list:
                 res = self.delete_func(user_id, course, res)
@@ -613,10 +652,10 @@ class PaymentView(APIView):
             pay_dict[order.id]['pay_time'] = order.order.pay_time
             pay_dict[order.id]['id'] = order.id
         res.data = pay_dict
-        print(res.data)
         return Response(res.dict)
 
     def post(self, request):
+        """支付"""
         res = BaseResponse()
         # 获取前端传来的数据
         # {"balance": 20, "price": 73.1}
@@ -629,21 +668,20 @@ class PaymentView(APIView):
             return Response(res.dict)
 
         if price and isinstance(price, str):
-            print(price, type(price))
             price = eval(price)
 
-        # 购买有两种情况，一种直接购买，一种是添加购物车之后购买
+        # 购买有两种情况，一种直接购买，一种是添加购物车之后购买，在前端单独处理这两个情况
 
         user_key = SETTLEMENT_KEY % (user.id, "*")
         user_settlements = CONN.scan_iter(user_key)
 
         total_price = 0
-        user_coupon_dict = {}
-        global_coupon_dict = {}
+        # user_coupon_dict = {}  # 专项优惠券
+        # global_coupon_dict = {}  # 全局优惠券
         global_coupon_key = None
         for item in user_settlements:
             settlement_info = CONN.hgetall(item)
-            course_id = settlement_info['id']
+            course_id = str(settlement_info['id'])
             # 检验课程合法性
             course_obj = models.Course.objects.filter(id=course_id).first()
             if not course_obj and course_obj.state == 2:  # 状态2表示课程下架
@@ -651,6 +689,7 @@ class PaymentView(APIView):
                 res.error = '课程id不正确，可能已下架'
                 return Response(res.dict)
             course_coupon_id = int(settlement_info.get('default_coupon_id', 0))
+
             # 有优惠券，检验课程优惠券有效期
             if course_coupon_id:
                 user_coupon_dict = models.Coupon.objects.filter(
@@ -658,12 +697,13 @@ class PaymentView(APIView):
                     object_id=course_id,
                     start_time__lte=now(),
                     end_time__gte=now(),
-                    coupondetail__account_id=user.id,
-                    coupondetail__status=0).values('coupon_type', 'equal_money', 'off_percent', 'minimum_consume')
+                    coupondetail__account=user,
+                    coupondetail__status=0).values('coupon_type', 'equal_money', 'off_percent',
+                                                   'minimum_consume').all().distinct()
 
                 if course_coupon_id and not user_coupon_dict:
                     res.code = 1102
-                    res.error = '优惠券id不合法'
+                    res.error = '优惠券id不合法'  # 优惠券已使用
                     return Response(res.dict)
 
                 course_db_price = settlement_info['price']
@@ -673,14 +713,9 @@ class PaymentView(APIView):
                     res.error = '优惠券不符合使用要求'
                     return Response(res.dict)
                 total_price += course_count_price
-                # 修改优惠券使用状态
-                models.CouponDetail.objects.filter(account_id=user.id,
-                                                   coupon__coupon_type__in=[1, 2]).update(status=1, use_time=now())
-
             # 没有优惠券的情况
             else:
                 total_price += float(settlement_info['price'])
-
         # 全局优惠券
         # 有三个情况：
         #   1.当前用户本来就没有领取全局优惠券
@@ -707,8 +742,8 @@ class PaymentView(APIView):
                     id=global_coupon_id,
                     start_time__lte=now(),
                     end_time__gte=now(),
-                    couponrecord__account_id=user.id,
-                    couponrecord__status=0).values('coupon_type', 'equal_money', 'off_percent', 'minimum_consume')
+                    coupondetail__account_id=user.id,
+                    coupondetail__status=0).values('coupon_type', 'equal_money', 'off_percent', 'minimum_consume')
 
                 if not global_coupon_dict:
                     res.code = 1105
@@ -719,8 +754,6 @@ class PaymentView(APIView):
                     res.code = 1106
                     res.error = '全局优惠券不符合使用要求'
                     return Response(res.dict)
-                # 修改优惠券使用状态
-                models.CouponDetail.objects.filter(account_id=user.id, coupon__coupon_type=0).update(status=1)
 
         # 没有全局优惠券,最后的价格就是前面的专项优惠券打折之后的值
         else:
@@ -734,7 +767,10 @@ class PaymentView(APIView):
             total_price = 0
         total_price = float('%.2f' % total_price)
         # 最后的检验
+
         if price != total_price:  # price是前端传来的总价格
+            print(total_price, type(total_price))
+            print(price, type(price))
             # 说明前端传来的数据不正确
             res.code = 1107
             res.error = '操作失败，数据可能被篡改'
@@ -748,7 +784,7 @@ class PaymentView(APIView):
 
         # 删掉redis结算中心里的数据
 
-        # 不知道为什么这里又要再取一次才能删除
+        # 这里又要再取一次才能删除
         user_key = SETTLEMENT_KEY % (user.id, "*")
         user_settlements = CONN.scan_iter(user_key)
 
@@ -763,6 +799,11 @@ class PaymentView(APIView):
         # 更新数据库信息
         user_obj = models.Account.objects.filter(id=user.id)
         user_obj.update(balance=F('balance') - balance)
+        # 修改优惠券使用状态
+        models.CouponDetail.objects.filter(account_id=user.id, coupon__coupon_type=0).update(status=1)
+        # 修改优惠券使用状态
+        models.CouponDetail.objects.filter(account_id=user.id,
+                                           coupon__coupon_type__in=[1, 2]).update(status=1, use_time=now())
 
         # 用余额交易
         models.TradeRecord.objects.create(account_id=user.id, amount=balance,
@@ -816,7 +857,6 @@ class PaymentView(APIView):
             off_percent = user_coupon_dict['off_percent'] / 100
             minimum_consume = user_coupon_dict['minimum_consume']
             if minimum_consume > price:
-                print(minimum_consume, price)
                 return -1
             else:
                 result = price * off_percent
@@ -830,6 +870,7 @@ class PaymentView(APIView):
             return result
 
     def put(self, request):
+        """此项后续再补充，目前使用不到"""
         # 退款,退货
         # 售后服务、纠纷
         # 评价
@@ -840,7 +881,6 @@ class PaymentView(APIView):
         """删除账单"""
         res = BaseResponse()
         orders = request.data.get('order')
-        print(orders)
         user = request.user
         if not isinstance(orders, int):
             for order_id in orders:
@@ -873,10 +913,11 @@ class CouponDistributionView(APIView):
         for item in all_coupon:
             coupon_dict[item.id] = {
                 'id': item.id,
-                'object_id':item.object_id,
+                'object_id': item.object_id,
                 'title': item.title,
                 'brief': item.brief,
                 'equal_money': item.equal_money,
+                'off_percent': item.off_percent,
                 'coupon_type': item.coupon_type,
                 'coupon_type_display': item.get_coupon_type_display(),
                 'grant_begin_time': item.grant_begin_time,
@@ -901,8 +942,8 @@ class CouponDistributionView(APIView):
             return Response(res.dict)
 
         models.Coupon.objects.filter(id=coupon_id).update(count=F('count') - 1)
-        models.CouponDetail.objects.create(coupon=coupon_obj, number=str(time.time()),
-                                           account=request.user, get_time=now())
+        obj2 = models.CouponDetail.objects.create(coupon=coupon_obj, number=str(time.time()),
+                                                  account=request.user, get_time=now())
 
         res.data = '优惠券领取成功'
         return Response(res.dict)
@@ -914,7 +955,7 @@ class UserCouponView(APIView):
 
     def get(self, request):
         res = BaseResponse()
-        user_coupons = models.Coupon.objects.filter(coupondetail__account=request.user).all()
+        user_coupons = models.Coupon.objects.filter(coupondetail__account=request.user).all().distinct()
         coupon_dict = {}
         for item in user_coupons:
             coupon_dict[item.id] = {
@@ -922,7 +963,8 @@ class UserCouponView(APIView):
                 'object_id': item.object_id,
                 'title': item.title,
                 'brief': item.brief,
-                'equal_money':item.equal_money,
+                'equal_money': item.equal_money,
+                'off_percent': item.off_percent,
                 'coupon_type': item.coupon_type,
                 'coupon_type_display': item.get_coupon_type_display(),
                 'grant_begin_time': item.grant_begin_time,
@@ -933,5 +975,3 @@ class UserCouponView(APIView):
             }
         res.data = coupon_dict
         return Response(res.dict)
-
-

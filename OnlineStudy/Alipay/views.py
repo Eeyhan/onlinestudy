@@ -42,7 +42,6 @@ class AlipayView(APIView):
         return render(request, 'pay.html')
 
     def post(self, request):
-        print(request.data)
         money = request.data.get('money')
         try:
             if isinstance(money, str):
@@ -77,7 +76,7 @@ class AlipayView(APIView):
 
         # request.notify_url = "http://localhost:8080/Order"
         response = client.page_execute(request, http_method="GET")
-        print("alipay.trade.page.pay response:" + response)
+        # print("alipay.trade.page.pay response:" + response)
         return redirect(response)
         # return HttpResponse(response)
 

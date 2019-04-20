@@ -43,7 +43,7 @@ export default {
         },
         {
           id: 3,
-          imgSrc: "https://s2.ax1x.com/2019/04/17/Az0v2n.png"
+          imgSrc: "https://s2.ax1x.com/2019/04/17/AzDHhQ.jpg"
         },
         {
           id: 4,

@@ -231,7 +231,7 @@ export default {
           this.$http.shopping(product).then(res => {
             if (!res.error) {
               this.$message({
-                message: this.details.title + ` 已加入购物车`,
+                message: this.details.title + res.data,
                 center: true
               });
             }

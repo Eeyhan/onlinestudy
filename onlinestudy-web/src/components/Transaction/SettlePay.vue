@@ -183,14 +183,14 @@
     </div>
 
     <div class="total">
-      <!-- <form method="post" action="http://127.0.0.1:8000/api/v1/pay/pay/"> -->
+      <form method="post" action="http://127.0.0.1:8000/api/v1/pay/pay/">
       <!-- <el-button type="primary" @click="toPayment(totalPrice)">立即支付</el-button>
 
       <h3>总计: ¥{{totalPrice}}</h3>-->
       <label for="money">总计：￥</label>
       <el-input type="text" name="money" :value="totalPrice" id="money"></el-input>
       <el-button type="primary" native-type="submit" @click="onsumbit">立即支付</el-button>
-      <!-- </form> -->
+      </form>
     </div>
     <router-view></router-view>
 
@@ -235,7 +235,6 @@ export default {
 
       // 通用券
       this.multipleSelection2.forEach((item, index) => {
-        console.log(item.coupon_type);
         total -= parseFloat(item.equal_money);
       });
 
@@ -383,8 +382,6 @@ export default {
         this.multipleSelection1.forEach((item1, index) => {
           // 增删改查
           this.multipleSelection.forEach((item, index) => {
-            // 还有个情况：已选择了优惠券，之后又去掉的优惠券,即有商品无对应优惠券
-
             // 最开始的从无到有的选择情况
             this.use_coupon_id[item1.object_id] = {
               course: item1.object_id,
@@ -419,12 +416,13 @@ export default {
           price: this.totalPrice
         };
         this.$http.Updatesettlement(settleparams).then(res => {
-          if (!res.error) {
+          console.log(res)
+          if (!res.error) {            
             // 支付
             this.$http.Payment(params).then(res => {
               console.log(res);
             });
-          } else if (res.code == 1081) {  //  已选择优惠券，未支付或者支付失败
+          } else if (res.code == 1081) {  //  上一次已选择优惠券，未支付或者支付失败
             this.$http.Payment(params).then(res => {
               console.log(res);
             });

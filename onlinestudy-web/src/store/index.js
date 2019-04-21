@@ -6,12 +6,12 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state:{
         userInfo:{},
-        isRemember:false // 是否记住密码
+        isRemember:false // 是否记住密码标志位
     },
     mutations:{
         // 设置记住用户信息
         getUserInfo(state,user){
-            state.userInfo = user            
+            state.userInfo = user         
         },
 
         // 删除用户信息

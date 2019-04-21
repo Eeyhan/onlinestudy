@@ -4,7 +4,7 @@
     <h3 class="shopping-cart-tit">我的订单 &nbsp;</h3>
     <div class="row">     
       <el-table ref="multipleTable" :data="PaymentOrder" tooltip-effect="dark" style="width: 100%">
-        <el-table-column type="selection" width="55"></el-table-column>
+        <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column label="商品" width="450">
           <el-table-column>
             <template slot-scope="scope">

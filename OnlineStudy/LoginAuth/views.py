@@ -37,13 +37,13 @@ class RegisterView(APIView):
 
     def post(self, request):
         res = BaseResponse()
-        user_obj = RegisterSerializer(data=request.data)
-        if user_obj.is_valid():
-            user_obj.save()
-            res.data = user_obj.data
-        else:
-            res.code = 1020
-            res.error = user_obj.errors
+        # user_obj = RegisterSerializer(data=request.data)
+        # if user_obj.is_valid():
+        #     user_obj.save()
+        #     res.data = user_obj.data
+        # else:
+        #     res.code = 1020
+        #     res.error = user_obj.errors
         return Response(res.dict)
 
 
@@ -54,7 +54,6 @@ class LoginView(APIView):
         res = BaseResponse()
         username = request.data.get('username')
         passwd = request.data.get('passwd')
-        print(request.data)
         # 密码加盐
         hash_key = 'password'
         passwd = passwd + hash_key
@@ -67,14 +66,14 @@ class LoginView(APIView):
             token = uuid.uuid4()
             RedisConn.set(str(token), user_obj.id)
             shop_cart = ShoppingView().get(request)  # 购物车数据
-            print(shop_cart.data)
             res.data = {
                 'access_token': token,
                 'avatar': 'http://127.0.0.1:8000/media/avatar.png',  # 真实部署时改成公网地址
                 'username': user_obj.username,
-                'shop_cart_num': shop_cart.data.get('data')
+                'shop_cart_num': shop_cart.data.get('data'),
+                'balance': user_obj.balance
             }
-            # 头像，购物车数据，token,用户名
+            # 头像，购物车数据，token,用户名,账户余额
         except Exception as e:
             print('........', e)
             res.code = 1031

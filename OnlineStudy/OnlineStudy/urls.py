@@ -23,5 +23,7 @@ urlpatterns = [
     path('api/v1/', include(('generic.urls', 'generic'))),  # 主业务
     path('api/v1/auth/', include(('LoginAuth.urls', 'LoginAuth'))),  # 登录认证
     path('api/v1/pay/', include(('Alipay.urls', 'Alipay'))),  # 支付宝支付
-    re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT})
+    path('blv/', include(('blwvideo.urls', 'blwvideo'))),    # 保利威加密视频接口
+    re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
+
 ]

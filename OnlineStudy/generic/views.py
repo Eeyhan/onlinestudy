@@ -131,6 +131,8 @@ class CourseChapterView(APIView):
     """课程章节，课时"""
 
     def get(self, request, pk):
+        print(request.data)
+        print(pk, type(pk))
         coursechapter = models.CourseChapter.objects.filter(course_id=pk).all().order_by('chapter')
         # coursechapter = models.CourseChapter.objects.all()
         res = serializers.ChapterSerializer(coursechapter, many=True)
@@ -343,7 +345,6 @@ class ShoppingView(APIView):
         res = BaseResponse()
         # 拿到前端传过来的数据
         course_list = request.data.get('course')
-        print(request.data)
         user = request.user
 
         # 检测是否有该课程
@@ -367,7 +368,6 @@ class ShoppingView(APIView):
     def delete_func(self, user, course, res):
         # 删除函数，通用部分
         key = SHOPPING_KEY % (user.id, course)
-        print(key)
         if not CONN.exists(key):
             res.code = 1060
             res.error = '选中课程不合法'
@@ -447,7 +447,6 @@ class SettlementView(APIView):
             coupon__start_time__lte=now(),
             coupon__end_time__gte=now(),
         ).all()
-
         # 构建数据
         user_coupon_dict = {}
         user_global_coupon_dict = {}
@@ -535,7 +534,6 @@ class SettlementView(APIView):
             user_id = request.user.pk
             key = SETTLEMENT_KEY % (user_id, course_id)  # 订单数据
             global_key = GLOBAL_COUPON_KEY % user_id
-
             # 验证数据合法
             if course_id:
                 if not CONN.exists(key):
@@ -544,7 +542,6 @@ class SettlementView(APIView):
                     return Response(res.dict)
             if course_coupon_id:
                 user_coupon_dict = json.loads(CONN.hget(key, 'course_coupon_dict'))
-
                 if str(course_coupon_id) not in user_coupon_dict:
                     res.code = 1081
                     res.error = '课程优惠券id不合法'
@@ -595,6 +592,7 @@ class SettlementView(APIView):
 
 class PaymentView(APIView):
     """支付接口"""
+
     authentication_classes = [Auther, ]
 
     def get(self, request):
@@ -623,7 +621,7 @@ class PaymentView(APIView):
 
         res = BaseResponse()
         user_trades = models.TradeRecord.objects.filter(account=request.user).all()
-        user_orders = models.OrderDetail.objects.filter(order__account=request.user).all()
+        user_orders = models.OrderDetail.objects.filter(order__account=request.user).all().distinct()
 
         pay_dict = {}
         # 商品数量
@@ -636,7 +634,6 @@ class PaymentView(APIView):
             }
         for order in user_orders:
             product = eval(order.product)
-            # print(product)
             pay_dict[order.id] = {}
             for item in product:
                 brief = models.Course.objects.filter(id=int(item['id'])).first().coursedetail.brief
@@ -689,7 +686,6 @@ class PaymentView(APIView):
                 res.error = '课程id不正确，可能已下架'
                 return Response(res.dict)
             course_coupon_id = int(settlement_info.get('default_coupon_id', 0))
-
             # 有优惠券，检验课程优惠券有效期
             if course_coupon_id:
                 user_coupon_dict = models.Coupon.objects.filter(
@@ -725,7 +721,6 @@ class PaymentView(APIView):
         # 判断用户是否有优惠券
 
         user_global_coupon = models.CouponDetail.objects.all().filter(account_id=user.id, coupon__coupon_type=0)
-
         # 有全局优惠券，检查优惠券使用场景合法性
         if user_global_coupon:
             global_coupon_key = GLOBAL_COUPON_KEY % user.id
@@ -754,11 +749,9 @@ class PaymentView(APIView):
                     res.code = 1106
                     res.error = '全局优惠券不符合使用要求'
                     return Response(res.dict)
-
         # 没有全局优惠券,最后的价格就是前面的专项优惠券打折之后的值
         else:
             global_count_price = total_price
-
         # 抵扣账户余额金币，按平台换算比例，1:100
 
         balance_equivalent = balance / 100  # balance是前端传来的数据
@@ -769,6 +762,7 @@ class PaymentView(APIView):
         # 最后的检验
 
         if price != total_price:  # price是前端传来的总价格
+            """ 有个bug,需要先领券再加入购物车才能使用优惠券，不然会报错"""
             print(total_price, type(total_price))
             print(price, type(price))
             # 说明前端传来的数据不正确
@@ -819,10 +813,14 @@ class PaymentView(APIView):
             pay_course_obj = models.Course.objects.filter(id=item['id']).first()
             course_coupon_dict = json.loads(item['course_coupon_dict'])
             price = float('%.2f' % float(item['price']))  # 不失真的转为浮点型数据，并取两位小数
+
+            """这里会创建多条重复数据"""
+
             # 如果有优惠券
             if len(course_coupon_dict) != 0:
                 for key, value in course_coupon_dict.items():
                     real_price = price - value['equal_money']
+
                 models.OrderDetail.objects.create(order=order_obj, original_price=item['price'],
                                                   price=real_price,
                                                   transaction_type=1,
@@ -955,7 +953,8 @@ class UserCouponView(APIView):
 
     def get(self, request):
         res = BaseResponse()
-        user_coupons = models.Coupon.objects.filter(coupondetail__account=request.user).all().distinct()
+        user_coupons = models.Coupon.objects.filter(coupondetail__account=request.user,
+                                                    coupondetail__status=0).all().distinct()
         coupon_dict = {}
         for item in user_coupons:
             coupon_dict[item.id] = {
@@ -975,3 +974,36 @@ class UserCouponView(APIView):
             }
         res.data = coupon_dict
         return Response(res.dict)
+
+
+class UserCourseView(APIView):
+    """当期那用户的已购买的课程"""
+    authentication_classes = [Auther, ]
+
+    def get(self, request):
+        # 获取用户的账单
+        res = BaseResponse()
+
+        order_res = PaymentView().get(request)  # 当前用户账单数据
+        user_order_products = order_res.data['data'].values()
+        course_ids = []
+        for product in user_order_products:
+            for item in list(product.keys()):
+                if item.isdigit():
+                    course_ids.append(item)
+        course_ids = list(set(course_ids))  # 去重
+        # 从账单中拿到对应的商品数据
+        courses = []
+        for course_id in course_ids:
+            course_res = CourseDetailView().get(request, course_id)
+            if len(courses) == 0:
+                courses = course_res.data
+            else:
+                courses.extend(course_res.data)
+        res.data = courses
+        # 返回展示已购买的商品内容，视频链接接入保利威视频，作业，
+        return Response(res.dict)
+
+    def post(self, request):
+        """对课程做评价、提问题，交作业"""
+        pass

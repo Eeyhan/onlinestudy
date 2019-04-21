@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <h3>我的优惠券</h3>
+      <h3>我的可用优惠券(已过滤掉已使用和已过期的)</h3>
       <el-table ref="multipleTable" :data="usercoupons" tooltip-effect="dark" style="width: 100%">
         <el-table-column label="优惠券名" width="250">
           <template slot-scope="scope">

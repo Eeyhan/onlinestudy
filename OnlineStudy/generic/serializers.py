@@ -59,6 +59,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     course_img = serializers.CharField(source='course.course_img')
     study_number = serializers.CharField(source='course.study_number')
     difficult = serializers.CharField(source='course.get_difficult_display')
+    course_id = serializers.IntegerField(source='course.id')
     teacher = serializers.SerializerMethodField()
     prices = serializers.SerializerMethodField()
     course_outline = serializers.SerializerMethodField()
@@ -95,7 +96,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CourseDetail
-        fields = ['title', 'course_img', 'course_review', 'study_number', 'difficult', 'prices',
+        fields = ['course_id', 'title', 'course_img', 'course_review', 'study_number', 'difficult', 'prices',
                   'lesson', 'teacher', 'brief', 'why_study', 'slogan', 'feature',
                   'point', 'course_outline', 'harvest', 'object_person', 'recommend_course',
                   'prerequisite']

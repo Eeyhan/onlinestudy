@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'generic.apps.GenericConfig',
     'LoginAuth',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'blwvideo',
 ]
 
 MIDDLEWARE = [
@@ -181,6 +182,12 @@ CORS_ALLOW_HEADERS = (
 
 )
 
-
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# --------- 保利威视频注册用户id和key--------
+
+POLYV_CONFIG = {
+    'userId': '2f57a43618',  # polyv 提供的服务器间的通讯验证
+    'secretkey': 'Uh9Ezw7Wdq'  # polyv 提供的接口调用签名访问的key
+}

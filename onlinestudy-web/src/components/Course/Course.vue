@@ -150,7 +150,7 @@ export default {
       this.GetconditionCourse(this.category_id, this.query_isup);
     },
 
-    // 跳转到课程
+    // 跳转到课程详情
     coursedetail(courseid) {
       this.$router.push({
         name: "CourseDetail",

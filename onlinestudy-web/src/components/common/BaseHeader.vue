@@ -28,10 +28,10 @@
             <i class="el-icon-goods"></i> 购物车
           </span>
           <!-- <span class="el-dropdown-link">学习中心</span> -->
-          <span class="user">{{userInfo.username}}</span>
+          <span class="user" @click="toStudy">学习中心</span>
           <img :src="userInfo.avatar" alt>
           <ul class="my_account" v-show="isShow">
-            <li>
+            <li @click="toMypage">
               我的账户
               <i>></i>
             </li>
@@ -41,7 +41,7 @@
             </li>
             <li>
               我的消息
-              <span class="msg">(40)</span>
+              <span class="msg"></span>
               <i>></i>
             </li>
             <li @click="toOrder">我的账单</li>
@@ -60,12 +60,14 @@
       </div>
     </el-header>
 
-    <!-- 购物车 -->
-    <div class="totop" @click="toTop">
-      <i class="el-icon-caret-top"></i>
-    </div>
-    <div class="toShop" @click="toShoppingCart">
-      <span>购物车</span>
+    <!-- 浮动固定，去顶部，去购物车 -->
+    <div v-show="srcollIsShow">
+      <div class="totop" @click="toTop">
+        <i class="el-icon-caret-top"></i>
+      </div>
+      <div class="toShop" @click="toShoppingCart">
+        <span>购物车</span>
+      </div>
     </div>
   </el-container>
 </template>
@@ -81,7 +83,8 @@ export default {
         { id: "3", name: "Degree", title: "学位课程" },
         { id: "4", name: "LightCourse", title: "线下面授" }
       ],
-      isShow: false
+      isShow: false, // 导航栏页面是否显示标志位
+      srcollIsShow: false // 右边浮动固定按钮
     };
   },
   methods: {
@@ -112,14 +115,24 @@ export default {
         name: "ShopCart"
       });
     },
-
+    // 去个人页面
+    toMypage() {
+      this.$router.push({
+        name: "Mypage"
+      });
+    },
     // 去优惠券
     toCoupon() {
       this.$router.push({
         name: "Usercoupon"
       });
     },
-
+    // 去学习中心
+    toStudy(){
+      this.$router.push({
+        name:'study'
+      })
+    },
     // 去账单中心
     toOrder() {
       this.$router.push({
@@ -134,6 +147,24 @@ export default {
       // 如果记住密码标志位为false就在退出的同时删除用户信息，否则就不删除
       if (!this.$store.state.isRemember) {
         localStorage.clear();
+      }
+      this.$router.push({
+        name:'Home'
+      })
+    },
+
+    // 监听滚动时间
+    handleScroll() {
+      var scrollTop =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop;
+      // 显示浮动的购物车和回顶部按钮
+      if (scrollTop >= 500) {
+        this.srcollIsShow = true;
+      }
+      if(scrollTop <= 150){
+        this.srcollIsShow = false;
       }
     }
   },
@@ -152,6 +183,9 @@ export default {
           .setAttribute("style", "");
       }
     }
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
   }
 
   // mounted() {

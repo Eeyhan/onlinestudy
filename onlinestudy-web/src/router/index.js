@@ -8,6 +8,10 @@ import LightCourse from '@/components/LightCourse/LightCourse'
 import Degree from '@/components/Course/Degree'
 import Login from '@/components/Person/Login'
 import Register from '@/components/Person/Register'
+import Mypage from '@/components/Person/Mypage'
+import study from '@/components/Person/study'
+import Courselesson from '@/components/Person/Courselesson'
+import learning from '@/components/Person/learning'
 import ShopCart from '@/components/Transaction/ShopCart'
 import SettlePay from '@/components/Transaction/SettlePay'
 import Order from '@/components/Transaction/Order'
@@ -70,6 +74,26 @@ export default new Router({
       path: '/Login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/Mypage',
+      name: 'Mypage',
+      component: Mypage
+    },  
+    {
+      path: '/study',
+      name: 'study',
+      component: study
+    },
+    {
+      path: '/study/:courseId',
+      name: 'Courselesson',
+      component: Courselesson
+    },
+    {
+      path:'/learning',
+      name:'learning',
+      component:learning
     },
     {
       path: '/ShopCart',

@@ -21,6 +21,9 @@ import '../static/global/global.css'
 // 导入极验js
 import '../static/global/gt.js'
 
+
+import '../static/global/axios.js'
+
 // 导入api接口函数
 import * as api from './RestfulApi/api.js'
 Vue.prototype.$http = api
@@ -32,7 +35,8 @@ router.beforeEach((to, form, next) => {
       access_token: localStorage.getItem('access_token'),
       username: localStorage.getItem('username'),
       avatar: localStorage.getItem('avatar'),
-      shop_cart_num: localStorage.getItem('shop_cart_num')
+      shop_cart_num: localStorage.getItem('shop_cart_num'),
+      balance:localStorage.getItem('balance')
     }
     store.dispatch('getUserInfo', user)
   }

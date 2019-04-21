@@ -1,8 +1,6 @@
 <template>
   <div class="box">
     <img src="https://s2.ax1x.com/2019/04/14/AOarGT.jpg" alt>
-    <el-button :plain="true" @click="open3"></el-button>
-    <el-button :plain="true" @click="open4"></el-button>
     <div class="login">
       <div class="login-title">
         <p>机会永远只留给有准备的人</p>
@@ -45,7 +43,14 @@ export default {
     };
   },
 
-  methods: {  
+  methods: {
+    open2() {
+      this.$message({
+        message: "请先输入注册数据",
+        type: "warning",
+        center: true
+      });
+    },
     open3() {
       this.$message({
         message: "请先点击验证按钮进行验证",
@@ -55,18 +60,20 @@ export default {
     },
 
     open4() {
-        this.$message({
-          message: '两次密码输入不正确',
-          type: 'error',
-          center: true
-        });
-      },
+      this.$message({
+        message: "两次密码输入不正确",
+        type: "error",
+        center: true
+      });
+    },
 
     ReigsterHandler() {
-      if (this.password !== this.password2) {
-        this.open4()
-      }else if (!this.validateResult.geetest_challenge) {
-        this.open3()
+      if (this.username == "") {
+        this.open2();
+      } else if (this.password !== this.password2) {
+        this.open4();
+      } else if (!this.validateResult.geetest_challenge) {
+        this.open3();
       } else {
         let params = {
           username: this.username,
@@ -81,7 +88,7 @@ export default {
           .then(res => {
             if (!res.error) {
               this.$router.push({
-                name: "Login"
+                name: "Login"  // name:"Home"
               });
             }
           })

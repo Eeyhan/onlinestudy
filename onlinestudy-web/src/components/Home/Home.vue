@@ -63,7 +63,8 @@ export default {
     next() {
       if (this.active++ > 2) this.active = 0;
     }
-  }
+  },
+  
 };
 </script>
 

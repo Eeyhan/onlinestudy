@@ -167,3 +167,9 @@ export const PaymentList = () =>{
 export const delPayment = (params) =>{
     return Axios.delete('/payment',{data:params}).then(res=>res.data)
 }
+
+
+// 用户已购买的课程、商品
+export const userCourselist =()=>{
+    return Axios.get('/usercourse').then(res=>res.data)
+}

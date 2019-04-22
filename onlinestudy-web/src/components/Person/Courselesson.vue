@@ -2,24 +2,40 @@
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">学无止境&nbsp;</h3>
     <div class="row">
-      <div class="course-item" v-for="(item,index) in courseChapter" :key="index">
-        <div class="course-inner">
-          <div class="course-info">
-            <p>章节 {{index+1}}：{{item.title}}</p>
+      <div class="course-left">
+        <div @click="tocomment">
+          <div class="block comment">
+            <span class="demonstration">课程评价</span>
+            <el-rate v-model="value2" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
           </div>
-          <div
-            class="content"
-            v-for="(lesson,index) in item.chapter_lesson"
-            :key="index"
-            :class="{active:currentIndex==index}"
-            @mouseenter="enterHandler(index)"
-            @mouseleave="leaveHandler"
-            @click="tolearning(lesson.id)"
-          >
-            <p>课时 {{index+1}} - {{lesson.title}}</p>
-            <span class="player">
-              <img src="http://127.0.0.1:8000/media/player.png">
-            </span>
+        </div>
+        <div @click="tohomework" class="comment">
+          <el-button type="success" round size="mini" class="common">作业/提交</el-button>
+        </div>
+        <div @click="toquestion" class="comment">
+          <el-button type="danger" round size="mini" class="common">问题求救</el-button>
+        </div>
+      </div>
+      <div>
+        <div class="course-item" v-for="(item,index) in courseChapter" :key="index">
+          <div class="course-inner">
+            <div class="course-info">
+              <p>章节 {{index+1}}：{{item.title}}</p>
+            </div>
+            <div
+              class="content"
+              v-for="(lesson,index) in item.chapter_lesson"
+              :key="index"
+              :class="{active:currentIndex==index}"
+              @mouseenter="enterHandler(index)"
+              @mouseleave="leaveHandler"
+              @click="tolearning(lesson.id)"
+            >
+              <p>课时 {{index+1}} - {{lesson.title}}</p>
+              <span class="player">
+                <img src="http://127.0.0.1:8000/media/player.png">
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -40,12 +56,29 @@ export default {
     };
   },
   methods: {
-    tolearning(course_id) {
+    tolearning(lesson_id) {
       this.$router.push({
         name: "learning",
-        params: { courseId: course_id }
+        params: { courseId: lesson_id }
       });
     },
+
+    tocomment() {
+      // 发送一个post请求
+    },
+    tohomework() {
+      this.$router.push({
+        name: "homework",
+        params: { courseId: this.$route.params.courseId }
+      });
+    },
+    toquestion() {
+      this.$router.push({
+        name: "solvequestion",
+        params: { courseId: this.$route.params.courseId }
+      });
+    },
+
     getCourseChapter() {
       let course_id = this.$route.params.courseId;
       this.$http.chapter(course_id).then(res => {
@@ -58,8 +91,8 @@ export default {
     enterHandler(index) {
       this.currentIndex = index;
     },
-    leaveHandler(){
-      this.currentIndex = 999
+    leaveHandler() {
+      this.currentIndex = 999;
     }
   },
   created() {
@@ -84,7 +117,13 @@ export default {
   margin: 0 auto;
   padding-top: 20px;
   padding-bottom: 20px;
+  display: flex;
 }
+
+.course-left {
+  margin-right: 100px;
+}
+
 .shopping-cart-wrap h3 {
   padding: 50px 0;
 }
@@ -116,7 +155,7 @@ export default {
 
 .content.active {
   background: #a2c5e9;
-  color: white
+  color: white;
 }
 
 .player {
@@ -126,5 +165,8 @@ export default {
 }
 .content img {
   width: 20px;
+}
+.comment {
+  margin-bottom: 20px;
 }
 </style>

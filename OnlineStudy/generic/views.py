@@ -601,54 +601,63 @@ class PaymentView(APIView):
 
         账单详情：
         [
-            账单id:{
-                商品名：
-                简介：
-                数量：
-                价格：
-                图片：
-            },
-        ]
-
+        账单id:[{
+                    商品名：
+                    简介：
+                    数量：
+                    价格：
+                    图片：
+                },
+                {
+                    商品名：
+                    简介：
+                    数量：
+                    价格：
+                    图片：
+                }]
         创建订单时间：
         下单付款时间:
         流水号:
         付款方式:
         实付金额:
         收获地址：
+        ]
 
         """
-
         res = BaseResponse()
         user_trades = models.TradeRecord.objects.filter(account=request.user).all()
         user_orders = models.OrderDetail.objects.filter(order__account=request.user).all().distinct()
 
-        pay_dict = {}
         # 商品数量
         trade_menu = {}
-        for trade in user_trades:
-            trade_menu[trade.id] = {
-                'user_address': trade.user_address,
-                'use_balance': trade.amount,
-                'pay_date': trade.date
+        product_dict = {}
+        for item in user_trades:
+            trade_menu[item.order_id] = {
+                'user_address': item.user_address,
+                'use_balance': item.amount,
+                'pay_date': item.date.strftime("%Y-%m-%d %H:%M:%S")
             }
-        for order in user_orders:
-            product = eval(order.product)
-            pay_dict[order.id] = {}
-            for item in product:
-                brief = models.Course.objects.filter(id=int(item['id'])).first().coursedetail.brief
-                pay_dict[order.id][item['id']] = item
-                pay_dict[order.id][item['id']]['brief'] = brief
 
-                for trade_id in trade_menu:
-                    pay_dict[order.id][item['id']]['use_balance'] = trade_menu[trade_id]['use_balance']
-                    pay_dict[order.id]['user_address'] = str(trade_menu[trade_id]['user_address'])
+        product_dict = {}
 
-            pay_dict[order.id]['transaction_number'] = order.transaction_number
-            pay_dict[order.id]['create_order_time'] = order.order.date
-            pay_dict[order.id]['pay_time'] = order.order.pay_time
-            pay_dict[order.id]['id'] = order.id
-        res.data = pay_dict
+        for item in user_orders:
+            product_dict[item.order_id] = {}
+
+        for item in user_orders:
+            product = eval(item.product)
+            product_dict[item.order_id]['id'] = item.id
+            product_dict[item.order_id][item.object_id] = product
+            product_dict[item.order_id][item.object_id]['real_price'] = item.price
+            for trade in trade_menu:
+                if trade == item.order_id:
+                    product_dict[item.order_id]['user_address'] = str(trade_menu[trade]['user_address'])
+                    product_dict[item.order_id]['pay_date'] = trade_menu[trade]['pay_date']
+                    product_dict[item.order_id]['use_balance'] = trade_menu[trade]['use_balance']
+            product_dict[item.order_id]['transaction_number'] = item.transaction_number
+            product_dict[item.order_id]['create_order_time'] = item.order.date.strftime("%Y-%m-%d %H:%M:%S")
+            product_dict[item.order_id]['pay_time'] = item.order.pay_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        res.data = product_dict
         return Response(res.dict)
 
     def post(self, request):
@@ -826,7 +835,7 @@ class PaymentView(APIView):
                                                   transaction_type=1,
                                                   transaction_number='pay' + str(time.time()),
                                                   valid_period=item['valid_period'],
-                                                  content_object=pay_course_obj, product=product)
+                                                  content_object=pay_course_obj, product=item)
             # 没有优惠券
             else:
                 models.OrderDetail.objects.create(order=order_obj, original_price=item['price'],
@@ -834,7 +843,7 @@ class PaymentView(APIView):
                                                   transaction_type=1,
                                                   transaction_number='pay' + str(time.time()),
                                                   valid_period=item['valid_period'],
-                                                  content_object=pay_course_obj, product=product)
+                                                  content_object=pay_course_obj, product=item)
 
         return Response(res.dict)
 
@@ -988,8 +997,9 @@ class UserCourseView(APIView):
         user_order_products = order_res.data['data'].values()
         course_ids = []
         for product in user_order_products:
+            print(product)
             for item in list(product.keys()):
-                if item.isdigit():
+                if isinstance(item,int):
                     course_ids.append(item)
         course_ids = list(set(course_ids))  # 去重
         # 从账单中拿到对应的商品数据

@@ -359,27 +359,28 @@ class Order(models.Model):
         db_table = verbose_name_plural
 
     def __str__(self):
-        return "%s" % self.order_nubmer
+        return "%s - %s" % (self.id,self.order_nubmer)
 
 
 class OrderDetail(models.Model):
     """订单详情表"""
-    order = models.ForeignKey(to="Order", on_delete='cascade')
-    original_price = models.FloatField(verbose_name="课程原价")
-    price = models.FloatField(verbose_name="折后价格")
+    # 把部分字段设置为空方便视图部分存储数据
+    order = models.ForeignKey(to="Order", on_delete='cascade',null=True,blank=True)
+    original_price = models.FloatField(verbose_name="课程原价",null=True,blank=True)
+    price = models.FloatField(verbose_name="折后价格",null=True,blank=True)
     valid_period_display = models.CharField(verbose_name="有效期在订单页显示", max_length=32, null=True, blank=True)
-    valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)")
+    valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)",null=True,blank=True)
     memo = models.CharField(max_length=255, blank=True, null=True, verbose_name="订单交易备注")
 
     transaction_type_choices = ((0, '收入'), (1, '支出'), (2, '退款'), (3, "提现"))  # 2 为了处理订单过期未支付时，锁定其余额的回退
     transaction_type = models.SmallIntegerField(choices=transaction_type_choices, verbose_name='交易类型',default=1)
-    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128)
+    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128,null=True,blank=True)
     product = models.CharField(max_length=2048, verbose_name='商品名',
                                null=True, blank=True,
                                help_text='如果是支出和退款一定写入购买的商品')
 
-    content_type = models.ForeignKey(ContentType, on_delete='cascade', verbose_name='关联普通课程或学位')
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete='cascade', verbose_name='关联普通课程或学位',null=True,blank=True)
+    object_id = models.PositiveIntegerField(null=True,blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
@@ -400,6 +401,7 @@ class OrderDetail(models.Model):
 class TradeRecord(models.Model):
     """余额交易记录表"""
     account = models.ForeignKey(to=Account, on_delete='cascade', verbose_name='用户')
+    order = models.ForeignKey(to=Order,on_delete='cascade',verbose_name='账单',null=True,blank=True)
     amount = models.FloatField(verbose_name="使用账户余额")
     balance = models.FloatField(verbose_name="账户余额")
     date = models.DateTimeField(auto_now_add=True, verbose_name='交易时间')

@@ -86,16 +86,22 @@ export default {
               localStorage.setItem("avatar", res.data.avatar);
               localStorage.setItem("shop_cart_num", res.data.shop_cart_num);
               localStorage.setItem("balance", res.data.balance);
-              
+
               // dispacth action的行为
               this.$store.dispatch("getUserInfo", res.data);
-              
+
               // 注册过来的，登录成功之后跳转会到注册页面
               // this.$router.go(-2)
 
               this.$router.push({
-                name:'Home'
-              })
+                name: "Home"
+              });
+            } else {
+              this.$message({
+                message: "登录失败，请重试",
+                type: "error",
+                center: true
+              });
             }
           })
           .catch(err => {

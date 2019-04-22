@@ -17,6 +17,8 @@ import SettlePay from '@/components/Transaction/SettlePay'
 import Order from '@/components/Transaction/Order'
 import Coupon from '@/components/Transaction/Coupon'
 import Usercoupon from '@/components/Transaction/UserCoupon'
+import homework from '@/components/Person/homework'
+import solvequestion from '@/components/Person/solvequestion'
 
 
 Vue.use(Router)
@@ -83,18 +85,31 @@ export default new Router({
     {
       path: '/study',
       name: 'study',
-      component: study
+      component: study,
+      
     },
     {
       path: '/study/:courseId',
       name: 'Courselesson',
-      component: Courselesson
+      component: Courselesson,
+      
     },
     {
       path:'/learning',
       name:'learning',
       component:learning
     },
+
+    {
+      path:'/homework',
+      name:'homework',
+      component:homework
+    },
+    {
+      path:'/solvequestion',
+      name:'solvequestion',
+      component:solvequestion
+    },   
     {
       path: '/ShopCart',
       name: 'ShopCart',

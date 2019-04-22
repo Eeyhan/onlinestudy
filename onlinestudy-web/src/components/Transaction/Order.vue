@@ -11,7 +11,7 @@
               <div v-for='(item,index) in scope.row' :key="index" v-if="typeof item == 'object'">
                 <img :src="item.course_img" alt>
                 <a href="javascript:void(0);">{{item.title}}</a>
-                <span>￥{{item.price}} - 有效期{{item.valid_period_display}}</span>
+                <span>￥{{item.real_price}} - 有效期{{item.valid_period_display}}</span>
                 
               </div> 
             </template>
@@ -83,7 +83,6 @@ export default {
         };
         console.log(params,rows[index])
         this.$http.delPayment(params).then(res => {
-          console.log(res)
           if (!res.error) {
             this.$message({
               message: ` ${res.data}`,
@@ -106,7 +105,7 @@ export default {
               this.PaymentOrder = Object.values(res.data);
             }
           }
-          console.log(this.products);
+          console.log(this.PaymentOrder);
         })
         .catch(err => {
           console.log(err);

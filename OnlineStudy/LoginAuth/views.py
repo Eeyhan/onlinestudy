@@ -37,13 +37,13 @@ class RegisterView(APIView):
 
     def post(self, request):
         res = BaseResponse()
-        # user_obj = RegisterSerializer(data=request.data)
-        # if user_obj.is_valid():
-        #     user_obj.save()
-        #     res.data = user_obj.data
-        # else:
-        #     res.code = 1020
-        #     res.error = user_obj.errors
+        user_obj = RegisterSerializer(data=request.data)
+        if user_obj.is_valid():
+            user_obj.save()
+            res.data = user_obj.data
+        else:
+            res.code = 1020
+            res.error = user_obj.errors
         return Response(res.dict)
 
 

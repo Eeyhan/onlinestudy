@@ -24,7 +24,8 @@ class Category(models.Model):
 class Course(models.Model):
     """课程表"""
     title = models.CharField(max_length=32, verbose_name='课程标题')
-    course_img = models.ImageField(verbose_name='课程图片', null=True, blank=True, upload_to='course/%Y-%m')
+    course_img = models.ImageField(verbose_name='课程图片', null=True, blank=True, upload_to='course/%Y-%m',
+                                   help_text='填写一个cdn外链地址即可')
     status_choices = ((0, '预售中'), (1, '开设中'), (2, '已下架'))
     status = models.SmallIntegerField(choices=status_choices, verbose_name='课程状态')
     difficult_choices = ((0, '初级'), (1, '中级'), (2, '高级'))
@@ -34,10 +35,10 @@ class Course(models.Model):
     course_type = models.SmallIntegerField(choices=course_type_choices, verbose_name='课程类型')
     release_date = models.DateField(verbose_name='发布日期', blank=True, null=True)
     order = models.IntegerField(verbose_name='课程顺序', help_text='从上一个课程开始')
-    category = models.ForeignKey(to=Category, on_delete='cascade')
+    category = models.ForeignKey(to=Category, on_delete=models.CASCADE, verbose_name='课程分类')
     study_number = models.IntegerField(verbose_name='学习人数', help_text='只要有人买，立即更新该字段')
-    degree_course = models.ForeignKey(to='Degree', on_delete='cascade', help_text='如果是学位课程，必须关联学位表',
-                                      blank=True, null=True)
+    degree_course = models.ForeignKey(to='Degree', on_delete=models.CASCADE, help_text='如果是学位课程，必须关联学位表',
+                                      blank=True, null=True, verbose_name='学位课程')
     price_policy = GenericRelation(to='PricePolicy')
     common_question = GenericRelation(to='CommonQuestion')
     comment = GenericRelation(to='Comment')
@@ -62,7 +63,7 @@ class Course(models.Model):
 
 class CourseDetail(models.Model):
     """课程详情表"""
-    course = models.OneToOneField(to='Course', on_delete='cascade')
+    course = models.OneToOneField(to='Course', on_delete=models.CASCADE)
     lesson = models.IntegerField(default=7, verbose_name='总课时')
     slogan = models.CharField(max_length=64, verbose_name='课程口号', blank=True, null=True)
     brief = models.CharField(max_length=128, verbose_name='简介')
@@ -88,7 +89,7 @@ class CourseDetail(models.Model):
 
 class CourseOutline(models.Model):
     """课程大纲表"""
-    course_detail = models.ForeignKey(to='CourseDetail', on_delete='cascade', related_name='course_outline')
+    course_detail = models.ForeignKey(to='CourseDetail', on_delete=models.CASCADE, related_name='course_outline')
     title = models.CharField(max_length=128, verbose_name='大纲名')
     order = models.SmallIntegerField(default=1, verbose_name='大纲顺序')
     content = models.TextField(max_length=2048, verbose_name='大纲内容')
@@ -105,7 +106,7 @@ class CourseOutline(models.Model):
 
 class CourseChapter(models.Model):
     """课程章节表"""
-    course = models.ForeignKey(to='Course', on_delete='cascade', related_name='course_chapters')
+    course = models.ForeignKey(to='Course', on_delete=models.CASCADE, related_name='course_chapters', verbose_name='课程')
     chapter = models.SmallIntegerField(default=1, verbose_name='第几章')
     title = models.CharField(max_length=32, verbose_name='章节名称')
 
@@ -125,7 +126,7 @@ class Degree(models.Model):
     aims = models.CharField(max_length=1024, verbose_name='培养目标')
     core = models.CharField(max_length=1024, verbose_name='核心优势')
     serving = models.CharField(max_length=1024, verbose_name='特色服务')
-    price = models.ForeignKey(to='PricePolicy', verbose_name='价格', on_delete='cascade')
+    price = models.ForeignKey(to='PricePolicy', verbose_name='价格', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -138,7 +139,7 @@ class Degree(models.Model):
 
 class CourseLesson(models.Model):
     """课时表"""
-    chapter = models.ForeignKey(to='CourseChapter', verbose_name='课程章节', on_delete='cascade',
+    chapter = models.ForeignKey(to='CourseChapter', verbose_name='课程章节', on_delete=models.CASCADE,
                                 related_name='course_lesson')
     title = models.CharField(max_length=32, verbose_name='课时名称')
     order = models.SmallIntegerField(verbose_name='课时顺序', help_text='每三个隔开排序，方便以后更新课程插入')
@@ -169,7 +170,7 @@ class CourseLesson(models.Model):
 
 class CommonQuestion(models.Model):
     """常见问题表"""
-    content_type = models.ForeignKey(to=ContentType, on_delete='cascade')
+    content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     question = models.CharField(max_length=64, verbose_name='问题')
@@ -187,10 +188,10 @@ class CommonQuestion(models.Model):
 
 class Comment(models.Model):
     """评论表"""
-    content_type = models.ForeignKey(to=ContentType, on_delete='cascade', null=True, blank=True)
+    content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE, null=True, blank=True)
     object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    account = models.ForeignKey(to='Account', on_delete='cascade', verbose_name='评论用户')
+    account = models.ForeignKey(to='Account', on_delete=models.CASCADE, verbose_name='评论用户')
     comment_date = models.DateField(auto_now_add=True)
     content = models.CharField(max_length=1024, verbose_name='评论内容')
 
@@ -219,36 +220,6 @@ class Teacher(models.Model):
         db_table = verbose_name_plural
 
 
-# class Tutor(models.Model):
-#     """导师表"""
-#     username = models.CharField(max_length=32, verbose_name='导师姓名')
-#     passwd = models.CharField(max_length=32, verbose_name='密码')
-#     title = models.CharField(max_length=64, verbose_name='导师头衔')
-#
-#     def __str__(self):
-#         return self.username
-
-
-class Account(models.Model):
-    """用户表"""
-    username = models.CharField(max_length=32, verbose_name='用户名')
-    passwd = models.CharField(max_length=32, verbose_name='密码')
-    email = models.EmailField(max_length=32, verbose_name='邮箱', null=True, blank=True)
-    brief = models.CharField(max_length=64, verbose_name='学员简介', null=True, blank=True)
-    CHOICES = ((0, '大专'), (1, '本科'), (2, '研究生'), (3, '博士'), (4, '硕士'), (5, '其他'))
-    education = models.IntegerField(choices=CHOICES,  verbose_name='学历', null=True, blank=True)
-    career = models.CharField(max_length=32, verbose_name='目前职业/最近一次从事职业', null=True, blank=True)
-    balance = models.IntegerField(verbose_name='账户余额', default=0)
-
-    def __str__(self):
-        return self.username
-
-    class Meta:
-        verbose_name = '用户表'
-        verbose_name_plural = 'DB_Account'
-        db_table = verbose_name_plural
-
-
 class Coupon(models.Model):
     """优惠券表"""
     title = models.CharField(max_length=64, verbose_name='活动名')
@@ -270,7 +241,7 @@ class Coupon(models.Model):
 
     date = models.DateTimeField(verbose_name='生效时间', help_text='即用户实际领取优惠券生效的时间', auto_now_add=True)
 
-    content_type = models.ForeignKey(to=ContentType, on_delete='cascade', null=True, blank=True)
+    content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE, null=True, blank=True)
     object_id = models.PositiveIntegerField(verbose_name='绑定的课程对象', null=True, blank=True,
                                             help_text='有值代表专项优惠券，没有值代表通用券')
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -297,14 +268,14 @@ class Coupon(models.Model):
 
 class CouponDetail(models.Model):
     """优惠券详情表"""
-    coupon = models.ForeignKey(to='Coupon', on_delete='cascade')
+    coupon = models.ForeignKey(to='Coupon', on_delete=models.CASCADE)
     number = models.CharField(max_length=64, unique=True, verbose_name='优惠券流水记录')
-    account = models.ForeignKey(to='Account', verbose_name='优惠券拥有者', on_delete='cascade')
+    account = models.ForeignKey(to='Account', verbose_name='优惠券拥有者', on_delete=models.CASCADE)
     status_choices = ((0, '未使用'), (1, '已使用'), (2, '已过期'))
     status = models.IntegerField(choices=status_choices, default=0)
     get_time = models.DateTimeField(verbose_name='用户领取时间')
     use_time = models.DateTimeField(verbose_name='用户使用时间', blank=True, null=True)
-    order = models.ForeignKey(to='Order', on_delete='cascade', blank=True, null=True, verbose_name='关联订单',
+    order = models.ForeignKey(to='Order', on_delete=models.CASCADE, blank=True, null=True, verbose_name='关联订单',
                               help_text='一个订单可以有多个优惠券使用记录')
 
     class Meta:
@@ -318,7 +289,7 @@ class CouponDetail(models.Model):
 
 class PricePolicy(models.Model):
     """价格策略表"""
-    content_type = models.ForeignKey(to=ContentType, on_delete='cascade')
+    content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField(verbose_name='课程对象')
     content_object = GenericForeignKey('content_type', 'object_id')
     valid_period_choices = ((1, '1天'), (3, '3天'), (7, '1周'), (14, '2周'),
@@ -345,7 +316,7 @@ class Order(models.Model):
     payment_type = models.SmallIntegerField(choices=payment_type_choices, verbose_name='付款类型')
     payment_number = models.IntegerField(verbose_name='支付第三方流水号', null=True, blank=True)
     order_nubmer = models.CharField(max_length=128, verbose_name='订单号', blank=True, null=True)
-    account = models.ForeignKey(to='Account', verbose_name='下单用户', on_delete='cascade')
+    account = models.ForeignKey(to='Account', verbose_name='下单用户', on_delete=models.CASCADE)
     payment_amount = models.FloatField(verbose_name='实付金额')
     status_choices = ((0, '交易成功'), (1, '待支付'), (2, '退费申请中'), (3, '已退费'), (4, '主动取消'), (5, '超时取消'))
     status = models.SmallIntegerField(choices=status_choices, verbose_name="订单状态")
@@ -359,28 +330,29 @@ class Order(models.Model):
         db_table = verbose_name_plural
 
     def __str__(self):
-        return "%s - %s" % (self.id,self.order_nubmer)
+        return "%s - %s" % (self.id, self.order_nubmer)
 
 
 class OrderDetail(models.Model):
     """订单详情表"""
     # 把部分字段设置为空方便视图部分存储数据
-    order = models.ForeignKey(to="Order", on_delete='cascade',null=True,blank=True)
-    original_price = models.FloatField(verbose_name="课程原价",null=True,blank=True)
-    price = models.FloatField(verbose_name="折后价格",null=True,blank=True)
+    order = models.ForeignKey(to="Order", on_delete=models.CASCADE, null=True, blank=True)
+    original_price = models.FloatField(verbose_name="课程原价", null=True, blank=True)
+    price = models.FloatField(verbose_name="折后价格", null=True, blank=True)
     valid_period_display = models.CharField(verbose_name="有效期在订单页显示", max_length=32, null=True, blank=True)
-    valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)",null=True,blank=True)
+    valid_period = models.PositiveIntegerField(verbose_name="课程有效期(days)", null=True, blank=True)
     memo = models.CharField(max_length=255, blank=True, null=True, verbose_name="订单交易备注")
 
     transaction_type_choices = ((0, '收入'), (1, '支出'), (2, '退款'), (3, "提现"))  # 2 为了处理订单过期未支付时，锁定其余额的回退
-    transaction_type = models.SmallIntegerField(choices=transaction_type_choices, verbose_name='交易类型',default=1)
-    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128,null=True,blank=True)
+    transaction_type = models.SmallIntegerField(choices=transaction_type_choices, verbose_name='交易类型', default=1)
+    transaction_number = models.CharField(unique=True, verbose_name="流水号", max_length=128, null=True, blank=True)
     product = models.CharField(max_length=2048, verbose_name='商品名',
                                null=True, blank=True,
                                help_text='如果是支出和退款一定写入购买的商品')
 
-    content_type = models.ForeignKey(ContentType, on_delete='cascade', verbose_name='关联普通课程或学位',null=True,blank=True)
-    object_id = models.PositiveIntegerField(null=True,blank=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, verbose_name='关联普通课程或学位', null=True,
+                                     blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
@@ -400,8 +372,8 @@ class OrderDetail(models.Model):
 
 class TradeRecord(models.Model):
     """余额交易记录表"""
-    account = models.ForeignKey(to=Account, on_delete='cascade', verbose_name='用户')
-    order = models.ForeignKey(to=Order,on_delete='cascade',verbose_name='账单',null=True,blank=True)
+    account = models.ForeignKey(to='Account', on_delete=models.CASCADE, verbose_name='用户')
+    order = models.ForeignKey(to=Order, on_delete=models.CASCADE, verbose_name='账单', null=True, blank=True)
     amount = models.FloatField(verbose_name="使用账户余额")
     balance = models.FloatField(verbose_name="账户余额")
     date = models.DateTimeField(auto_now_add=True, verbose_name='交易时间')
@@ -414,6 +386,207 @@ class TradeRecord(models.Model):
         db_table = verbose_name_plural
 
     def __str__(self):
-        return "%s - %s " % (self.amount,self.balance)
+        return "%s - %s " % (self.amount, self.balance)
 
 
+class Account(models.Model):
+    """用户表"""
+    username = models.CharField(max_length=32, verbose_name='用户名')
+    passwd = models.CharField(max_length=32, verbose_name='密码')
+    email = models.EmailField(max_length=32, verbose_name='邮箱', null=True, blank=True)
+    brief = models.CharField(max_length=64, verbose_name='学员简介', null=True, blank=True)
+    CHOICES = ((0, '大专'), (1, '本科'), (2, '研究生'), (3, '博士'), (4, '硕士'), (5, '其他'))
+    education = models.IntegerField(choices=CHOICES, verbose_name='学历', null=True, blank=True)
+    career = models.CharField(max_length=32, verbose_name='目前职业/最近一次从事职业', null=True, blank=True)
+    balance = models.IntegerField(verbose_name='账户余额', default=0)
+    LEVEL_CHOICES = ((0, '管理员'), (1, '导师'), (2, '学员'), (3, '非学员'))
+    level = models.IntegerField(choices=LEVEL_CHOICES, default=3, verbose_name='用户等级')
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = '用户表'
+        verbose_name_plural = 'DB_Account'
+        db_table = verbose_name_plural
+
+
+class Student(models.Model):
+    """学生表"""
+    account = models.OneToOneField(verbose_name='学员信息', to='Account', on_delete=models.CASCADE)
+    qq = models.CharField(verbose_name='QQ号', max_length=32, null=True, blank=True)
+    mobile = models.CharField(verbose_name='手机号', max_length=32, null=True, blank=True)
+    emergency_contract = models.CharField(verbose_name='紧急联系人电话', max_length=32, null=True, blank=True)
+    courses = models.ManyToManyField(verbose_name="已买课程", to='Course', blank=True)
+    student_status_choices = [
+        (1, "申请中"),
+        (2, "在学"),
+        (3, "毕业"),
+        (4, "退学"),
+        (5, "非学员")
+    ]
+    student_status = models.IntegerField(verbose_name="学员状态", choices=student_status_choices, default=1)
+    score = models.IntegerField(verbose_name='积分', default=100)
+    memo = models.TextField(verbose_name='备注', max_length=255, blank=True, null=True)
+    tutor = models.ForeignKey(verbose_name='导师', to='Tutor', blank=True, null=True,
+                              help_text='这个字段由管理员填写分配', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = '学生表'
+        verbose_name_plural = 'DB_Student'
+        db_table = verbose_name_plural
+
+    def __str__(self):
+        return self.account.username
+
+
+class Tutor(models.Model):
+    """导师表"""
+    account = models.OneToOneField(verbose_name='导师信息', to='Account', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.account.username
+
+    class Meta:
+        verbose_name = '导师表'
+        verbose_name_plural = 'DB_Tutor'
+        db_table = verbose_name_plural
+
+
+
+class Admins(models.Model):
+    """管理组表"""
+    account = models.OneToOneField(verbose_name='管理组', to='Account', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.account.username
+
+    def save(self, *args, **kwargs):
+        self.account.level = 0
+        super(Admins, self).save()
+
+    class Meta:
+        verbose_name = '管理组表'
+        verbose_name_plural = 'DB_Admins'
+        db_table = verbose_name_plural
+
+
+class PaymentRecord(models.Model):
+    """
+    缴费申请确认表
+    """
+    account = models.ForeignKey(to='Account', verbose_name="客户", on_delete=models.CASCADE)
+    pay_type_choices = [
+        (1, "报名费"),
+        (2, "学费"),
+        (3, "退学"),
+        (4, "其他"),
+    ]
+    pay_type = models.IntegerField(verbose_name="费用类型", choices=pay_type_choices, default=1)
+    paid_fee = models.FloatField(verbose_name="金额", default=0)
+    course = models.ForeignKey(verbose_name="申请课程", to="Course", on_delete=models.CASCADE)
+    apply_date = models.DateTimeField(verbose_name="申请日期", auto_now_add=True)
+
+    confirm_status_choices = (
+        (1, '申请中'),
+        (2, '已确认'),
+        (3, '已驳回'),
+    )
+    confirm_status = models.IntegerField(verbose_name="确认状态", choices=confirm_status_choices, default=1)
+    confirm_date = models.DateTimeField(verbose_name="确认日期", null=True, blank=True)
+    confirm_user = models.ForeignKey(verbose_name="审批人", to='Admins', related_name='confirms', on_delete=models.CASCADE,
+                                     null=True, blank=True)
+    note = models.TextField(verbose_name="备注", blank=True, null=True)
+
+    class Meta:
+        verbose_name = '缴费申请表'
+        verbose_name_plural = 'DB_PaymentRecord'
+        db_table = verbose_name_plural
+
+
+class ConsultRecord(models.Model):
+    """
+    导师跟进记录表
+    """
+    student = models.ForeignKey(verbose_name='所跟进学生', to='Account', on_delete=models.CASCADE,
+                                limit_choices_to={'level': 2})
+    consultant = models.ForeignKey(verbose_name='跟进人', to='Tutor', on_delete=models.CASCADE,
+                                   limit_choices_to={'account__level': 1})
+    note = models.TextField(verbose_name='跟进内容')
+    date = models.DateField(verbose_name='跟进日期', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '导师跟进记录表'
+        verbose_name_plural = 'DB_ConsultRecord'
+        db_table = verbose_name_plural
+
+
+class ScoreRecord(models.Model):
+    """
+    积分记录
+    """
+    student = models.ForeignKey(verbose_name='学生', to='Account', on_delete=models.CASCADE,
+                                limit_choices_to={'level': 2})
+    content = models.TextField(verbose_name='理由')
+    score = models.IntegerField(verbose_name='分值', help_text='违纪扣分写负值，表现邮寄加分写正值')
+    user = models.ForeignKey(verbose_name='执行人', to='Tutor', on_delete=models.CASCADE,
+                             limit_choices_to={'account__level': 1})
+
+    class Meta:
+        verbose_name = '积分记录'
+        verbose_name_plural = 'DB_ScoreRecord'
+        db_table = verbose_name_plural
+
+
+class StudyQuestion(models.Model):
+    """问题表"""
+    student = models.ForeignKey(verbose_name='提问学生', to='Account', on_delete=models.CASCADE,
+                                limit_choices_to={'level': 2})
+    tutor = models.ForeignKey(verbose_name='导师', to='Tutor', on_delete=models.CASCADE,
+                              limit_choices_to={'account__level': 1})
+    question = models.TextField(verbose_name='提问内容')
+    answer = models.TextField(verbose_name='回答内容', null=True, blank=True)
+
+    class Meta:
+        verbose_name = '问题表'
+        verbose_name_plural = 'DB_StudyQuestion'
+        db_table = verbose_name_plural
+
+
+class Homework(models.Model):
+    """
+    作业情况
+    """
+    courses = models.ForeignKey(verbose_name='课程', to='Course', on_delete=models.CASCADE)
+    teacher = models.ForeignKey(verbose_name='导师', to='Tutor', on_delete=models.CASCADE,
+                                limit_choices_to={'account__level': 1})
+    content = models.TextField(verbose_name='作业内容', null=True, blank=True)
+
+    class Meta:
+        verbose_name = '作业情况'
+        verbose_name_plural = 'DB_Homework'
+        db_table = verbose_name_plural
+
+
+class HomeworkDetail(models.Model):
+    """
+    作业详情
+    """
+    homework = models.ForeignKey(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
+    student = models.ManyToManyField(verbose_name='学生', to='Account', blank=True,
+                                     limit_choices_to={'level': 2})
+    work_status_choices = [
+        (1, "作业未发布"),
+        (2, "学生未提交"),
+        (3, "讲师未批改"),
+        (4, "讲师已批改-合格"),
+        (5, "讲师已批改-不合格")
+    ]
+    status = models.IntegerField(choices=work_status_choices, default=2)
+    file = models.FileField(upload_to='homework/%Y-%m-%d/', null=True, blank=True, verbose_name='作业文件')
+    critic = models.TextField(verbose_name='作业批语', null=True, blank=True)
+
+    class Meta:
+        verbose_name = '作业详情'
+        verbose_name_plural = 'DB_HomeworkDetail'
+        db_table = verbose_name_plural

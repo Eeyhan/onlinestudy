@@ -80,7 +80,7 @@ export default {
       headerList: [
         { id: "1", name: "Home", title: "首页" },
         { id: "2", name: "Course", title: "体验课程" },
-        { id: "3", name: "Degree", title: "学位课程" },
+        { id: "3", name: "Degree", title: "高级课程" },
         { id: "4", name: "LightCourse", title: "线下面授" }
       ],
       isShow: false, // 导航栏页面是否显示标志位

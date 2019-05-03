@@ -81,7 +81,6 @@ export default {
         let params = {
           order: parseInt(rows[index].id)
         };
-        console.log(params,rows[index])
         this.$http.delPayment(params).then(res => {
           if (!res.error) {
             this.$message({
@@ -105,7 +104,6 @@ export default {
               this.PaymentOrder = Object.values(res.data);
             }
           }
-          console.log(this.PaymentOrder);
         })
         .catch(err => {
           console.log(err);

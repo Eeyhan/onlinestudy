@@ -615,6 +615,7 @@ class PaymentView(APIView):
                     价格：
                     图片：
                 }]
+        账单ID
         创建订单时间：
         下单付款时间:
         流水号:
@@ -645,7 +646,7 @@ class PaymentView(APIView):
 
         for item in user_orders:
             product = eval(item.product)
-            product_dict[item.order_id]['id'] = item.id
+            product_dict[item.order_id]['id'] = item.order_id
             product_dict[item.order_id][item.object_id] = product
             product_dict[item.order_id][item.object_id]['real_price'] = item.price
             for trade in trade_menu:
@@ -676,7 +677,7 @@ class PaymentView(APIView):
         if price and isinstance(price, str):
             price = eval(price)
 
-        # 购买有两种情况，一种直接购买，一种是添加购物车之后购买，在前端单独处理这两个情况
+        # 购买有两种情况，一种直接购买，一种是添加购物车之后购买，已处理好此情况
 
         user_key = SETTLEMENT_KEY % (user.id, "*")
         user_settlements = CONN.scan_iter(user_key)
@@ -696,6 +697,12 @@ class PaymentView(APIView):
                 return Response(res.dict)
             course_coupon_id = int(settlement_info.get('default_coupon_id', 0))
             # 有优惠券，检验课程优惠券有效期
+            # 这里有四个情况：
+            #   1.当前用户本来就没有领取专项优惠券
+            #   2.当前用户有专项优惠券但和redis里的数据不匹配
+            #   2.当前用户有专项优惠券但并没有勾选使用优惠券
+            #   3.正常使用专项优惠券
+
             if course_coupon_id:
                 user_coupon_dict = models.Coupon.objects.filter(
                     id=course_coupon_id,
@@ -705,10 +712,11 @@ class PaymentView(APIView):
                     coupondetail__account=user,
                     coupondetail__status=0).values('coupon_type', 'equal_money', 'off_percent',
                                                    'minimum_consume').all().distinct()
-
+                # 优惠券已使用
+                # 有优惠券，但没有勾选
                 if course_coupon_id and not user_coupon_dict:
                     res.code = 1102
-                    res.error = '优惠券id不合法'  # 优惠券已使用
+                    res.error = '优惠券id不合法'
                     return Response(res.dict)
 
                 course_db_price = settlement_info['price']
@@ -768,10 +776,11 @@ class PaymentView(APIView):
         if total_price < 0:
             total_price = 0
         total_price = float('%.2f' % total_price)
+
         # 最后的检验
 
         if price != total_price:  # price是前端传来的总价格
-            """ 有个bug,需要先领券再加入购物车才能使用优惠券，不然会报错"""
+            """ 有个小问题,需要先领券再加入购物车才能使用优惠券，不然就会走这里"""
             print(total_price, type(total_price))
             print(price, type(price))
             # 说明前端传来的数据不正确
@@ -783,7 +792,7 @@ class PaymentView(APIView):
 
         res.data = '付款成功'
 
-        # 更新业务数据库里的数据
+        # ########## 更新业务数据库里的数据 #############
 
         # 删掉redis结算中心里的数据
 
@@ -817,9 +826,17 @@ class PaymentView(APIView):
         order_obj = models.Order.objects.create(payment_type=0, account_id=user.id,
                                                 payment_amount=total_price,
                                                 status=0, pay_time=now())
-
+        student_obj = models.Student.objects.create(account=user_obj.first())
         for item in product:
+
             pay_course_obj = models.Course.objects.filter(id=item['id']).first()
+            print(pay_course_obj)
+            # 加入到缴费申请表
+            models.PaymentRecord.objects.create(account=user_obj.first(), paid_fee=total_price,
+                                                course=pay_course_obj)
+            # 购买的用户信息链接到学生表里
+
+            student_obj.courses.add(pay_course_obj)
             course_coupon_dict = json.loads(item['course_coupon_dict'])
             price = float('%.2f' % float(item['price']))  # 不失真的转为浮点型数据，并取两位小数
 
@@ -900,7 +917,10 @@ class PaymentView(APIView):
 
     def delete_func(self, user, orders, res):
         """只删交易记录，不删账户余额使用情况，可以正常查询用户的账户余额走向"""
-        models.OrderDetail.objects.filter(order__account=user).all().filter(id=orders).delete()
+
+        obj = models.Order.objects.filter(id=int(orders), account=user)
+        if obj.exists():
+            obj.delete()
         # models.TradeRecord.objects.filter(account=user).all().filter()
 
         return res
@@ -931,7 +951,7 @@ class CouponDistributionView(APIView):
                 'grant_end_time': item.grant_end_time,
                 'start_time': item.start_time,
                 'end_time': item.end_time,
-                'period': item.date
+                'period': str(item.period) + '天'
             }
         res.data = coupon_dict
         return Response(res.dict)
@@ -979,14 +999,14 @@ class UserCouponView(APIView):
                 'grant_end_time': item.grant_end_time,
                 'start_time': item.start_time,
                 'end_time': item.end_time,
-                'period': item.date
+                'period': str(item.period) + '天'
             }
         res.data = coupon_dict
         return Response(res.dict)
 
 
 class UserCourseView(APIView):
-    """当期那用户的已购买的课程"""
+    """当期用户已购买的课程"""
     authentication_classes = [Auther, ]
 
     def get(self, request):
@@ -999,7 +1019,7 @@ class UserCourseView(APIView):
         for product in user_order_products:
             print(product)
             for item in list(product.keys()):
-                if isinstance(item,int):
+                if isinstance(item, int):
                     course_ids.append(item)
         course_ids = list(set(course_ids))  # 去重
         # 从账单中拿到对应的商品数据

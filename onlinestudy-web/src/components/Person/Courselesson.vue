@@ -141,21 +141,23 @@ export default {
   text-align: left;
 }
 .course-info {
-  background: #e1dbdb;
+  background: #d7eef2;
   padding: 20px;
-  padding-bottom: 30px;
+  border-left: 2px solid #8d03f6;
 }
 
 .content {
-  padding: 40px;
+  padding: 20px;
   position: relative;
   cursor: pointer;
   line-height: 18px;
 }
 
 .content.active {
-  background: #a2c5e9;
+  background: #ffcd00;
   color: white;
+  border-radius: 5px;
+  font-size: 20px;
 }
 
 .player {
@@ -164,7 +166,9 @@ export default {
   top: 40px;
 }
 .content img {
-  width: 20px;
+  width: 35px;
+  position: absolute;
+  top: -27px;
 }
 .comment {
   margin-bottom: 20px;

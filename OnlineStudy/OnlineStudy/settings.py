@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'blwvideo',
+    'startX.apps.StartxConfig'
 ]
 
 MIDDLEWARE = [
@@ -92,7 +93,10 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': '123456',
-        'NAME': 'onlinestudy'
+        'NAME': 'onlinestudy',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 

@@ -14,15 +14,20 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="name" label="活动开始领取时间" width="212">
+        <el-table-column prop="name" label="活动开始时间" width="212">
           <template slot-scope="scope">
-            <span>{{scope.row.grant_begin_time}}</span>
+            <span>{{scope.row.grant_begin_time|formatTime}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="优惠券生效时间" show-overflow-tooltip>
-          <template slot-scope="scope">{{scope.row.start_time}}</template>
+        <el-table-column prop="address" label="活动结束取时间" show-overflow-tooltip>
+          <template slot-scope="scope">{{scope.row.grant_end_time|formatTime}}</template>
         </el-table-column>
-
+        <el-table-column prop="address" label="优惠券生效时间" show-overflow-tooltip>
+          <template slot-scope="scope">{{scope.row.start_time|formatTime}}</template>
+        </el-table-column>
+        <el-table-column prop="address" label="优惠券结束时间" show-overflow-tooltip>
+          <template slot-scope="scope">{{scope.row.end_time|formatTime}}</template>
+        </el-table-column>
         <el-table-column prop="address" label="优惠券有效期" show-overflow-tooltip>
           <template slot-scope="scope">{{scope.row.period}}</template>
         </el-table-column>
@@ -48,12 +53,17 @@ export default {
   },
   created() {
     this.getCouponList();
+  },
+  filters: {
+    //格式化时间
+    formatTime(value) {
+      return value.replace("T", " ").split(".")[0];
+    }
   }
 };
 </script>
 
 <style lang="css" scoped>
-
 .row {
   width: 1200px;
   margin: 40px auto;
@@ -92,8 +102,6 @@ select {
   margin-bottom: 82px;
   /*justify-content:flex-end;*/
 }
-
-
 
 .el-input {
   width: 600px !important;

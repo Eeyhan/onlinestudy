@@ -1,0 +1,50 @@
+body{
+    margin: 0;
+}
+img {
+    border: 0;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.font-16{
+    font-size: 16px !important;
+}
+.clearfix:after {
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0;
+}
+.bg-danger {
+    background-color: #d9534f !important;
+    color: #ffffff;
+}
+.bg-success {
+    background-color: #5cb85c !important;
+    color: #ffffff;
+}
+
+.badge {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: #777;
+    border-radius: 10px;
+}
+.img-circle {
+    border-radius: 50%;
+}

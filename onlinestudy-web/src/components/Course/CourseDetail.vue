@@ -232,7 +232,8 @@ export default {
             if (!res.error) {
               this.$message({
                 message: this.details.title + res.data,
-                center: true
+                center: true,
+                type: 'success'
               });
             }
           });

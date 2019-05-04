@@ -1,4 +1,4 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display
+from startX.serivce.v1 import StartXHandler, get_m2m_display, Option
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
 
@@ -38,4 +38,8 @@ class CourseChapterHandler(StartXHandler):
         course_id = kwargs.get('course_id')
         return self.model_class.objects.filter(course_id=course_id)
 
-    list_display = ['course', 'title', 'chapter',display_lesson]
+    list_display = ['course', 'title', 'chapter', display_lesson]
+    search_list = ['course_contains']
+    search_group = [
+        Option('course')
+    ]

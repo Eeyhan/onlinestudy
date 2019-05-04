@@ -22,13 +22,13 @@ class OrderHandler(StartXHandler):
         record_url = reverse('startX:generic_paymentrecord_list', kwargs={'account_id': model.account_id})
         return mark_safe('<a target="_blank" href="%s">缴费申请</a>' % record_url)
 
-    list_display = [StartXHandler.display_checkbox,
-                    'account', 'payment_amount',
-                    get_field_display('交易类型', 'payment_type'),
-                    get_field_display('订单状态', 'status'),
-                    get_datetime_format('生成时间', 'date'),
-                    get_datetime_format('付款时间', 'pay_time'),
-                    'payment_number', 'order_nubmer', display_orderdetail, display_paymentrecord]
+    list_display = [
+        'account', 'payment_amount',
+        get_field_display('交易类型', 'payment_type'),
+        get_field_display('订单状态', 'status'),
+        get_datetime_format('生成时间', 'date'),
+        get_datetime_format('付款时间', 'pay_time'),
+        'payment_number', 'order_nubmer', display_orderdetail, display_paymentrecord]
 
     def get_list_display(self, request, *args, **kwargs):
         """
@@ -40,3 +40,5 @@ class OrderHandler(StartXHandler):
             value.extend(self.list_display)
             value.append(type(self).display_edit)
         return value
+
+    search_list = ['account__contains', ]

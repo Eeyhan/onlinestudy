@@ -37,6 +37,8 @@ def get_datetime_format(field_title, field, time_format='%Y-%m-%d'):
         if is_header:
             return field_title
         datetime_format = getattr(model, field)
+        if not datetime_format:
+            return None
         return datetime_format.strftime(time_format)
 
     return inner

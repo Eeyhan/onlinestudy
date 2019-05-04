@@ -1,5 +1,5 @@
-from startX.serivce.v1 import StartXHandler, StartXModelForm, get_field_display
-from django.urls import reverse, re_path
+from startX.serivce.v1 import StartXHandler, StartXModelForm, get_field_display, Option
+from django.urls import re_path
 from django.utils.safestring import mark_safe
 from generic import models
 
@@ -42,3 +42,5 @@ class CourseLessonHandler(StartXHandler):
 
     list_display = [
         'title', 'order', get_field_display('课程顺序', 'course_lesson_type'), 'free_trail', 'lesson_link']
+
+    search_list = ['title__contains']

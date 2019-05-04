@@ -14,6 +14,7 @@ import Courselesson from '@/components/Person/Courselesson'
 import learning from '@/components/Person/learning'
 import ShopCart from '@/components/Transaction/ShopCart'
 import SettlePay from '@/components/Transaction/SettlePay'
+import OrderDetail from '@/components/Transaction/OrderDetail'
 import Order from '@/components/Transaction/Order'
 import Coupon from '@/components/Transaction/Coupon'
 import Usercoupon from '@/components/Transaction/UserCoupon'
@@ -120,12 +121,18 @@ export default new Router({
       path: '/SettlePay',
       name: 'SettlePay',
       component: SettlePay,
-
+      
     },
+    
     {
       path: '/Order',
       name: 'Order',
       component: Order
+    },
+    {
+      path: '/Order/detail/:orderId',
+      name: 'OrderDetail',
+      component: OrderDetail
     },
     {
       path: '/coupon',

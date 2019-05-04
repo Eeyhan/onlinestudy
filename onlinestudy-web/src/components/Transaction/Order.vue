@@ -1,22 +1,19 @@
 <template>
   <div class="shopping-cart-wrap">
-    
     <h3 class="shopping-cart-tit">我的订单 &nbsp;</h3>
-    <div class="row">     
+    <div class="row">
       <el-table ref="multipleTable" :data="PaymentOrder" tooltip-effect="dark" style="width: 100%">
         <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column label="商品" width="450">
           <el-table-column>
             <template slot-scope="scope">
-              <div v-for='(item,index) in scope.row' :key="index" v-if="typeof item == 'object'">
+              <div v-for="(item,index) in scope.row" :key="index" v-if="typeof item == 'object'">
                 <img :src="item.course_img" alt>
                 <a href="javascript:void(0);">{{item.title}}</a>
                 <span>￥{{item.real_price}} - 有效期{{item.valid_period_display}}</span>
-                
-              </div> 
+              </div>
             </template>
           </el-table-column>
-          
         </el-table-column>
 
         <el-table-column prop="name" label="提交订单时间" width="130">
@@ -34,6 +31,15 @@
           <template slot-scope="scope">{{scope.row.user_address}}</template>
         </el-table-column>
 
+        <el-table-column fixed="right" label="账单详情" width="130">
+          <template slot-scope="scope">
+            <el-button
+              @click.native.prevent="toAssess(scope.$index, PaymentOrder)"
+              type="text"
+              size="small"
+            >账单详情</el-button>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="130">
           <template slot-scope="scope">
             <el-button
@@ -108,6 +114,21 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    toAssess(index, row) {
+      let order = row[index].id;
+      let course = {};
+      let params = {};
+      for (let key in row[index]) {
+        if (typeof row[index][key] == "object") {
+          course[row[index][key].id] = row[index][key];
+        }
+      }
+      params[order] = course;
+      this.$router.push({
+        name: "OrderDetail",
+        params: { params: params,orderId:order }
+      });
     }
   },
 
@@ -144,7 +165,7 @@ export default {
 }
 .cell a {
   color: #000;
-  margin-left: 30px;
+  font-size: 12px;
 }
 select {
   border: 0;

@@ -13,3 +13,4 @@ class AccountHandler(StartXHandler):
     model_form_class = AccountModelForm
     list_display = ['username', 'email', 'brief', get_field_display('学历', 'education'), 'career',
                     get_field_display('用户等级', 'level')]
+    search_list = ['username__contains']

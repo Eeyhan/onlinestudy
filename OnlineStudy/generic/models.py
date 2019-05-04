@@ -453,7 +453,6 @@ class Tutor(models.Model):
         db_table = verbose_name_plural
 
 
-
 class Admins(models.Model):
     """管理组表"""
     account = models.OneToOneField(verbose_name='管理组', to='Account', on_delete=models.CASCADE)
@@ -589,4 +588,16 @@ class HomeworkDetail(models.Model):
     class Meta:
         verbose_name = '作业详情'
         verbose_name_plural = 'DB_HomeworkDetail'
+        db_table = verbose_name_plural
+
+
+class Article(models.Model):
+    """资讯文章"""
+    title = models.CharField(verbose_name='文章标题', max_length=32)
+    content = models.TextField(verbose_name='文章正文')
+    date = models.DateTimeField(verbose_name='发布日期',auto_now_add=True)
+
+    class Meta:
+        verbose_name = '资讯文章'
+        verbose_name_plural = 'DB_Article'
         db_table = verbose_name_plural

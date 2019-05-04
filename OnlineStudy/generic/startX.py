@@ -13,6 +13,8 @@ from generic.handlers.ordertail import OrderDetailHandler
 from generic.handlers.payment_record import PaymentRecordHandler
 from generic.handlers.student import StudentHandler
 from generic.handlers.tutor import TutorHandler
+from generic.handlers.consult_record import ConsultRecordHandler
+from generic.handlers.article import ArticleHandler
 
 site.register(models.Account, AccountHandler)
 site.register(models.Course, CourseHandler)
@@ -27,3 +29,5 @@ site.register(models.OrderDetail, OrderDetailHandler)
 site.register(models.PaymentRecord, PaymentRecordHandler)
 site.register(models.Student, StudentHandler)
 site.register(models.Tutor, TutorHandler)
+site.register(models.ConsultRecord, ConsultRecordHandler)
+site.register(models.Article, ArticleHandler)

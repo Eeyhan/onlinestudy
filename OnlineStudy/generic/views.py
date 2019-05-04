@@ -894,12 +894,46 @@ class PaymentView(APIView):
             return result
 
     def put(self, request):
-        """此项后续再补充，目前使用不到"""
-        # 退款,退货
-        # 售后服务、纠纷
-        # 评价
-        # 追评
-        pass
+        """
+        对账单对应的课程做评价
+        order_id:{
+            {
+                "course":xx,
+                "assess":xx,
+            }
+
+        }
+        """
+
+        res = BaseResponse()
+        user = request.user
+        print(request.data)
+        # order_id_dict = request.data.get('order_id')
+        # order_db_obj = models.Order.objects.filter(id=order_id_dict, account=user).first()
+        # if not order_db_obj:
+        #     res.error = '不存在的账单'
+        #     res.code = 1201
+        #     return Response(res.dict)
+        # try:
+        #     for item in order_id_dict:
+        #         for course, asses in item.items():
+        #             # 存入课程的评价表里
+        #             models.Comment.objects.create(content_object=course, account=user, content=asses)
+        # except Exception as e:
+        #     print(e)
+        #     res.code = 1301
+        #     res.error = '操作有误'
+        #     return Response(res.dict)
+        # else:
+        #     res.data = '评价成功'
+        #     return Response(res.dict)
+        """
+                以下功能暂时用不到，后续再补充
+                退款,退货
+                售后服务、纠纷
+                追评
+                """
+        return Response(res.dict)
 
     def delete(self, request):
         """删除账单"""
@@ -1035,5 +1069,5 @@ class UserCourseView(APIView):
         return Response(res.dict)
 
     def post(self, request):
-        """对课程做评价、提问题，交作业"""
+        """提问题，交作业"""
         pass

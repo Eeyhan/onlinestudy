@@ -1,4 +1,4 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display
+from startX.serivce.v1 import StartXHandler, get_m2m_display,Option
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
 
@@ -32,3 +32,9 @@ class CourseDetailHandler(StartXHandler):
                     display_coupon, display_price_policy]
 
     # 常见问题
+
+    search_list = ['course__contains']
+    search_group = [
+        Option('course'),
+        Option('teacher'),
+    ]

@@ -1,4 +1,4 @@
-from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm
+from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm, Option
 from generic import models
 from startX.forms.widgets import DateTimePickerInput
 
@@ -22,4 +22,11 @@ class CourseHandler(StartXHandler):
                     get_field_display('付费类型', 'course_type'), 'release_date', 'category',
                     'degree_course']
 
-    # 课程章节，常见问题，优惠券，课程大纲，价格策略
+    # 常见问题
+
+    search_list = ['title__contains']
+    search_group = [
+        Option('category'),
+        Option('degree_course'),
+
+    ]

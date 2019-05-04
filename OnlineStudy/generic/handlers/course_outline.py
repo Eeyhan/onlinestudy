@@ -1,4 +1,4 @@
-from startX.serivce.v1 import StartXHandler, get_field_display, get_m2m_display
+from startX.serivce.v1 import StartXHandler, Option
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
 
@@ -33,3 +33,7 @@ class CourseOutlineHandler(StartXHandler):
         return self.model_class.objects.filter(course_detail__course_id=course_id)
 
     list_display = ['course_detail', 'title', 'order', 'content']
+    search_list = ['title__contains']
+    search_group = [
+        Option('course_detail')
+    ]

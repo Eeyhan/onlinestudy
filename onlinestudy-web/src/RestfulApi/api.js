@@ -163,6 +163,11 @@ export const PaymentList = () =>{
     return Axios.get('/payment').then(res=>res.data)
 }
 
+// 评价商品
+export const PaymentAssess = (params) =>{
+    return Axios.put('/payment',params).then(res=>res.data)
+}
+
 // 删除账单
 export const delPayment = (params) =>{
     return Axios.delete('/payment',{data:params}).then(res=>res.data)

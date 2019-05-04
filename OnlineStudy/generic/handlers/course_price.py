@@ -1,9 +1,17 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display, get_field_display
+from startX.serivce.v1 import StartXHandler, get_m2m_display, get_field_display, StartXModelForm
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
+from generic import models
+
+
+class CoursePriceModelForm(StartXModelForm):
+    class Meta:
+        model = models.PricePolicy
+        fields = ['valid_period', 'price']
 
 
 class CoursePriceHandler(StartXHandler):
+    model_form_class = CoursePriceModelForm
 
     def get_urls(self):
         """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""
@@ -34,4 +42,6 @@ class CoursePriceHandler(StartXHandler):
 
     list_display = [
         # get_m2m_display('课程','object_id'),
+        'content_type',
         get_field_display('有效期', 'valid_period'), 'price']
+    # search_list = ['']

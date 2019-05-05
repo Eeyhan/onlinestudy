@@ -1095,6 +1095,42 @@ class UserCourseView(APIView):
         # 返回展示已购买的商品内容，视频链接接入保利威视频，作业，
         return Response(res.dict)
 
+
+class HomeworkView(APIView):
+    """作业接口"""
+    authentication_classes = [Auther, ]
+
+    def get(self, request):
+        user = request.user
+        my_homework = models.Homework.objects.all()
+
     def post(self, request):
-        """提问题，交作业"""
         pass
+
+
+class QuestionView(APIView):
+    """提问题"""
+    authentication_classes = [Auther, ]
+
+    def get(self, request):
+        user = request.user
+        my_question = models.StudyQuestion.objects.filter(student=user).all().order_by(
+            '-question_date')
+        res = serializers.UserQuestionAnswerSerializer(my_question, many=True)
+        return Response(res.data)
+
+    def post(self, request):
+        res = BaseResponse()
+        user = request.user
+        user_obj = models.Student.objects.filter(account=user).first()
+
+        if not user_obj:
+            res.code = 1401
+            res.data = '非法用户'
+            return Response(res.dict)
+        tutor = user_obj.tutor
+
+        question = request.data.get('question')
+        models.StudyQuestion.objects.create(student=user, question=question, tutor=tutor)
+        res.data = '提交问题成功'
+        return Response(res.dict)

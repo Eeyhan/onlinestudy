@@ -1,4 +1,6 @@
-# coding:utf-8
+#! /usr/bin/env python
+# -*- coding:utf-8 -*-
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,12 +16,15 @@ import redis
 import json
 import uuid
 import hashlib
+from django.shortcuts import redirect, render
+from generic.models import Account
+from utils.md5 import gen_md5
+
+# from rbac.service.init_permission import init_permission
+
 
 pc_geetest_id = "64936e8e1ad53dad8bbee6f96224e7d0"
 pc_geetest_key = "8322ed330d370a704a77d8205c94d20f"
-
-# pc_geetest_id = "b46d1900d0a894591916ea94ea91bd2c"
-# pc_geetest_key = "36fc3fe98530eea08dfc6ce76e3d24c4"
 
 RedisConn = redis.Redis(connection_pool=POOL)
 
@@ -109,3 +114,32 @@ class LoginAuthView(APIView):
         result = {"status": "success"} if result else {"status": "fail"}
         print(request.data)
         return HttpResponse(json.dumps(result))
+
+
+# ################## 后台登录部分 #######################
+
+
+def login(request):
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    username = request.POST.get('username')
+    password = gen_md5(request.POST.get('password'))
+    current_user = Account.objects.filter(username=username, passwd=password).first()
+
+    if not current_user:
+        return render(request, 'login.html', {'error': '用户名或密码错误'})
+
+    request.session['userinfo'] = {'id': current_user.id, 'username': current_user.username}
+    # 用户权限信息的初始化
+    # init_permission(current_user, request)
+
+    return redirect('/index/')
+
+
+def logout(request):
+    request.session.delete()
+    return redirect('/login/')
+
+
+def index(request):
+    return render(request, 'backend_index.html')

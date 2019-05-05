@@ -178,3 +178,13 @@ export const delPayment = (params) =>{
 export const userCourselist =()=>{
     return Axios.get('/usercourse').then(res=>res.data)
 }
+
+// 提问题
+export const question =(params)=>{
+    return Axios.post('/question',params).then(res=>res.data)
+}
+
+// 展示问题
+export const questionList =()=>{
+    return Axios.get('/question').then(res=>res.data)
+}

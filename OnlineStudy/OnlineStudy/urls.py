@@ -18,8 +18,12 @@ from django.urls import path, include, re_path
 from django.views.static import serve
 from django.conf import settings
 from startX.serivce.v1 import site
+from LoginAuth import views
 
 urlpatterns = [
+    path('login/', views.login),
+    path('logout/', views.logout),
+    path('index/', views.index),
     path('admin/', admin.site.urls),
     path('api/v1/', include(('generic.urls', 'generic'))),  # 主业务
     path('api/v1/auth/', include(('LoginAuth.urls', 'LoginAuth'))),  # 登录认证

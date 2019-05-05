@@ -15,5 +15,5 @@ urlpatterns = [
     path('coupon', views.CouponDistributionView.as_view()),
     path('usercoupon', views.UserCouponView.as_view()),
     path('usercourse', views.UserCourseView.as_view()),
-    # path('homework', views.homeworkView.as_view()),
+    path('question', views.QuestionView.as_view()),
 ]

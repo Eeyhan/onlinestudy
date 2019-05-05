@@ -547,6 +547,8 @@ class StudyQuestion(models.Model):
                               limit_choices_to={'account__level': 1})
     question = models.TextField(verbose_name='提问内容')
     answer = models.TextField(verbose_name='回答内容', null=True, blank=True)
+    question_date = models.DateTimeField(verbose_name='提问日期', auto_now_add=True)
+    answer_date = models.DateTimeField(verbose_name='回答日期', null=True, blank=True)
 
     class Meta:
         verbose_name = '问题表'
@@ -558,9 +560,7 @@ class Homework(models.Model):
     """
     作业情况
     """
-    courses = models.ForeignKey(verbose_name='课程', to='Course', on_delete=models.CASCADE)
-    teacher = models.ForeignKey(verbose_name='导师', to='Tutor', on_delete=models.CASCADE,
-                                limit_choices_to={'account__level': 1})
+    courses = models.ManyToManyField(verbose_name='课程', to='Course')
     content = models.TextField(verbose_name='作业内容', null=True, blank=True)
 
     class Meta:
@@ -574,8 +574,11 @@ class HomeworkDetail(models.Model):
     作业详情
     """
     homework = models.ForeignKey(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
-    student = models.ManyToManyField(verbose_name='学生', to='Account', blank=True,
-                                     limit_choices_to={'level': 2})
+    student = models.ManyToManyField(verbose_name='学生', to='Student', blank=True,
+                                     limit_choices_to={'account__level': 2})
+    teacher = models.ManyToManyField(verbose_name='导师', to='Tutor',
+                                     limit_choices_to={'account__level': 1})
+
     work_status_choices = [
         (1, "作业未发布"),
         (2, "学生未提交"),

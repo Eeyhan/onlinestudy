@@ -1,0 +1,39 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+
+    <link rel="stylesheet" href="{% static 'startX/plugins/bootstrap/css/bootstrap.css' %} "/>
+
+</head>
+<body>
+<div style="width: 500px;margin: 0 auto;margin-top: 100px;">
+    <form class="form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label" id="name">用户名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="name" name="username">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label" id="pwd">密码</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="pwd" name="password">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">登 录</button>
+                <span style="color: red">{{ error }}</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+</body>
+</html>

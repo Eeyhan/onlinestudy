@@ -16,6 +16,7 @@ from generic.handlers.tutor import TutorHandler
 from generic.handlers.consult_record import ConsultRecordHandler
 from generic.handlers.article import ArticleHandler
 from generic.handlers.homework import HomeworkHandler
+from generic.handlers.question import QuestionHandler
 
 site.register(models.Account, AccountHandler)
 site.register(models.Course, CourseHandler)
@@ -33,3 +34,4 @@ site.register(models.Tutor, TutorHandler)
 site.register(models.ConsultRecord, ConsultRecordHandler)
 site.register(models.Article, ArticleHandler)
 site.register(models.Homework, HomeworkHandler)
+site.register(models.StudyQuestion, QuestionHandler)

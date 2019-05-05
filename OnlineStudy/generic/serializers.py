@@ -125,8 +125,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CommonQuestionSerializer(serializers.ModelSerializer):
-    """常见问题"""
+    """课程相关的常见问题"""
 
     class Meta:
         model = models.CommonQuestion
         fields = ['id', 'question', 'answer']
+
+
+class UserQuestionAnswerSerializer(serializers.ModelSerializer):
+    """用户的已回答问题"""
+    class Meta:
+        model = models.StudyQuestion
+        fields = ['question', 'answer', 'question_date']

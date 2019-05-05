@@ -323,6 +323,8 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now_add=True, verbose_name="订单生成时间")
     pay_time = models.DateTimeField(blank=True, null=True, verbose_name="付款时间")
     cancel_time = models.DateTimeField(blank=True, null=True, verbose_name="订单取消时间")
+    assess_status_choices = ((0, '未评价'), (1, '已评价'), (2, '已追评'))
+    assess_status = models.IntegerField(choices=assess_status_choices, default=0)
 
     class Meta:
         verbose_name = '订单表'
@@ -595,7 +597,7 @@ class Article(models.Model):
     """资讯文章"""
     title = models.CharField(verbose_name='文章标题', max_length=32)
     content = models.TextField(verbose_name='文章正文')
-    date = models.DateTimeField(verbose_name='发布日期',auto_now_add=True)
+    date = models.DateTimeField(verbose_name='发布日期', auto_now_add=True)
 
     class Meta:
         verbose_name = '资讯文章'

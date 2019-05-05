@@ -3,17 +3,31 @@
     <h3 class="shopping-cart-tit">学无止境&nbsp;</h3>
     <div class="row">
       <div class="course-left">
-        <div @click="tocomment">
-          <div class="block comment">
-            <span class="demonstration">课程评价</span>
-            <el-rate v-model="value2" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
-          </div>
-        </div>
         <div @click="tohomework" class="comment">
           <el-button type="success" round size="mini" class="common">作业/提交</el-button>
         </div>
         <div @click="toquestion" class="comment">
           <el-button type="danger" round size="mini" class="common">问题求救</el-button>
+        </div>
+
+        <div style="margin-top:50px">
+          <div class="block comment">
+            <span class="demonstration">课程评价</span>
+            <br>
+            <br>
+            <el-input
+              type="textarea"
+              :rows="2"
+              placeholder="请输入评价内容"
+              v-model="assess"
+              style="width:200px"
+            ></el-input>
+            <div class="comment-yan">
+              <br>
+              <el-rate v-model="value2" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
+              <el-button type="primary" size="mini" @click="tocomment">提交</el-button>
+            </div>
+          </div>
         </div>
       </div>
       <div>
@@ -52,7 +66,9 @@ export default {
     return {
       courseChapter: "",
       currentIndex: 999,
-      isSHow: false
+      isSHow: false,
+      assess: "", // 评价内容
+      courseId: 0
     };
   },
   methods: {
@@ -64,7 +80,18 @@ export default {
     },
 
     tocomment() {
-      // 发送一个post请求
+      let params = {
+        course: this.courseId,
+        assess: this.assess
+      };
+      this.$http.PaymentAssess(params).then(res => {
+        this.$message({
+          type: "success",
+          message: res.data,
+          center: true
+        });
+        this.assess = ''
+      });
     },
     tohomework() {
       this.$router.push({
@@ -97,6 +124,7 @@ export default {
   },
   created() {
     this.getCourseChapter();
+    this.courseId = this.$route.params.courseId;
   }
 };
 </script>
@@ -172,5 +200,10 @@ export default {
 }
 .comment {
   margin-bottom: 20px;
+}
+.comment-yan {
+  display: flex;
+  margin-top: 10px;
+  margin-left: 5px;
 }
 </style>

@@ -143,8 +143,8 @@ class CourseCommentView(APIView):
     """课程评论"""
 
     def get(self, request, pk):
-        # coursecomment = models.Comment.objects.filter(object_id=pk).first().content_object.comment.all()
-        coursecomment = models.Course.objects.filter(id=pk).first().comment.all()
+        """coursecomment = models.Comment.objects.filter(object_id=pk).first().content_object.comment.all()"""
+        coursecomment = models.Course.objects.filter(id=pk).first().comment.all().order_by('-id')
         res = serializers.CommentSerializer(coursecomment, many=True)
         return Response(res.data)
 
@@ -153,7 +153,7 @@ class CourseCommonquestionView(APIView):
     """课程常见问题"""
 
     def get(self, request, pk):
-        # coursecomment = models.CommonQuestion.objects.filter(object_id=pk).first().content_object.common_question.all()
+        """ coursecomment = models.CommonQuestion.objects.filter(object_id=pk).first().content_object.common_question.all()"""
         commonquestion = models.Course.objects.filter(id=pk).first().common_question.all().order_by('id')
         res = serializers.CommonQuestionSerializer(commonquestion, many=True)
         return Response(res.data)
@@ -643,10 +643,10 @@ class PaymentView(APIView):
 
         for item in user_orders:
             product_dict[item.order_id] = {}
-
         for item in user_orders:
             product = eval(item.product)
             product_dict[item.order_id]['id'] = item.order_id
+            product_dict[item.order_id]['status'] = item.order.get_assess_status_display()
             product_dict[item.order_id][item.object_id] = product
             product_dict[item.order_id][item.object_id]['real_price'] = item.price
             for trade in trade_menu:
@@ -903,37 +903,64 @@ class PaymentView(APIView):
             }
 
         }
+
+        or
+
+
+
+        {
+            "course":xx,
+            "assess":xx,
+        }
+
+
+
+        以下功能暂时用不到，后续再补充：
+            退款,退货
+            售后服务、纠纷
+            追评
         """
 
+        # 评价有两种，一种是从账单页面的评价(带有订单id)，一种是学习界面里的评价(不带有订单id)
         res = BaseResponse()
         user = request.user
-        print(request.data)
-        # order_id_dict = request.data.get('order_id')
-        # order_db_obj = models.Order.objects.filter(id=order_id_dict, account=user).first()
-        # if not order_db_obj:
-        #     res.error = '不存在的账单'
-        #     res.code = 1201
-        #     return Response(res.dict)
-        # try:
-        #     for item in order_id_dict:
-        #         for course, asses in item.items():
-        #             # 存入课程的评价表里
-        #             models.Comment.objects.create(content_object=course, account=user, content=asses)
-        # except Exception as e:
-        #     print(e)
-        #     res.code = 1301
-        #     res.error = '操作有误'
-        #     return Response(res.dict)
-        # else:
-        #     res.data = '评价成功'
-        #     return Response(res.dict)
-        """
-                以下功能暂时用不到，后续再补充
-                退款,退货
-                售后服务、纠纷
-                追评
-                """
-        return Response(res.dict)
+        flag_yang = request.data.keys()
+        if len(flag_yang) > 1:  # 大于1则是从学习界面来的评价
+            res = self.put_func(data=request.data, res=res, user=user)
+            return Response(res.dict)
+        else:  # 账单页面来的评价
+            order_id = list(flag_yang)[0]
+            order_db_obj = models.Order.objects.filter(id=order_id, account=user).first()
+            if not order_db_obj:
+                res.error = '不存在的账单'
+                res.code = 1201
+                return Response(res.dict)
+            try:
+                data = request.data.get(order_id)
+                res = self.put_func(data, res, user, order_db_obj)
+            except Exception as e:
+                print(e)
+                res.code = 1301
+                res.error = '操作有误'
+                return Response(res.dict)
+            else:
+                return Response(res.dict)
+
+    def put_func(self, data, res, user, order_db_obj=None):
+        course_id = int(data.get('course'))
+        assess = data.get('assess')
+        # 存入课程的评价表里
+        course_obj = models.Course.objects.filter(id=course_id).first()
+        comment_obj = course_obj.comment.all().filter(account=user)
+        if comment_obj:
+            res.data = '您已评价过啦'
+            return res
+        models.Comment.objects.create(account=user, content=assess, content_object=course_obj)
+        if order_db_obj:
+            order_db_obj.assess_status = 1
+            order_db_obj.save()
+        res.data = '评价成功'
+        return res
 
     def delete(self, request):
         """删除账单"""

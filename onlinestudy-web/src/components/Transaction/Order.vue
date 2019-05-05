@@ -31,7 +31,17 @@
           <template slot-scope="scope">{{scope.row.user_address}}</template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="账单详情" width="130">
+        <el-table-column prop="name" label="状态" width="100">
+          <template slot-scope="scope">
+            <el-button
+              @click.native.prevent="toAssess(scope.$index, PaymentOrder)"
+              type="text"
+              size="small"
+            >{{scope.row.status}}</el-button>
+          </template>
+        </el-table-column>
+
+        <el-table-column fixed="right" label="账单详情" width="100">
           <template slot-scope="scope">
             <el-button
               @click.native.prevent="toAssess(scope.$index, PaymentOrder)"
@@ -40,7 +50,7 @@
             >账单详情</el-button>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="130">
+        <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button
               @click.native.prevent="deleteRow(scope.$index, PaymentOrder)"

@@ -58,13 +58,11 @@ export default {
           params[this.orderId] = inner;
 
           this.$http.PaymentAssess(params).then(res => {
-            console.log(res.data);
-          });
-
-          this.$message({
-            type: "success",
-            message: "评价成功",
-            center: true
+            this.$message({
+              type: "success",
+              message: res.data,
+              center: true
+            });
           });
         })
         .catch(() => {

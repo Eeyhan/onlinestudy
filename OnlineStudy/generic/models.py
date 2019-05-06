@@ -561,19 +561,24 @@ class Homework(models.Model):
     作业情况
     """
     courses = models.ManyToManyField(verbose_name='课程', to='Course')
+    chapter = models.ManyToManyField(verbose_name='课程章节', to='CourseChapter')
     content = models.TextField(verbose_name='作业内容', null=True, blank=True)
+    title = models.CharField(max_length=32, verbose_name='作业标题', null=True, blank=True)
 
     class Meta:
         verbose_name = '作业情况'
         verbose_name_plural = 'DB_Homework'
         db_table = verbose_name_plural
 
+    def __str__(self):
+        return self.title
+
 
 class HomeworkDetail(models.Model):
     """
     作业详情
     """
-    homework = models.ForeignKey(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
+    homework = models.OneToOneField(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
     student = models.ManyToManyField(verbose_name='学生', to='Student', blank=True,
                                      limit_choices_to={'account__level': 2})
     teacher = models.ManyToManyField(verbose_name='导师', to='Tutor',

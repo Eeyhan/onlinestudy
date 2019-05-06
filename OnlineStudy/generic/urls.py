@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,re_path
 from generic import views
 
 urlpatterns = [
@@ -16,4 +16,5 @@ urlpatterns = [
     path('usercoupon', views.UserCouponView.as_view()),
     path('usercourse', views.UserCourseView.as_view()),
     path('question', views.QuestionView.as_view()),
+    path('homework', views.HomeworkView.as_view()),
 ]

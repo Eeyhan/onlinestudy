@@ -131,10 +131,7 @@ class CourseChapterView(APIView):
     """课程章节，课时"""
 
     def get(self, request, pk):
-        print(request.data)
-        print(pk, type(pk))
         coursechapter = models.CourseChapter.objects.filter(course_id=pk).all().order_by('chapter')
-        # coursechapter = models.CourseChapter.objects.all()
         res = serializers.ChapterSerializer(coursechapter, many=True)
         return Response(res.data)
 
@@ -1101,10 +1098,31 @@ class HomeworkView(APIView):
     authentication_classes = [Auther, ]
 
     def get(self, request):
-        user = request.user
-        my_homework = models.Homework.objects.all()
+        course = request.query_params.get('course')
+        course_obj = models.Course.objects.filter(id=course).first()
+        chapter = request.query_params.get('chapter')
+        chapter_obj = models.CourseChapter.objects.filter(id=chapter).first()
+        my_homework = models.Homework.objects.filter(courses=course_obj.id, chapter=chapter_obj.id).first()
+        res = serializers.UserHomeworkSerializer(my_homework)
+        return Response(res.data)
 
     def post(self, request):
+        res = BaseResponse()
+        homework_id = request.data.get('homework')
+        file = request.data.get('file')
+        file.name = '%s-' % request.user + file.name
+        user_obj = models.Student.objects.filter(account_id=request.user.pk).first()
+        homework_obj = models.HomeworkDetail.objects.filter(homework_id=homework_id, student=user_obj).first()
+        if not homework_obj:
+            obj = models.HomeworkDetail.objects.create(homework_id=homework_id, file=file,status=3)
+            obj.student.add(user_obj)
+            obj.teacher.add(user_obj.tutor)
+            res.data = '上传成功'
+        else:
+            res.data = '您已上传过啦'
+        return Response(res.dict)
+
+    def put(self, request):
         pass
 
 

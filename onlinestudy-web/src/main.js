@@ -21,8 +21,9 @@ import '../static/global/global.css'
 // 导入极验js
 import '../static/global/gt.js'
 
-
-import '../static/global/axios.js'
+// 这里单独再引入一遍axios，为后续要单独使用axios做准备
+import axios from '../static/global/axios.js'
+Vue.prototype.axios = axios
 
 // 导入api接口函数
 import * as api from './RestfulApi/api.js'

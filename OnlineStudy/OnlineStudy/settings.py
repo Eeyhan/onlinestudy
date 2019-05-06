@@ -195,3 +195,6 @@ POLYV_CONFIG = {
     'userId': '2f57a43618',  # polyv 提供的服务器间的通讯验证
     'secretkey': 'Uh9Ezw7Wdq'  # polyv 提供的接口调用签名访问的key
 }
+
+# ############ 作业文件 ####
+BASE_FILE = 'http://127.0.0.1:8000/media/'

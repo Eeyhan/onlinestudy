@@ -1,10 +1,15 @@
 <template>
-  <div id="player"></div>
+  <div id="player">
+    
+  </div>
+
 </template>
 
 <script>
-export default {
+
+export default {  
   name: "Mypage",
+  
   data() {
     return {};
   },

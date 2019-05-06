@@ -188,3 +188,13 @@ export const question =(params)=>{
 export const questionList =()=>{
     return Axios.get('/question').then(res=>res.data)
 }
+
+// 获取作业
+export const homework =(courseId,chapterId)=>{
+    return Axios.get(`/homework?course=${courseId}&chapter=${chapterId}`).then(res=>res.data)
+}
+
+// 提交作业
+export const upHomework =(homeworkId)=>{
+    return Axios.post('/homework',homeworkId).then(res=>res.data)
+}

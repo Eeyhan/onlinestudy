@@ -3,9 +3,6 @@
     <h3 class="shopping-cart-tit">学无止境&nbsp;</h3>
     <div class="row">
       <div class="course-left">
-        <div @click="tohomework" class="comment">
-          <el-button type="success" round size="mini" class="common">作业/提交</el-button>
-        </div>
         <div @click="toquestion" class="comment">
           <el-button type="danger" round size="mini" class="common">问题求救</el-button>
         </div>
@@ -24,7 +21,7 @@
             ></el-input>
             <div class="comment-yan">
               <br>
-              <el-rate v-model="value2" :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
+              <el-rate  :colors="['#99A9BF', '#F7BA2A', '#FF9900']"></el-rate>
               <el-button type="primary" size="mini" @click="tocomment">提交</el-button>
             </div>
           </div>
@@ -35,13 +32,16 @@
           <div class="course-inner">
             <div class="course-info">
               <p>章节 {{index+1}}：{{item.title}}</p>
+              <div @click="tohomework(item.id)" class="homework-yang">
+                <el-button type="success" round size="mini" class="common">本章作业</el-button>
+              </div>
             </div>
             <div
               class="content"
               v-for="(lesson,index) in item.chapter_lesson"
-              :key="index"
-              :class="{active:currentIndex==index}"
-              @mouseenter="enterHandler(index)"
+              :key="lesson.id"
+              :class="{active:currentIndex==lesson.id}"
+              @mouseenter="enterHandler(lesson.id)"
               @mouseleave="leaveHandler"
               @click="tolearning(lesson.id)"
             >
@@ -90,13 +90,13 @@ export default {
           message: res.data,
           center: true
         });
-        this.assess = ''
+        this.assess = "";
       });
     },
-    tohomework() {
+    tohomework(chapterId) {
       this.$router.push({
         name: "homework",
-        params: { courseId: this.$route.params.courseId }
+        query: { courseId: this.$route.params.courseId, chapterId: chapterId }
       });
     },
     toquestion() {
@@ -111,7 +111,6 @@ export default {
       this.$http.chapter(course_id).then(res => {
         if (!res.error) {
           this.courseChapter = res.data;
-          console.log(this.courseChapter);
         }
       });
     },
@@ -172,6 +171,7 @@ export default {
   background: #d7eef2;
   padding: 20px;
   border-left: 2px solid #8d03f6;
+  display: flex;
 }
 
 .content {
@@ -205,5 +205,11 @@ export default {
   display: flex;
   margin-top: 10px;
   margin-left: 5px;
+}
+
+.homework-yang {
+  position: absolute;
+  right: 145px;
+  margin-top: -4px;
 }
 </style>

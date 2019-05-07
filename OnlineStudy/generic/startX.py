@@ -18,8 +18,11 @@ from generic.handlers.article import ArticleHandler
 from generic.handlers.homework import HomeworkHandler
 from generic.handlers.question import QuestionHandler
 from generic.handlers.homework_detail import HomeworkDetailHandler
+from generic.handlers.study_record import StudyRecordHandler
+from generic.handlers.register_record import AccountRegisterRecordHandler
 
 site.register(models.Account, AccountHandler)
+site.register(models.Account, AccountRegisterRecordHandler, prev='trend')
 site.register(models.Course, CourseHandler)
 site.register(models.CourseDetail, CourseDetailHandler)
 site.register(models.CourseOutline, CourseOutlineHandler)
@@ -37,3 +40,4 @@ site.register(models.Article, ArticleHandler)
 site.register(models.Homework, HomeworkHandler)
 site.register(models.StudyQuestion, QuestionHandler)
 site.register(models.HomeworkDetail, HomeworkDetailHandler)
+site.register(models.StudyRecord, StudyRecordHandler)

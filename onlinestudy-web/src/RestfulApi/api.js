@@ -198,3 +198,8 @@ export const homework =(courseId,chapterId)=>{
 export const upHomework =(homeworkId)=>{
     return Axios.post('/homework',homeworkId).then(res=>res.data)
 }
+
+// 首页文章
+export const article = () => {
+    return Axios.get('/article').then(res => res)
+}

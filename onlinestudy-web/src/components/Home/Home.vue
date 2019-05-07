@@ -22,6 +22,14 @@
         <el-progress type="circle" :percentage="100" status="success">linux</el-progress>
         <el-progress type="circle" :percentage="50" status="exception">Go</el-progress>
       </div>
+      <div
+        v-for="(item,index) in news"
+        :key="index"
+        style="    width: 1200px;    margin: 0 auto; margin-top:20px"
+      >
+        <pre>{{item.title}} --  {{item.date|formatTime}}</pre>
+        <pre><p>{{item.content}}</p> </pre>
+      </div>
     </div>
   </div>
 </template>
@@ -32,6 +40,7 @@ export default {
   data() {
     return {
       active: 0,
+      news: "",
       lunboImgs: [
         {
           id: 1,
@@ -62,9 +71,23 @@ export default {
   methods: {
     next() {
       if (this.active++ > 2) this.active = 0;
+    },
+    getdata() {
+      this.$http.article().then(res => {
+        this.news = res.data;        
+      });
     }
   },
-  
+  mounted() {
+    this.getdata();
+    console.log(this.news);
+  },
+  filters: {
+    //格式化时间
+    formatTime(value) {
+      return value.replace("T", " ").split(".")[0];
+    }
+  }
 };
 </script>
 

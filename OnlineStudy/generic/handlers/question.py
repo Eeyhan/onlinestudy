@@ -16,6 +16,9 @@ class QuestionModelForm(StartXModelForm):
 class QuestionHandler(StartXHandler):
     model_form_class = QuestionModelForm
 
+    def get_add_btn(self, request, *args, **kwargs):
+        return None
+
     def get_urls(self):
         """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""
 
@@ -37,9 +40,6 @@ class QuestionHandler(StartXHandler):
                     ]
 
     search_list = ['title__contains']
-
-    def get_add_btn(self, request, *args, **kwargs):
-        return None
 
     def get_list_display(self, request, *args, **kwargs):
         """

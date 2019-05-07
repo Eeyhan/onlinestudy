@@ -1114,7 +1114,7 @@ class HomeworkView(APIView):
         user_obj = models.Student.objects.filter(account_id=request.user.pk).first()
         homework_obj = models.HomeworkDetail.objects.filter(homework_id=homework_id, student=user_obj).first()
         if not homework_obj:
-            obj = models.HomeworkDetail.objects.create(homework_id=homework_id, file=file,status=3)
+            obj = models.HomeworkDetail.objects.create(homework_id=homework_id, file=file, status=3)
             obj.student.add(user_obj)
             obj.teacher.add(user_obj.tutor)
             res.data = '上传成功'
@@ -1152,3 +1152,13 @@ class QuestionView(APIView):
         models.StudyQuestion.objects.create(student=user, question=question, tutor=tutor)
         res.data = '提交问题成功'
         return Response(res.dict)
+
+
+class ArticleView(APIView):
+    """文章"""
+
+    def get(self, request):
+        # 取最新的前三篇文章
+        article_obj = models.Article.objects.all().order_by('-id')[:3]
+        res = serializers.ArticleSerializer(article_obj,many=True)
+        return Response(res.data)

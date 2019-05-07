@@ -151,3 +151,11 @@ class UserHomeworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Homework
         fields = ['id', 'content', 'status', 'critic']
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    """首页资讯文章"""
+
+    class Meta:
+        model = models.Article
+        fields = ['title', 'content', 'date']

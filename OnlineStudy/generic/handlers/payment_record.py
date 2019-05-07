@@ -30,6 +30,13 @@ class PaymentRecordHandler(StartXHandler):
         patterns.extend(self.extra_url())
         return patterns
 
+    def display_edit(self, model=None, is_header=None, *args, **kwargs):
+        if is_header:
+            return '操作'
+        account_id = kwargs.get('account_id')
+        tpl = '<a href="%s">编辑</a>' % self.reverse_change_url(pk=model.pk, account_id=account_id)
+        return mark_safe(tpl)
+
     def get_list_display(self, request, *args, **kwargs):
         """
         预留的钩子函数
@@ -38,6 +45,7 @@ class PaymentRecordHandler(StartXHandler):
         value = []
         if self.list_display:
             value.extend(self.list_display)
+            value.append(type(self).display_edit)
         return value
 
     def get_model_queryset(self, request, *args, **kwargs):

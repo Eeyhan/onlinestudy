@@ -7,7 +7,6 @@ from django.utils.safestring import mark_safe
 
 class HomeworkHandler(StartXHandler):
 
-
     def display_outline(self, model=None, is_header=None, *args, **kwargs):
         if is_header:
             return '作业详情'

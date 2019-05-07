@@ -403,6 +403,7 @@ class Account(models.Model):
     balance = models.IntegerField(verbose_name='账户余额', default=0)
     LEVEL_CHOICES = ((0, '管理员'), (1, '导师'), (2, '学员'), (3, '非学员'))
     level = models.IntegerField(choices=LEVEL_CHOICES, default=3, verbose_name='用户等级')
+    date = models.DateTimeField(verbose_name='注册日期', auto_now_add=True)
 
     def __str__(self):
         return self.username
@@ -444,7 +445,9 @@ class Student(models.Model):
 
 class Tutor(models.Model):
     """导师表"""
-    account = models.OneToOneField(verbose_name='导师信息', to='Account', on_delete=models.CASCADE)
+    account = models.OneToOneField(verbose_name='导师信息', to='Account', on_delete=models.CASCADE, )
+
+    # 这里不加 limit_choices_to={'level': 1}，因为就是通过从Account表中的用户提权到导师的，所以不能做限制
 
     def __str__(self):
         return self.account.username
@@ -610,4 +613,17 @@ class Article(models.Model):
     class Meta:
         verbose_name = '资讯文章'
         verbose_name_plural = 'DB_Article'
+        db_table = verbose_name_plural
+
+
+class StudyRecord(models.Model):
+    """学员学习进度"""
+    course_lesson = models.ManyToManyField(verbose_name='课时', to='CourseLesson')
+    student = models.ManyToManyField(verbose_name='学生', to='Student')
+    status_choice = ((1, '未学习'), (2, '已学习'))
+    status = models.IntegerField(choices=status_choice, default=1)
+
+    class Meta:
+        verbose_name = '学员学习进度'
+        verbose_name_plural = 'DB_StudyRecord'
         db_table = verbose_name_plural

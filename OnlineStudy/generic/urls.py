@@ -17,4 +17,5 @@ urlpatterns = [
     path('usercourse', views.UserCourseView.as_view()),
     path('question', views.QuestionView.as_view()),
     path('homework', views.HomeworkView.as_view()),
+    path('article', views.ArticleView.as_view()),
 ]

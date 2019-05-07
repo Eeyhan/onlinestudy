@@ -104,8 +104,16 @@
             margin: 20px auto;
             font-size: 15px;
         }
-        .upload{
+
+        .upload {
             margin-top: 40px;
+        }
+
+        td {
+            max-width: 500px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 
@@ -175,7 +183,7 @@
         <div class="menu-body">
             <div class="static-menu">
                 {# 动态菜单#}
-{#                {% menu request %}#}
+                {#                {% menu request %}#}
             </div>
         </div>
     </div>
@@ -183,7 +191,7 @@
         <div>
             <ol class="breadcrumb no-radius no-margin" style="border-bottom: 1px solid #ddd;">
                 {# 路径导航#}
-{#                {% url_navigation request %}#}
+                {#                {% url_navigation request %}#}
             </ol>
         </div>
         {% block content %} {% endblock %}

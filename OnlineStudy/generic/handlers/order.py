@@ -1,7 +1,6 @@
-from startX.serivce.v1 import StartXHandler, Option, get_field_display, get_datetime_format
-from django.urls import reverse
+from startX.serivce.v1 import StartXHandler, get_field_display, get_datetime_format
+from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
-from generic import models
 
 
 class OrderHandler(StartXHandler):
@@ -21,6 +20,18 @@ class OrderHandler(StartXHandler):
             return '缴费申请'
         record_url = reverse('startX:generic_paymentrecord_list', kwargs={'account_id': model.account_id})
         return mark_safe('<a target="_blank" href="%s">缴费申请</a>' % record_url)
+
+    def get_urls(self):
+        """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""
+
+        patterns = [
+            re_path(r'^list/$', self.wrapper(self.changelist), name=self.get_list_name),
+            re_path(r'^change/(?P<pk>\d+)/$', self.wrapper(self.change_view),
+                    name=self.get_change_name),
+
+        ]
+        patterns.extend(self.extra_url())
+        return patterns
 
     list_display = [
         'account', 'payment_amount',

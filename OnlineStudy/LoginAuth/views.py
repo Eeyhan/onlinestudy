@@ -22,8 +22,7 @@ from utils.md5 import gen_md5
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
-
-# from rbac.service.init_permission import init_permission
+from rbac.service.init_permission import init_permission
 
 
 pc_geetest_id = "64936e8e1ad53dad8bbee6f96224e7d0"
@@ -134,7 +133,7 @@ def login(request):
 
     request.session['userinfo'] = {'id': current_user.id, 'username': current_user.username}
     # 用户权限信息的初始化
-    # init_permission(current_user, request)
+    init_permission(current_user, request)
 
     return redirect('/index/')
 

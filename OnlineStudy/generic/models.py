@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from rbac.models import User as RBACUser
 
 __all__ = ['Account', 'Course', 'Degree', 'CourseDetail', 'CourseOutline', 'CourseChapter',
            'CourseLesson', 'Teacher', 'Coupon', 'CouponDetail', 'Category',
@@ -391,11 +392,8 @@ class TradeRecord(models.Model):
         return "%s - %s " % (self.amount, self.balance)
 
 
-class Account(models.Model):
+class Account(RBACUser):
     """用户表"""
-    username = models.CharField(max_length=32, verbose_name='用户名')
-    passwd = models.CharField(max_length=32, verbose_name='密码')
-    email = models.EmailField(max_length=32, verbose_name='邮箱', null=True, blank=True)
     brief = models.CharField(max_length=64, verbose_name='学员简介', null=True, blank=True)
     CHOICES = ((0, '大专'), (1, '本科'), (2, '研究生'), (3, '博士'), (4, '硕士'), (5, '其他'))
     education = models.IntegerField(choices=CHOICES, verbose_name='学历', null=True, blank=True)
@@ -498,8 +496,10 @@ class PaymentRecord(models.Model):
     )
     confirm_status = models.IntegerField(verbose_name="确认状态", choices=confirm_status_choices, default=1)
     confirm_date = models.DateTimeField(verbose_name="确认日期", null=True, blank=True)
-    confirm_user = models.ForeignKey(verbose_name="审批人", to='Admins', related_name='confirms', on_delete=models.CASCADE,
-                                     null=True, blank=True)
+    confirm_user = models.ForeignKey(verbose_name="审批人", to='Account', related_name='confirms',
+                                     on_delete=models.CASCADE,
+                                     null=True, blank=True,
+                                     limit_choices_to={'level': 0})
     note = models.TextField(verbose_name="备注", blank=True, null=True)
 
     class Meta:

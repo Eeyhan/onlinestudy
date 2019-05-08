@@ -32,6 +32,6 @@ urlpatterns = [
     path('backend/', site.urls),  # 后台相关管理
     re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
     path('test', views.test),
-
+    re_path(r'^rbac/', include(('rbac.urls', 'rbac'))),  # 权限配置
 
 ]

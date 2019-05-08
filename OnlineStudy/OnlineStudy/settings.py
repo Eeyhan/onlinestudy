@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'blwvideo',
-    'startX.apps.StartxConfig'
+    'startX.apps.StartxConfig',
+    'rbac.apps.RbacConfig',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +53,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rbac.middlewares.rbac.RbacMiddleware',
     # 'utils.middlewares.MyCors',
+
 ]
 
 ROOT_URLCONF = 'OnlineStudy.urls'
@@ -198,3 +201,30 @@ POLYV_CONFIG = {
 
 # ############ 作业文件 ####
 BASE_FILE = 'http://127.0.0.1:8000/media/'
+
+# ############ 权限配置相关 #########
+
+RBAC_USER_MODLE_CLASS = "generic.models.Account"
+
+# 自动化发现路由中URL时，排除的URL
+AUTO_DISCOVER_EXCLUDE = [
+    '/admin/.*',
+    '/login/',
+    '/logout/',
+    '/index/',
+]
+
+INIT_PERMISSION = "XXX_permission_url_list_key"
+INIT_MENU = "XXX_permission_menu_key"
+
+# 需要登录但无需权限的URL
+NO_PERMISSION_LIST = [
+    '/index/',
+    '/logout/',
+]
+
+# 白名单，无需登录就可以访问：
+VALID_URL = [
+    '/login/',
+    '/admin/.*'
+]

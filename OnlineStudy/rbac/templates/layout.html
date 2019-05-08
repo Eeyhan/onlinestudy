@@ -7,7 +7,6 @@
     <title>XX教育后台管理</title>
     <link rel="shortcut icon" href="{% static 'startX/imgs/education.png' %} ">
     <link rel="stylesheet" href="{% static 'startX/plugins/bootstrap/css/bootstrap.css' %} "/>
-    <link rel="stylesheet" href="{% static 'startX/plugins/bootstrap/css/bootstrap-datetimepicker.css' %} "/>
     <link rel="stylesheet" href="{% static 'startX/plugins/font-awesome/css/font-awesome.css' %} "/>
     <link rel="stylesheet" href="{% static 'startX/css/commons.css' %} "/>
     <link rel="stylesheet" href="{% static 'startX/css/nav.css' %} "/>
@@ -58,65 +57,52 @@
             padding: 15px;
         }
 
-        .search-group {
-            padding: 5px 10px;
+        .left-menu .menu-body .static-menu {
+
         }
 
-        .search-group .row .whole {
-            min-width: 40px;
-            float: left;
+        .left-menu .menu-body .static-menu .icon-wrap {
+            width: 20px;
             display: inline-block;
-            padding: 5px 0 5px 8px;
-            margin: 3px;
-            font-weight: bold;
-
+            text-align: center;
         }
 
-        .search-group .row .others {
-            padding-left: 60px;
+        .left-menu .menu-body .static-menu a {
+            text-decoration: none;
+            padding: 8px 15px;
+            border-bottom: 1px solid #ccc;
+            color: #333;
+            display: block;
+            background: #efefef;
+            background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #efefef), color-stop(1, #fafafa));
+            background: -ms-linear-gradient(bottom, #efefef, #fafafa);
+            background: -moz-linear-gradient(center bottom, #efefef 0%, #fafafa 100%);
+            background: -o-linear-gradient(bottom, #efefef, #fafafa);
+            filter: progid:dximagetransform.microsoft.gradient(startColorStr='#e3e3e3', EndColorStr='#ffffff');
+            box-shadow: inset 0px 1px 1px white;
+            box-shadow: inset 0px 1px 1px white;
+            box-shadow: inset 0px 1px 1px white;
+            box-shadow: inset 0px 1px 1px white;
         }
 
-        .search-group .row a {
-            display: inline-block;
-            padding: 5px 8px;
-            margin: 3px;
-            border: 1px solid #d4d4d4;
-
+        .left-menu .menu-body .static-menu a:hover {
+            color: #2F72AB;
+            border-left: 2px solid #2F72AB;
         }
 
-        .search-group .row a {
-            display: inline-block;
-            padding: 5px 8px;
-            margin: 3px;
-            border: 1px solid #d4d4d4;
+        .left-menu .menu-body .static-menu a.active {
+            color: #2F72AB;
+            border-left: 2px solid #2F72AB;
         }
-
-        .search-group a.active {
-            color: #fff;
-            background-color: #337ab7;
-            border-color: #2e6da4;
-        }
-
-        .homework {
-            padding: 20px;
-            background: #eeeeee;
-            border-radius: 4px;
-            margin: 20px auto;
-            font-size: 15px;
-        }
-
-        .upload {
-            margin-top: 40px;
-        }
-
-        td {
+		td {
             max-width: 500px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
     </style>
+    {% block css %}
 
-    {% block css %}{% endblock %}
+    {% endblock %}
 </head>
 <body>
 
@@ -134,11 +120,11 @@
             <a class="menu-item">XX信息</a>
             <a class="menu-item">XX管理</a>
             <div class="menu-item">
-                <span>XXXX</span>
+                <span>使用说明</span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
                 <div class="more-info">
-                    <a href="#" class="more-item">XXXX</a>
-                    <a href="#" class="more-item">XXXX</a>
+                    <a href="#" class="more-item">见覅挖二纺机</a>
+                    <a href="#" class="more-item">发境外二姐夫</a>
                 </div>
             </div>
         </div>
@@ -152,7 +138,7 @@
 
                 <div class="more-info">
                     <a href="#" class="more-item">个人信息</a>
-                    <a href="#" class="more-item">注销</a>
+                    <a href="/logout/" class="more-item">注销</a>
                 </div>
             </div>
 
@@ -181,15 +167,16 @@
     <div class="left-menu">
         <div class="menu-body">
             <div class="static-menu">
-                {# 动态菜单#}
+                {#                动态菜单#}
                 {% menu request %}
             </div>
+
         </div>
     </div>
     <div class="right-body">
         <div>
             <ol class="breadcrumb no-radius no-margin" style="border-bottom: 1px solid #ddd;">
-                {# 路径导航#}
+                {#                路径导航#}
                 {% url_navigation request %}
             </ol>
         </div>
@@ -198,24 +185,9 @@
 </div>
 
 
-<script src="{% static 'startX/js/jquery-3.3.1.min.js' %} "></script>
-<script src="{% static 'startX/plugins/bootstrap/js/bootstrap.js' %} "></script>
-<script src="{% static 'startX/plugins/bootstrap/js/bootstrap-datetimepicker.js' %} "></script>
-<script src="{% static 'startX/plugins/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js' %} "></script>
+<script src="{% static 'js/jquery-3.3.1.min.js' %} "></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.js' %} "></script>
 <script src="{% static 'rbac/js/rbac.js' %} "></script>
-<script>
-    $('.form_date').datetimepicker({
-        minView: "month",
-        language: "zh-CN",
-        sideBySide: true,
-        format: 'yyyy-mm-dd',
-        bootcssVer: 3,
-        startDate: new Date(),
-        autoclose: true,
-        pickerPosition: "bottom-left"
-    });
-</script>
-
 
 {% block js %} {% endblock %}
 </body>

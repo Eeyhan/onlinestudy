@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="XXX-container">
+        <form method="post" action="?type=generate">
+            {% csrf_token %}
+            {{ generate_formset.management_form }}
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <i class="fa fa-th-list" aria-hidden="true"></i> 待新建权限列表
+                    <button href="#" class="right btn btn-primary btn-xs"
+                       style="padding: 2px 8px;margin: -3px;">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        新建
+                    </button>
+                </div>
+                <!-- Table -->
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>名称</th>
+                        <th>URL</th>
+                        <th>别名</th>
+                        <th>菜单</th>
+                        <th>父权限</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for form in generate_formset %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            {% for field in  form %}
+                                <td>{{ field }}<span style="color: red;">{{ field.errors.0 }}</span></td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </form>
+
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <i class="fa fa-th-list" aria-hidden="true"></i> 待删除权限列表
+            </div>
+
+            <!-- Table -->
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>名称</th>
+                    <th>URL</th>
+                    <th>别名</th>
+                    <th>删除</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in delete_row_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ row.title }}</td>
+                        <td>{{ row.url }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>
+                            <a style="color: #d9534f;" href="{% url 'rbac:multi_permission_del' id=row.id %}">
+                                <i class="fa fa-trash-o"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post" action="?type=update">
+            {% csrf_token %}
+            {{ update_formset.management_form }}
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <i class="fa fa-th-list" aria-hidden="true"></i> 待更新权限列表
+                    <button href="#" class="right btn btn-primary btn-xs"
+                       style="padding: 2px 8px;margin: -3px;">
+                        <i class="fa fa-save" aria-hidden="true"></i>
+                        保存
+                    </button>
+
+
+                </div>
+
+                <!-- Table -->
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>名称</th>
+                        <th>URL</th>
+                        <th>别名</th>
+                        <th>菜单</th>
+                        <th>父权限</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for form in update_formset %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            {% for field in  form %}
+                                {% if forloop.first %}
+                                    {{ field }}
+                                {% else %}
+                                    <td>{{ field }}<span style="color: red;">{{ field.errors.0 }}</span></td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

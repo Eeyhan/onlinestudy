@@ -1,0 +1,23 @@
+{% for item in navigation %}
+
+    {% if item.class %}
+        <li class="active">{{ item.title }}</li>
+
+    {% else %}
+        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+    {% endif %}
+
+
+{% endfor %}
+
+{#<div>#}
+{#    <ol class="breadcrumb no-radius no-margin" style="border-bottom: 1px solid #ddd;">#}
+{#        {% for item in record_list %}#}
+{#            {% if item.class %}#}
+{#                <li class="active">{{ item.title }}</li>#}
+{#            {% else %}#}
+{#                <li><a href="{{ item.url }}">{{ item.title }}</a></li>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{#    </ol>#}
+{#</div>#}

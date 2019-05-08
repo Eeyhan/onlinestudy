@@ -1,0 +1,75 @@
+.left-menu .menu-body .static-menu {
+
+}
+
+.left-menu .menu-body .static-menu .icon-wrap {
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+}
+
+.left-menu .menu-body .static-menu a {
+    text-decoration: none;
+    padding: 8px 15px;
+    border-bottom: 1px solid #ccc;
+    color: #333;
+    display: block;
+    background: #efefef;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #efefef), color-stop(1, #fafafa));
+    background: -ms-linear-gradient(bottom, #efefef, #fafafa);
+    background: -moz-linear-gradient(center bottom, #efefef 0%, #fafafa 100%);
+    background: -o-linear-gradient(bottom, #efefef, #fafafa);
+    filter: progid:dximagetransform.microsoft.gradient(startColorStr='#e3e3e3', EndColorStr='#ffffff');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fafafa',EndColorStr='#efefef')";
+    box-shadow: inset 0px 1px 1px white;
+}
+
+.left-menu .menu-body .static-menu a:hover {
+    color: #2F72AB;
+    border-left: 2px solid #2F72AB;
+}
+
+.left-menu .menu-body .static-menu a.active {
+    color: #2F72AB;
+    border-left: 2px solid #2F72AB;
+}
+
+.multi-menu .item {
+    background-color: white;
+}
+
+.multi-menu .item > .title {
+    padding: 10px 5px;
+    border-bottom: 1px solid #dddddd;
+    cursor: pointer;
+    color: #333;
+    display: block;
+    background: #efefef;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #efefef), color-stop(1, #fafafa));
+    background: -ms-linear-gradient(bottom, #efefef, #fafafa);
+    background: -o-linear-gradient(bottom, #efefef, #fafafa);
+    filter: progid:dximagetransform.microsoft.gradient(startColorStr='#e3e3e3', EndColorStr='#ffffff');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fafafa',EndColorStr='#efefef')";
+    box-shadow: inset 0 1px 1px white;
+}
+
+.multi-menu .item > .body {
+    border-bottom: 1px solid #dddddd;
+}
+
+.multi-menu .item > .body a {
+    display: block;
+    padding: 5px 20px;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    font-size: 13px;
+
+}
+
+.multi-menu .item > .body a:hover {
+    border-left: 2px solid #2F72AB;
+}
+
+.multi-menu .item > .body a.active {
+    border-left: 2px solid #2F72AB;
+}

@@ -1,0 +1,143 @@
+.nav {
+    min-width: 980px;
+    height: 48px;
+    background-color: #0e3658;
+    color: #ffffff;
+    line-height: 48px;
+    overflow: visible;
+    font-size: 12px;
+}
+
+.nav .logo-area {
+    width: 220px;
+    overflow: hidden;
+    height: 48px;
+    text-align: center;
+    background-color: #114570;
+}
+
+.nav .logo-area > a {
+    color: #ffffff;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav .logo-area .logo {
+    height: 37px;
+    width: 37px;
+    float: left;
+    margin: 6px;
+    margin-right: 10px;
+}
+
+.nav .left-menu {
+    font-size: 13px;
+}
+
+.nav .left-menu .menu-item {
+    display: inline-block;
+    padding: 0 15px;
+    cursor: pointer;
+    position: relative;
+    color: white;
+    text-decoration: none;
+}
+
+.nav .left-menu .menu-item:hover {
+    background-color: #337ab7;
+
+}
+
+.nav .left-menu .menu-item .more-info {
+    display: none;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    border: 1px solid rgba(0, 0, 0, .15);
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    background-color: #fff;
+    color: #333;
+    z-index: 1003;
+}
+
+.nav .left-menu .menu-item:hover .more-info {
+    display: block;
+}
+
+.nav .left-menu .menu-item .more-info .more-item {
+    display: block;
+    min-width: 120px;
+    padding: 0 15px;
+    line-height: 35px;
+    text-decoration: none;
+    color: #000000;
+
+}
+
+.nav .left-menu .menu-item .more-info .more-item:hover {
+    background-color: #f1f0f0;
+}
+
+.nav .right-menu .user-menu {
+    padding: 0 8px;
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+}
+
+.nav .right-menu .user-menu:hover {
+    background-color: #337ab7;
+
+}
+
+.nav .right-menu .user-info {
+    padding: 0 30px 0 10px;
+    height: 48px;
+    position: relative;
+}
+
+.nav .right-menu .user-info:hover .avatar {
+    background-color: #337ab7;
+}
+
+.nav .right-menu .user-info .avatar {
+    display: inline-block;
+    padding: 0 10px;
+    height: 48px;
+}
+
+.nav .right-menu .user-info .avatar img {
+    /* margin-top: 2px;*/
+}
+
+.nav .right-menu .user-info .more-info {
+    display: none;
+    position: absolute;
+    top: 48px;
+    right: 20px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    background-color: #fff;
+    color: #333;
+    z-index: 1002;
+}
+
+.nav .right-menu .user-info:hover .more-info {
+    display: block;
+}
+
+.nav .right-menu .user-info .more-info .more-item {
+    display: block;
+    min-width: 160px;
+    padding: 0 15px;
+    line-height: 35px;
+    text-decoration: none;
+    color: #000000;
+
+}
+
+.nav .right-menu .user-info .more-info .more-item:hover {
+    background-color: #f1f0f0;
+}

@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="XXX-container">
+
+
+        {% if search_group_row_list %}
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-filter" aria-hidden="true"></i> 快速筛选
+                </div>
+                <div class="panel-body">
+                    <div class="search-group">
+                        {% for row in search_group_row_list %}
+                            <div class="row">
+                                {% for obj in row %}
+                                    {{ obj|safe }}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+
+        {% if search_list %}
+            <div style="float: right;">
+                <form method="GET" class="form-inline">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" value="{{ query_field }}" placeholder="关键字搜索">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if action_dict %}
+                <div style="float: left;margin: 5px 10px 5px 0;">
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <select class="form-control" name="action">
+                                <option value="">请选择操作</option>
+                                {% for action,text in action_dict.items %}
+                                    <option value="{{ action }}">{{ text }}</option>
+                                {% endfor %}
+
+                            </select>
+                            <input class="btn btn-primary" type="submit" value="执行"/>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
+
+            {% if add_btn %}
+                <div style="margin: 5px 0;float: left;">
+                    {{ add_btn|safe }}
+                </div>
+            {% endif %}
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    {% for item in header_list %}
+                        <th>
+                            {{ item }}
+                        </th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                {% for row in body_list %}
+                    <tr>
+                        {% for foo in  row %}
+                            <td>
+                                {{ foo }}
+                            </td>
+                        {% endfor %}
+
+                    </tr>
+                {% endfor %}
+            </table>
+        </form>
+
+        <nav>
+            <ul class="pagination">
+                {{ pager.page_html|safe }}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

@@ -14,4 +14,4 @@ __pycache__
 *.sln
 package-lock.json
 .gitignore
-
+migrations

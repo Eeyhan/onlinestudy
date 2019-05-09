@@ -469,7 +469,7 @@ class SettlementView(APIView):
                     'off_percent': coupon.off_percent,
                     'minimum_consume': coupon.minimum_consume
                 }
-        # 去购物车信息里取对应课程信息
+        # 去redis里的购物车信息里取对应课程信息
         course_info = CONN.hgetall(key)
         # 拿到价格策略字典
         price_policy_dict = json.loads(course_info['price_policy_dict'])
@@ -510,6 +510,40 @@ class SettlementView(APIView):
 
         return res
 
+    def put_func(self, user_id, course_id):
+        user_coupons = models.CouponDetail.objects.filter(
+            account_id=user_id,
+            status=0,
+            coupon__start_time__lte=now(),
+            coupon__end_time__gte=now(),
+        ).all()
+        # 构建数据
+        user_coupon_dict = {}
+        user_global_coupon_dict = {}
+        # 筛选优惠券是全局优惠券还是专项优惠券
+        for coupon_record in user_coupons:
+            coupon = coupon_record.coupon
+            if coupon.object_id == course_id:  # 专项优惠券
+                user_coupon_dict[str(coupon.id)] = {
+                    'id': coupon.id,
+                    'title': coupon.title,
+                    'coupon_type': coupon.get_coupon_type_display(),
+                    'equal_money': coupon.equal_money,
+                    'off_percent': coupon.off_percent,
+                    'minimum_consume': coupon.minimum_consume
+                }
+
+            elif coupon.object_id is None:  # 全局优惠券
+                user_global_coupon_dict[str(coupon.id)] = {
+                    'id': coupon.id,
+                    'title': coupon.title,
+                    'coupon_type': coupon.get_coupon_type_display(),
+                    'equal_money': coupon.equal_money,
+                    'off_percent': coupon.off_percent,
+                    'minimum_consume': coupon.minimum_consume
+                }
+        return user_coupon_dict, user_global_coupon_dict
+
     def put(self, request):
         """设置订单中商品的优惠券"""
 
@@ -527,7 +561,6 @@ class SettlementView(APIView):
         for course_coupon in courses:
             course_id = course_coupon.get('course')
             course_coupon_id = course_coupon.get('coupon')
-
             user_id = request.user.pk
             key = SETTLEMENT_KEY % (user_id, course_id)  # 订单数据
             global_key = GLOBAL_COUPON_KEY % user_id
@@ -539,6 +572,20 @@ class SettlementView(APIView):
                     return Response(res.dict)
             if course_coupon_id:
                 user_coupon_dict = json.loads(CONN.hget(key, 'course_coupon_dict'))
+
+                # 先加入结算中心之后又领取优惠券，并选择优惠券购买的情况
+                if user_coupon_dict == {}:
+                    user_coupon_dicts, user_global_coupon_dict = self.put_func(user_id, course_id)
+                    CONN.hset(key, 'course_coupon_dict', json.dumps(user_coupon_dicts, ensure_ascii=False))
+                    user_coupon_dict = user_coupon_dicts
+                    if user_global_coupon_dict:
+                        user_global_coupons = GLOBAL_COUPON_KEY % user_id
+                        # 多套了一层，不然redis报错，不能内层直接套一个字典
+                        global_settlement_info = {
+                            'global_course_coupon_dict': json.dumps(user_global_coupon_dict, ensure_ascii=False)
+                        }
+                        CONN.hmset(user_global_coupons, global_settlement_info)
+
                 if str(course_coupon_id) not in user_coupon_dict:
                     res.code = 1081
                     res.error = '课程优惠券id不合法'
@@ -707,10 +754,11 @@ class PaymentView(APIView):
                     start_time__lte=now(),
                     end_time__gte=now(),
                     coupondetail__account=user,
-                    coupondetail__status=0).values('coupon_type', 'equal_money', 'off_percent',
-                                                   'minimum_consume').all().distinct()
+                    coupondetail__status=0).exclude(coupon_type=0).values('coupon_type', 'equal_money', 'off_percent',
+                                                                          'minimum_consume').all().distinct()
                 # 优惠券已使用
-                # 有优惠券，但没有勾选
+                # 有勾选优惠券，但没有数据库内没有
+
                 if course_coupon_id and not user_coupon_dict:
                     res.code = 1102
                     res.error = '优惠券id不合法'
@@ -734,7 +782,8 @@ class PaymentView(APIView):
 
         # 判断用户是否有优惠券
 
-        user_global_coupon = models.CouponDetail.objects.all().filter(account_id=user.id, coupon__coupon_type=0)
+        user_global_coupon = models.CouponDetail.objects.filter(account_id=user.id, coupon__coupon_type=0,
+                                                                status=0).all()
         # 有全局优惠券，检查优惠券使用场景合法性
         if user_global_coupon:
             global_coupon_key = GLOBAL_COUPON_KEY % user.id
@@ -823,11 +872,15 @@ class PaymentView(APIView):
         order_obj = models.Order.objects.create(payment_type=0, account_id=user.id,
                                                 payment_amount=total_price,
                                                 status=0, pay_time=now())
-        student_obj = models.Student.objects.create(account=user_obj.first())
-        for item in product:
 
+        # 买了课程就是申请状态的学生了,如果已经买过课程的学生直接查询获取
+        student_obj = models.Student.objects.filter(account=user_obj.first()).first()
+        if not student_obj:
+            student_obj = models.Student.objects.create(account=user_obj.first())
+
+        for item in product:
             pay_course_obj = models.Course.objects.filter(id=item['id']).first()
-            print(pay_course_obj)
+
             # 加入到缴费申请表
             models.PaymentRecord.objects.create(account=user_obj.first(), paid_fee=total_price,
                                                 course=pay_course_obj)
@@ -1160,6 +1213,5 @@ class ArticleView(APIView):
     def get(self, request):
         # 取最新的前三篇文章
         article_obj = models.Article.objects.all().order_by('-id')[:3]
-        res = serializers.ArticleSerializer(article_obj,many=True)
+        res = serializers.ArticleSerializer(article_obj, many=True)
         return Response(res.data)
-

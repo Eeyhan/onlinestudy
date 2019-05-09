@@ -2,8 +2,8 @@
   <div class="shopping-cart-wrap">
     <h3 class="shopping-cart-tit">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <router-link :to="{ path: '/ShopCart' }">我的购物车</router-link>>
-        <router-link :to="{ path: '/Coupon' }">领券中心</router-link>>
+        <router-link :to="{ path: '/ShopCart' }">我的购物车</router-link> > 
+        <router-link :to="{ path: '/Coupon' }">领券中心</router-link> > 
         <router-link :to="{ path: '/SettlePay' }">结算中心</router-link>
       </el-breadcrumb>
       <p>您即将获得最好的服务，最好的教育方式</p>
@@ -406,27 +406,27 @@ export default {
           delete this.use_coupon_id["global_coupon"];
         });
       }
-
+      let params = {
+        balance: 0,
+        price: this.totalPrice
+      };
       console.log(this.use_coupon_id);
       if (JSON.stringify(this.use_coupon_id) !== "{}") {
         // 使用优惠券
         let settleparams = this.use_coupon_id;
-        let params = {
-          balance: 0,
-          price: this.totalPrice
-        };
+
         this.$http.Updatesettlement(settleparams).then(res => {
-          console.log(res)
-          if (!res.error) {            
+          console.log(res);
+          if (!res.error) {
             // 支付
             this.$http.Payment(params).then(res => {
               console.log(res);
-            });
-          } else if (res.code == 1081) {  //  上一次已选择优惠券，未支付或者支付失败
-            this.$http.Payment(params).then(res => {
-              console.log(res);
-            });
+            });          
           }
+        });
+      } else {
+        this.$http.Payment(params).then(res => {
+          console.log(res);
         });
       }
     }

@@ -641,13 +641,13 @@ li {
   border-radius: 82px;
 }
 .course-action button.left {
-  background: #7ed321;
+  background: #5b97f0;
   box-shadow: 0 2px 4px 0 #e8e8e8;
   color: #fff;
   margin-right: 48px;
   padding: 0 20px;
 }
 .course-action button.right {
-  background: #f5a623 url() no-repeat 125px 15px !important;
+  background: #f34475  no-repeat 125px 15px !important;
 }
 </style>

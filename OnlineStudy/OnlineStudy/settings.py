@@ -226,11 +226,14 @@ NO_PERMISSION_LIST = [
 # 白名单，无需登录就可以访问：
 VALID_URL = [
     '/login/',
-    '/admin/.*'
+    '/admin/.*',
+    '/api/v1/.*',   # 与前端交互的api接口
+    '/media/.*'     # 静态文件url
+
 ]
 
-# ######## 用户趋势 #######
+# ######## 用户趋势图 #######
 TREND_URL = 'http://127.0.0.1:8000/account/trend/%d'
 
-# ######## 订单趋势 #######
+# ######## 订单趋势图 #######
 ORDER_URL = 'http://127.0.0.1:8000/order/trend/%d'

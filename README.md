@@ -12,6 +12,7 @@
 * 前端：
     + vue 2.5.2
     + webpack 3.6.0
+	+ Element-UI
 * 规范协议：
     restful 
 * 数据库：

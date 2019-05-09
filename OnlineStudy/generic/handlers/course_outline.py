@@ -1,9 +1,10 @@
 from startX.serivce.v1 import StartXHandler, Option
-from django.urls import reverse, re_path
+from django.urls import re_path
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class CourseOutlineHandler(StartXHandler):
+class CourseOutlineHandler(PermissionHandler, StartXHandler):
 
     def get_urls(self):
         """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""

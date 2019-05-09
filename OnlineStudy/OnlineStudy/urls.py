@@ -31,7 +31,8 @@ urlpatterns = [
     path('blv/', include(('blwvideo.urls', 'blwvideo'))),  # 保利威加密视频接口
     path('backend/', site.urls),  # 后台相关管理
     re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
-    path('test', views.test),
+    re_path(r'^account/trend/(?P<year>\d+)/$', views.account_trend, name='account_trend'),
+    re_path(r'^order/trend/(?P<year>\d+)/$', views.order_trend, name='order_trend'),
     re_path(r'^rbac/', include(('rbac.urls', 'rbac'))),  # 权限配置
 
 ]

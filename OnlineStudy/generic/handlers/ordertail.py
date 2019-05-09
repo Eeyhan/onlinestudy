@@ -1,9 +1,10 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display, get_field_display
+from startX.serivce.v1 import StartXHandler, get_field_display
 from django.urls import re_path
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class OrderDetailHandler(StartXHandler):
+class OrderDetailHandler(PermissionHandler, StartXHandler):
 
     def get_add_btn(self, request, *args, **kwargs):
         return

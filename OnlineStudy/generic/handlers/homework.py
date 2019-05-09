@@ -1,11 +1,10 @@
-from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm, get_m2m_display
-from generic import models
-from startX.forms.widgets import DateTimePickerInput
+from startX.serivce.v1 import StartXHandler, get_m2m_display
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class HomeworkHandler(StartXHandler):
+class HomeworkHandler(PermissionHandler, StartXHandler):
 
     def display_outline(self, model=None, is_header=None, *args, **kwargs):
         if is_header:

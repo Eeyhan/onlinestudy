@@ -19,10 +19,11 @@ from generic.handlers.homework import HomeworkHandler
 from generic.handlers.question import QuestionHandler
 from generic.handlers.homework_detail import HomeworkDetailHandler
 from generic.handlers.study_record import StudyRecordHandler
-from generic.handlers.register_record import AccountRegisterRecordHandler
+from generic.handlers.register_trend import AccountRegisterTrendHandler
+from generic.handlers.order_trend import OrderTrendHandler
 
 site.register(models.Account, AccountHandler)
-site.register(models.Account, AccountRegisterRecordHandler, prev='trend')
+site.register(models.Account, AccountRegisterTrendHandler, prev='trend')
 site.register(models.Course, CourseHandler)
 site.register(models.CourseDetail, CourseDetailHandler)
 site.register(models.CourseOutline, CourseOutlineHandler)
@@ -31,6 +32,7 @@ site.register(models.Coupon, CourseCouponHandler)
 site.register(models.PricePolicy, CoursePriceHandler)
 site.register(models.CourseLesson, CourseLessonHandler)
 site.register(models.Order, OrderHandler)
+site.register(models.Order, OrderTrendHandler,prev='trend')
 site.register(models.OrderDetail, OrderDetailHandler)
 site.register(models.PaymentRecord, PaymentRecordHandler)
 site.register(models.Student, StudentHandler)

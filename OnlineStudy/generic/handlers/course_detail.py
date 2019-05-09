@@ -1,9 +1,10 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display,Option
-from django.urls import reverse, re_path
+from startX.serivce.v1 import StartXHandler, get_m2m_display, Option
+from django.urls import reverse
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class CourseDetailHandler(StartXHandler):
+class CourseDetailHandler(PermissionHandler, StartXHandler):
     def display_outline(self, model=None, is_header=None, *args, **kwargs):
         if is_header:
             return '课程大纲'

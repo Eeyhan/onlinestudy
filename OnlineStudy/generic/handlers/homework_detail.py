@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from generic import models
 from django.conf import settings
 from django.shortcuts import HttpResponse
+from .base_promission import PermissionHandler
 
 
 class HomeworkDetailModelForm(StartXModelForm):
@@ -12,7 +13,7 @@ class HomeworkDetailModelForm(StartXModelForm):
         fields = ['status', 'critic']
 
 
-class HomeworkDetailHandler(StartXHandler):
+class HomeworkDetailHandler(PermissionHandler, StartXHandler):
     model_form_class = HomeworkDetailModelForm
 
     def get_add_btn(self, request, *args, **kwargs):

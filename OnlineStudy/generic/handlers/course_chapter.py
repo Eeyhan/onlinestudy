@@ -1,9 +1,10 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display, Option
+from startX.serivce.v1 import StartXHandler, Option
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class CourseChapterHandler(StartXHandler):
+class CourseChapterHandler(PermissionHandler, StartXHandler):
 
     def display_lesson(self, model=None, is_header=None, *args, **kwargs):
         if is_header:

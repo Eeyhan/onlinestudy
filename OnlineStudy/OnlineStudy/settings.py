@@ -132,7 +132,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -228,3 +228,9 @@ VALID_URL = [
     '/login/',
     '/admin/.*'
 ]
+
+# ######## 用户趋势 #######
+TREND_URL = 'http://127.0.0.1:8000/account/trend/%d'
+
+# ######## 订单趋势 #######
+ORDER_URL = 'http://127.0.0.1:8000/order/trend/%d'

@@ -1,6 +1,7 @@
 from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm, Option
 from generic import models
 from startX.forms.widgets import DateTimePickerInput
+from .base_promission import PermissionHandler
 
 
 class CourseModelForm(StartXModelForm):
@@ -12,10 +13,8 @@ class CourseModelForm(StartXModelForm):
         }
 
 
-class CourseHandler(StartXHandler):
+class CourseHandler(PermissionHandler, StartXHandler):
     model_form_class = CourseModelForm
-
-    # def display_outline(self, model=None, is_header=None, *args, **kwargs):
 
     list_display = ['title', get_field_display('课程状态', 'status'),
                     get_field_display('课程难度', 'difficult'),

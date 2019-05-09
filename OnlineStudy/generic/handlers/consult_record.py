@@ -1,8 +1,9 @@
-from startX.serivce.v1 import StartXHandler, StartXModelForm, get_field_display, get_datetime_format
-from django.urls import reverse, re_path
+from startX.serivce.v1 import StartXHandler, StartXModelForm, get_datetime_format
+from django.urls import re_path
 from django.utils.safestring import mark_safe
 from generic import models
 from django.shortcuts import HttpResponse
+from .base_promission import PermissionHandler
 
 
 class ConsultRecordModelForm(StartXModelForm):
@@ -11,7 +12,7 @@ class ConsultRecordModelForm(StartXModelForm):
         exclude = ['consultant', 'student']
 
 
-class ConsultRecordHandler(StartXHandler):
+class ConsultRecordHandler(PermissionHandler, StartXHandler):
     model_form_class = ConsultRecordModelForm
     order_by = ['-date', 'id']
     list_display = ['student', 'consultant', 'note',

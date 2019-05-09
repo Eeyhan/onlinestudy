@@ -1,7 +1,8 @@
-from startX.serivce.v1 import StartXHandler, get_m2m_display, get_field_display, StartXModelForm
-from django.urls import reverse, re_path
+from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm
+from django.urls import re_path
 from django.utils.safestring import mark_safe
 from generic import models
+from .base_promission import PermissionHandler
 
 
 class CoursePriceModelForm(StartXModelForm):
@@ -10,7 +11,7 @@ class CoursePriceModelForm(StartXModelForm):
         fields = ['valid_period', 'price']
 
 
-class CoursePriceHandler(StartXHandler):
+class CoursePriceHandler(PermissionHandler, StartXHandler):
     model_form_class = CoursePriceModelForm
 
     def get_urls(self):

@@ -2,6 +2,7 @@ from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm,
 from generic import models
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
 class StudentModelForm(StartXModelForm):
@@ -12,7 +13,7 @@ class StudentModelForm(StartXModelForm):
         fields = ['tutor']
 
 
-class StudentHandler(StartXHandler):
+class StudentHandler(PermissionHandler, StartXHandler):
     order_by = ['id']
     model_form_class = StudentModelForm
 

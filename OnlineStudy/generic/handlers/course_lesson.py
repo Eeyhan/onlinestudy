@@ -2,6 +2,7 @@ from startX.serivce.v1 import StartXHandler, StartXModelForm, get_field_display,
 from django.urls import re_path
 from django.utils.safestring import mark_safe
 from generic import models
+from .base_promission import PermissionHandler
 
 
 class CourseLessonModelForm(StartXModelForm):
@@ -10,7 +11,7 @@ class CourseLessonModelForm(StartXModelForm):
         fields = '__all__'
 
 
-class CourseLessonHandler(StartXHandler):
+class CourseLessonHandler(PermissionHandler, StartXHandler):
 
     def get_urls(self):
         """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""

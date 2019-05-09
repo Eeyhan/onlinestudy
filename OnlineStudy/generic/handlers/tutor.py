@@ -1,8 +1,9 @@
 from startX.serivce.v1 import StartXHandler
 from django.urls import re_path
+from .base_promission import PermissionHandler
 
 
-class TutorHandler(StartXHandler):
+class TutorHandler(PermissionHandler, StartXHandler):
 
     def get_urls(self):
         """预留的重新自定义url钩子函数,主要是覆盖掉默认的url,并设置name别名"""

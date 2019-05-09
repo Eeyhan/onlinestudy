@@ -79,7 +79,7 @@
                     <tr>
                         {% for foo in  row %}
                             <td>
-                                {{ foo }}
+                                {{ foo|safe }}
                             </td>
                         {% endfor %}
 

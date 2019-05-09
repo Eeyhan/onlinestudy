@@ -423,6 +423,14 @@ class StartXHandler(object):
         """
         return self.model_class.objects
 
+    def get_headers_list(self):
+        header_list = []
+        return header_list
+
+    def get_body_list(self):
+        body_list = []
+        return body_list
+
     def changelist(self, request, *args, **kwargs):
         """
 
@@ -482,32 +490,33 @@ class StartXHandler(object):
 
         # 处理表头
         list_display = self.get_list_display(request, *args, **kwargs)
-        header_list = []
-
-        if list_display:
-            for key_or_func in list_display:
-                if isinstance(key_or_func, FunctionType):
-                    verbose_name = key_or_func(self, model=None, is_header=True)
-                else:
-                    verbose_name = self.model_class._meta.get_field(key_or_func).verbose_name
-                header_list.append(verbose_name)
-        else:
-            header_list.append(self.model_class._meta.model_name)  # 如果是个model对象，直接显示对象，在models文件里定义对象的__str__方法即可
-
-        # 根据表头处理表内容
-
-        body_list = []
-        for item in data_list:
-            tr_list = []
+        header_list = self.get_headers_list()
+        if header_list == []:
             if list_display:
                 for key_or_func in list_display:
                     if isinstance(key_or_func, FunctionType):
-                        tr_list.append(key_or_func(self, model=item, is_header=False, *args, **kwargs))
+                        verbose_name = key_or_func(self, model=None, is_header=True)
                     else:
-                        tr_list.append(getattr(item, key_or_func))
+                        verbose_name = self.model_class._meta.get_field(key_or_func).verbose_name
+                    header_list.append(verbose_name)
             else:
-                tr_list.append(item)
-            body_list.append(tr_list)
+                header_list.append(self.model_class._meta.model_name)  # 如果是个model对象，直接显示对象，在models文件里定义对象的__str__方法即可
+
+        # 根据表头处理表内容
+
+        body_list = self.get_body_list()
+        if body_list == []:
+            for item in data_list:
+                tr_list = []
+                if list_display:
+                    for key_or_func in list_display:
+                        if isinstance(key_or_func, FunctionType):
+                            tr_list.append(key_or_func(self, model=item, is_header=False, *args, **kwargs))
+                        else:
+                            tr_list.append(getattr(item, key_or_func))
+                else:
+                    tr_list.append(item)
+                body_list.append(tr_list)
 
         # ########## 7. 组合搜索 ##########
 

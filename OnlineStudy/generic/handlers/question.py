@@ -1,7 +1,8 @@
-from startX.serivce.v1 import StartXHandler, get_field_display, StartXModelForm, get_datetime_format
+from startX.serivce.v1 import StartXHandler, StartXModelForm, get_datetime_format
 from generic import models
 from django.urls import re_path
 from startX.forms.widgets import DateTimePickerInput
+from .base_promission import PermissionHandler
 
 
 class QuestionModelForm(StartXModelForm):
@@ -13,7 +14,7 @@ class QuestionModelForm(StartXModelForm):
         }
 
 
-class QuestionHandler(StartXHandler):
+class QuestionHandler(PermissionHandler, StartXHandler):
     model_form_class = QuestionModelForm
 
     def get_add_btn(self, request, *args, **kwargs):

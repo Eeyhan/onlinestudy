@@ -1,9 +1,10 @@
 from startX.serivce.v1 import StartXHandler, get_field_display, get_datetime_format
 from django.urls import reverse, re_path
 from django.utils.safestring import mark_safe
+from .base_promission import PermissionHandler
 
 
-class OrderHandler(StartXHandler):
+class OrderHandler(PermissionHandler, StartXHandler):
     order_by = ['-id']
 
     def get_add_btn(self, request, *args, **kwargs):

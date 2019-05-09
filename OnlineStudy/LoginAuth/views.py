@@ -10,7 +10,7 @@ from utils.redis_pool import POOL
 from utils.BaseResponse import BaseResponse
 from LoginAuth.serializers import RegisterSerializer
 from generic.views import ShoppingView
-from generic.models import Account
+from generic import models
 from utils.Auther import Auther
 import redis
 import json
@@ -23,7 +23,10 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 from rbac.service.init_permission import init_permission
-
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.dates import DateFormatter
+import datetime, random
 
 pc_geetest_id = "64936e8e1ad53dad8bbee6f96224e7d0"
 pc_geetest_key = "8322ed330d370a704a77d8205c94d20f"
@@ -160,37 +163,76 @@ def index(request):
 #     return render(request, "test.html", {"img": imd})
 
 
-def test(request):
-    from django.http import HttpResponse
-    from matplotlib.figure import Figure
-    from matplotlib.backends.backend_agg import FigureCanvasAgg
-    from matplotlib.dates import DateFormatter
-    import matplotlib.pyplot as plt
-    import datetime, random
-    fig = Figure(figsize=(6, 6))
-    ax = fig.add_subplot(111)
-    x = []
-    y = []
-    now = datetime.datetime.now()
-    delta = datetime.timedelta(days=1)
-    for i in range(10):
-        x.append(now)
-        now += delta
-        y.append(random.randint(0, 1000))
-    ax.plot_date(x, y, '-')
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-    fig.autofmt_xdate()
-    canvas = FigureCanvasAgg(fig)
-    # 方法一：
+# def test(request):
+#     fig = Figure(figsize=(6, 6))
+#     ax = fig.add_subplot(111)
+#     x = []
+#     y = []
+#     now = datetime.datetime.now()
+#     delta = datetime.timedelta(days=1)
+#     for i in range(10):
+#         x.append(now)
+#         now += delta
+#         y.append(random.randint(0, 1000))
+#     ax.plot_date(x, y, '-')
+#     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+#     fig.autofmt_xdate()
+#     canvas = FigureCanvasAgg(fig)
+#
+#     # 方法一：
+#
+#     # response = HttpResponse(content_type='image/jpg')
+#     # canvas.print_jpg(response)
+#     # plt.close(fig)
+#     # return response
+#
+#     # 方法二：
+#
+#     response = HttpResponse(content_type='image/jpeg')
+#     canvas.print_jpeg(response)
+#     plt.close(fig)
+#     return response
 
-    # response = HttpResponse(content_type='image/jpg')
-    # canvas.print_jpg(response)
-    # plt.close(fig)
-    # return response
 
-    # 方法二：
+def account_trend(request, year):
+    year = int(year)
+    months = [i for i in range(1, 13)]
+    count = []
+    for month in months:
+        data = models.Account.objects.filter(date__year=year, date__month=month).count()
+        count.append(data)
+    plt.plot(months, count)
+    plt.title('account register trend')
+    plt.xlabel('month')
+    plt.ylabel('count')
+    # plt.show()
+    buffer = BytesIO()
+    plt.savefig(buffer)
+    plot_data = buffer.getvalue()
+    imb = base64.b64encode(plot_data)  # 对plot_data进行编码
+    ims = imb.decode()
+    imd = "data:image/png;base64," + ims
+    plt.close()
+    return render(request, "trend.html", {"img": imd, 'title': '用户注册趋势','year':year})
 
-    response = HttpResponse(content_type='image/jpeg')
-    canvas.print_jpeg(response)
-    plt.close(fig)
-    return response
+
+def order_trend(request, year):
+    year = int(year)
+    months = [i for i in range(1, 13)]
+    orders = []
+    for month in months:
+        data = models.Order.objects.filter(date__year=year, date__month=month).count()
+        orders.append(data)
+    plt.plot(months, orders)
+    plt.title('order trend')
+    plt.xlabel('month')
+    plt.ylabel('order')
+    # plt.show()
+    buffer = BytesIO()
+    plt.savefig(buffer)
+    plot_data = buffer.getvalue()
+    imb = base64.b64encode(plot_data)  # 对plot_data进行编码
+    ims = imb.decode()
+    imd = "data:image/png;base64," + ims
+    plt.close()
+    return render(request, "trend.html", {"img": imd, 'title': '订单报表趋势','year':year})

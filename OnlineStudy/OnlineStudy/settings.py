@@ -212,6 +212,10 @@ AUTO_DISCOVER_EXCLUDE = [
     '/login/',
     '/logout/',
     '/index/',
+    '/api/v1/.*',  # 与前端交互的api接口
+    '/media/.*',  # 静态文件url
+    '/blv/polyv.*',  # 保利威视频
+    '/polyv.*'
 ]
 
 INIT_PERMISSION = "XXX_permission_url_list_key"
@@ -227,8 +231,10 @@ NO_PERMISSION_LIST = [
 VALID_URL = [
     '/login/',
     '/admin/.*',
-    '/api/v1/.*',   # 与前端交互的api接口
-    '/media/.*'     # 静态文件url
+    '/api/v1/.*',  # 与前端交互的api接口
+    '/media/.*',  # 静态文件url
+    '/blv/polyv.*',  # 保利威视频
+    '/polyv.*'
 
 ]
 

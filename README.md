@@ -99,7 +99,9 @@
     
     ![课程详情部分](https://raw.githubusercontent.com/yang-va/pictures/master/8.png)
     
-    ![购买部分](https://raw.githubusercontent.com/yang-va/pictures/master/9.png)
+    ![购买部分](https://raw.githubusercontent.com/yang-va/pictures/master/33.png)
+    
+    + 如果未登录就会跳到登录页面
     
     ![登录页面](https://raw.githubusercontent.com/yang-va/pictures/master/10.png)
     
@@ -107,17 +109,21 @@
     
     ![登录之后进入首页](https://raw.githubusercontent.com/yang-va/pictures/master/11.png)
     
-    ![购物车](https://raw.githubusercontent.com/yang-va/pictures/master/13.png)
+    ![购物车](https://raw.githubusercontent.com/yang-va/pictures/master/34.png)
     
-    ![结算中心](https://raw.githubusercontent.com/yang-va/pictures/master/14.png)
+    ![结算中心](https://raw.githubusercontent.com/yang-va/pictures/master/35.png)
     
-    ![我的订单页面](https://raw.githubusercontent.com/yang-va/pictures/master/15.png)
+    ![选择优惠券](https://raw.githubusercontent.com/yang-va/pictures/master/36.png)
+    
+    ![支付宝支付](https://raw.githubusercontent.com/yang-va/pictures/master/37.png)
+    
+    ![我的订单页面](https://raw.githubusercontent.com/yang-va/pictures/master/38.png)
     
     ![学习中心部分，课程课时](https://raw.githubusercontent.com/yang-va/pictures/master/16.png)
     
     ![作业页面](https://raw.githubusercontent.com/yang-va/pictures/master/17.png)
     
-    + 由于我的保利威测试账户有效期已过，所以无法显示视频
+    + 由于我的保利威测试账户有效期已过，所以无法正常显示视频
     
     ![视频播放页面](https://raw.githubusercontent.com/yang-va/pictures/master/18.png)
 

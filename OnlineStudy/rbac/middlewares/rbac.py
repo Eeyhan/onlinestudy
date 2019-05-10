@@ -23,7 +23,7 @@ class RbacMiddleware(MiddlewareMixin):
 
         # 路径导航
         url_navigation = [
-            {'title': '首页', 'url': '#'}
+            {'title': '首页', 'url': '/index/'}
         ]
 
         # 此处代码进行判断：/logout  /index

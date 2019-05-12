@@ -15,7 +15,7 @@
           target="_blank"
         >新出网证（沪）字xxx号</a>&nbsp;&nbsp;
         <a href="#" target="_blank">xxxx</a>&nbsp;&nbsp;
-        <a href="//www.37.com/jzjh/" target="_blank" title="xxxx">xxxx</a>&nbsp;&nbsp;
+        <a href="#" target="_blank" title="xxxx">xxxx</a>&nbsp;&nbsp;
         <a
           href="#"
           target="_blank"

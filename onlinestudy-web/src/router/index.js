@@ -20,7 +20,7 @@ import Coupon from '@/components/Transaction/Coupon'
 import Usercoupon from '@/components/Transaction/UserCoupon'
 import homework from '@/components/Person/homework'
 import solvequestion from '@/components/Person/solvequestion'
-
+import NotFound from '@/components/common/NotFound'
 
 Vue.use(Router)
 
@@ -143,6 +143,12 @@ export default new Router({
       path: '/Usercoupon',
       name: 'Usercoupon',
       component: Usercoupon
+    },
+    // 不存在的网页
+    {
+      path: '*',
+      name: 'NotFound',
+      component: NotFound
     },
   ]
 })

@@ -142,15 +142,15 @@ class UserQuestionAnswerSerializer(serializers.ModelSerializer):
 
 class UserHomeworkSerializer(serializers.ModelSerializer):
     """用户的作业"""
-    critic = serializers.SerializerMethodField()
-    status = serializers.CharField(source='homeworkdetail.get_status_display')
+    content = serializers.SerializerMethodField()
+    status = serializers.CharField(source='get_status_display')
 
-    def get_critic(self, obj):
-        return obj.homeworkdetail.critic
+    def get_content(self, obj):
+        return obj.homework.content
 
     class Meta:
-        model = models.Homework
-        fields = ['id', 'content', 'status', 'critic']
+        model = models.HomeworkDetail
+        fields = ['id', 'content', 'critic','status']
 
 
 class ArticleSerializer(serializers.ModelSerializer):

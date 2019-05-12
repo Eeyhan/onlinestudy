@@ -10,6 +10,7 @@ class ArticleModelForm(StartXModelForm):
 
 
 class ArticleHandler(PermissionHandler, StartXHandler):
+    add_template = 'add_article.html'
     model_form_class = ArticleModelForm
     order_by = ['date', '-id', ]
     list_display = ['title', 'content',

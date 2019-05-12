@@ -1151,12 +1151,28 @@ class HomeworkView(APIView):
     authentication_classes = [Auther, ]
 
     def get(self, request):
+        user_obj = models.Student.objects.filter(account=request.user).first()
+
         course = request.query_params.get('course')
         course_obj = models.Course.objects.filter(id=course).first()
         chapter = request.query_params.get('chapter')
         chapter_obj = models.CourseChapter.objects.filter(id=chapter).first()
-        my_homework = models.Homework.objects.filter(courses=course_obj.id, chapter=chapter_obj.id).first()
-        res = serializers.UserHomeworkSerializer(my_homework)
+
+        # 点开就创建一个homeworkdetail对象
+
+        homework_obj = models.Homework.objects.filter(courses=course_obj.id, chapter=chapter_obj.id).first()
+
+        db_user_homework_obj = models.HomeworkDetail.objects.filter(homework=homework_obj, student=user_obj).first()
+
+        if not db_user_homework_obj:
+            user_homework_obj = models.HomeworkDetail.objects.create(homework=homework_obj)
+            user_homework_obj.student.add(user_obj)
+            user_homework_obj.teacher.add(user_obj.tutor)
+
+        # my_homework = models.Homework.objects.filter(courses=course_obj.id, chapter=chapter_obj.id,
+        #                                              homeworkdetail__student=user_obj).first()
+
+        res = serializers.UserHomeworkSerializer(db_user_homework_obj)
         return Response(res.data)
 
     def post(self, request):
@@ -1167,12 +1183,19 @@ class HomeworkView(APIView):
         user_obj = models.Student.objects.filter(account_id=request.user.pk).first()
         homework_obj = models.HomeworkDetail.objects.filter(homework_id=homework_id, student=user_obj).first()
         if not homework_obj:
-            obj = models.HomeworkDetail.objects.create(homework_id=homework_id, file=file, status=3)
-            obj.student.add(user_obj)
-            obj.teacher.add(user_obj.tutor)
-            res.data = '上传成功'
-        else:
+            res.code = 1501
+            res.data = '非法操作，不存在该作业'
+            return Response(res.dict)
+
+        homework_obj.status = 3
+        if homework_obj.file:
             res.data = '您已上传过啦'
+            return Response(res.dict)
+        homework_obj.file = file
+        homework_obj.save()
+
+        res.data = '上传成功'
+
         return Response(res.dict)
 
     def put(self, request):

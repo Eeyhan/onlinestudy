@@ -581,7 +581,7 @@ class HomeworkDetail(models.Model):
     """
     作业详情
     """
-    homework = models.OneToOneField(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
+    homework = models.ForeignKey(verbose_name='作业', to='Homework', on_delete=models.CASCADE)
     student = models.ManyToManyField(verbose_name='学生', to='Student', blank=True,
                                      limit_choices_to={'account__level': 2})
     teacher = models.ManyToManyField(verbose_name='导师', to='Tutor',

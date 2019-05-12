@@ -203,6 +203,8 @@
 <script src="{% static 'startX/plugins/bootstrap/js/bootstrap-datetimepicker.js' %} "></script>
 <script src="{% static 'startX/plugins/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js' %} "></script>
 <script src="{% static 'rbac/js/rbac.js' %} "></script>
+<script charset="utf-8" src="/static/kindeditor/kindeditor-all.js"></script>
+
 <script>
     $('.form_date').datetimepicker({
         minView: "month",
@@ -213,6 +215,24 @@
         startDate: new Date(),
         autoclose: true,
         pickerPosition: "bottom-left"
+    });
+    // 富文本编辑器
+    KindEditor.ready(function (K) {
+        window.editor = K.create('#editor_id', {
+            width: "800px",
+            height: "300px",
+            resizeType: 0,
+            uploadJson: "/upload/",
+            extraFileUploadParams: {
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+            },
+            filePostName: "upload_img",
+            // 上传图片、文件成功后预览在编辑器里
+            afterUpload: function (url) {
+
+            }
+
+        });
     });
 </script>
 

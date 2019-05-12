@@ -23,6 +23,8 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 from rbac.service.init_permission import init_permission
+import os
+from django.conf import settings
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.dates import DateFormatter
@@ -195,6 +197,7 @@ def index(request):
 
 
 def account_trend(request, year):
+    """注册用户趋势分析"""
     year = int(year)
     months = [i for i in range(1, 13)]
     count = []
@@ -213,10 +216,11 @@ def account_trend(request, year):
     ims = imb.decode()
     imd = "data:image/png;base64," + ims
     plt.close()
-    return render(request, "trend.html", {"img": imd, 'title': '用户注册趋势','year':year})
+    return render(request, "trend.html", {"img": imd, 'title': '用户注册趋势', 'year': year})
 
 
 def order_trend(request, year):
+    """订单分析"""
     year = int(year)
     months = [i for i in range(1, 13)]
     orders = []
@@ -235,4 +239,20 @@ def order_trend(request, year):
     ims = imb.decode()
     imd = "data:image/png;base64," + ims
     plt.close()
-    return render(request, "trend.html", {"img": imd, 'title': '订单报表趋势','year':year})
+    return render(request, "trend.html", {"img": imd, 'title': '订单报表趋势', 'year': year})
+
+
+def upload(request):
+    """富文本编辑，图片在线显示"""
+    img = request.FILES.get('upload_img')
+    path = os.path.join(settings.MEDIA_ROOT, 'article_img', img.name)
+    f = open(path, 'wb')
+    for biner in img:
+        f.write(biner)
+    f.close()
+
+    responese = {
+        'error': 0,
+        'url': 'media/article_img/%s' % img.name
+    }
+    return HttpResponse(json.dumps(responese))

@@ -24,6 +24,7 @@ urlpatterns = [
     path('login/', views.login),
     path('logout/', views.logout),
     path('index/', views.index),
+    path('upload/',views.upload),
     path('admin/', admin.site.urls),
     path('api/v1/', include(('generic.urls', 'generic'))),  # 主业务
     path('api/v1/auth/', include(('LoginAuth.urls', 'LoginAuth'))),  # 登录认证

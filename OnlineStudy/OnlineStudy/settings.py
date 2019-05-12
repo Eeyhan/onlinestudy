@@ -138,6 +138,9 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -199,7 +202,7 @@ POLYV_CONFIG = {
     'secretkey': 'Uh9Ezw7Wdq'  # polyv 提供的接口调用签名访问的key
 }
 
-# ############ 作业文件 ####
+# ############ 作业文件url ####
 BASE_FILE = 'http://127.0.0.1:8000/media/'
 
 # ############ 权限配置相关 #########
@@ -234,7 +237,8 @@ VALID_URL = [
     '/api/v1/.*',  # 与前端交互的api接口
     '/media/.*',  # 静态文件url
     '/blv/polyv.*',  # 保利威视频
-    '/polyv.*'
+    '/polyv.*',
+    '/upload.*'
 
 ]
 

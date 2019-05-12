@@ -28,7 +28,8 @@
         style="    width: 1200px;    margin: 0 auto; margin-top:20px"
       >
         <pre>{{item.title}} --  {{item.date|formatTime}}</pre>
-        <pre><p>{{item.content}}</p> </pre>
+        
+        <pre><p v-html="item.content"></p></pre>
       </div>
     </div>
   </div>

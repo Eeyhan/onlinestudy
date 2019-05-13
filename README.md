@@ -63,11 +63,10 @@
     ``pip install -r requirements.txt``
      
 * 前端部分请进入根目录，运行如下命令安装必须的第三方依赖  
-    
-    
-    ``npm install``
-    
     + 前提请自行安装node.js
+    
+    ``npm install``   
+    
     
 
 ## 启动项目
@@ -80,6 +79,11 @@
     进入后端根目录onlinestudy
     
     ``autopep8 --in-place --aggressive --aggressive onlinestudy ``
+
+### 单元测试
+    进入后端根目录onlinestudy
+    
+    ``python manage.py test ``
 
 ### 前端部分：
     进入前端端根目录onlinestudy

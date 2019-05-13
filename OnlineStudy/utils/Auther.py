@@ -17,11 +17,11 @@ class Auther(BaseAuthentication):
         else:
             token = request.META.get('HTTP_AUTHORIZATION', '')
             if not token:
-                return AuthenticationFailed(detail='没有携带token')
+                raise AuthenticationFailed(detail='没有携带token')
 
             user_id = RedisConn.get(str(token))
             user_obj = Account.objects.filter(id=user_id).first()
             if not user_obj:
-                return AuthenticationFailed(detail='非法用户，无效的token')
+                raise AuthenticationFailed(detail='非法用户，无效的token')
 
             return user_obj, token

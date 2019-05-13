@@ -141,6 +141,7 @@ class CourseCommentView(APIView):
 
     def get(self, request, pk):
         """coursecomment = models.Comment.objects.filter(object_id=pk).first().content_object.comment.all()"""
+
         coursecomment = models.Course.objects.filter(id=pk).first().comment.all().order_by('-id')
         res = serializers.CommentSerializer(coursecomment, many=True)
         return Response(res.data)

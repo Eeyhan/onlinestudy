@@ -12,36 +12,48 @@
 * 前端：
     + vue 2.5.2
     + webpack 3.6.0
-	+ Element-UI
+	+ Element-UI 2
+	
 * 规范协议：
-    restful 
+    + restful 
+    + PEP8协议
+    
 * 数据库：
-    + mysql
-    + redis
-* 其他：
+    + mysql(业务逻辑部分)
+    + redis(持久化存储登录状态，商城数据)
+    
+* 第三方组件/接口：
     + 支付宝支付接口
     + 极验验证码
     + 保利威加密视频
     + matplotlab数据可视化
+    + kindeditor富文本编辑器
+    + bootstrap-datepicker日期选择器
 
 ## 主要功能
 
 * 前端部分：
-    + 在线播放(保利威加密视频由于测试账号有效期已过，目前无法播放)
-    + 登录注册都调用极验验证码验证机制
-    + 展示课程 
+    + 在线播放视频(本项目中由于加密视频平台的测试账号有效期已过，目前无法播放)
+    + 登录注册均调用极验验证码验证机制
+    + 课程相关展示 
     + 购物车、优惠券
     + 作业提交、问题提问、商品评价
 * 后端部分：
-    + 采用restful规范，利用django的DRF与前端分离，与前端数据交互
+    + 采用restful规范，利用django的DRF组极简与前端分离并做数据交互
     + 与前端部分的数据存储使用redis永久存储
-    + 后台管理部分使用了startX快速实现后台权限管理
-    + 基于角色的权限控制，不同角色的用户，功能菜单不同
-    + 利用matplotlab模块，对注册用户和账单进行数据分析形成趋势图
+* 后台部分：
+    + 造了一个轮子 —— [django-startX](https://github.com/yang-va/django-startX "django-startX") 快速实现后台权限管理
+    + 造了一个轮子 —— [django-rbac](https://github.com/yang-va/django-rbac "django-startX") 快速完成根据角色不同做不同的功能权限限制
+    + 利用matplotlab模块，对注册用户、账单进行数据分析形成趋势图
 
-## 用户相关
+## 账户相关
 * 所有测试用户的密码都是123
 * django的超级用户账户：root/123456
+
+	
+## 程序流程图
+
+* http://naotu.baidu.com/file/c064fd111c5aac470d067f0c58942617
 
 ## 启动项目之前
 
@@ -58,20 +70,22 @@
     + 前提请自行安装node.js
     
 
-	
-## 程序流程图
-
-* http://naotu.baidu.com/file/c064fd111c5aac470d067f0c58942617
-	
 ## 启动项目
 
 ### 后端部分：
     进入后端根目录onlinestudy
     python manage.py runserver 127.0.0.1:8000 (启动地址随意)
 
+### 自动转化代码为PEP8规范
+    进入后端根目录onlinestudy
+    
+    ``autopep8 --in-place --aggressive --aggressive onlinestudy ``
+
 ### 前端部分：
     进入前端端根目录onlinestudy
-    npm run dev
+    
+    开发环境：npm run dev
+    生产环境：npm run bulid
 
 ## 启动之后的界面展示
 
@@ -123,7 +137,7 @@
     
     ![作业页面](https://raw.githubusercontent.com/yang-va/pictures/master/17.png)
     
-    + 由于我的保利威测试账户有效期已过，所以无法正常显示视频
+    + <font color="#dd0000">由于我的保利威测试账户有效期已过，所以无法正常显示视频</font><br /> 
     
     ![视频播放页面](https://raw.githubusercontent.com/yang-va/pictures/master/18.png)
 
@@ -142,6 +156,14 @@
     ![账单报表](https://raw.githubusercontent.com/yang-va/pictures/master/24.png)
     
     ![用户列表](https://raw.githubusercontent.com/yang-va/pictures/master/25.png)
+    
+    + 富文本插件的使用
+    
+    ![资讯管理](https://raw.githubusercontent.com/yang-va/pictures/master/39.png)
+    
+    + datepicker的使用
+    
+    ![datepicker](https://raw.githubusercontent.com/yang-va/pictures/master/40.png)
     
     ![注册用户分析](https://raw.githubusercontent.com/yang-va/pictures/master/26.png)
     

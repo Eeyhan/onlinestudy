@@ -71,7 +71,7 @@
 			'PORT': '数据库端口',
 			'USER': '账户名',
 			'PASSWORD': '密码',
-			'NAME': '对',
+			'NAME': '数据库名',
 			# 'OPTIONS': {
 			#     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", 
 			# },

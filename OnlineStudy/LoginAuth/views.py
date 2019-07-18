@@ -151,50 +151,6 @@ def index(request):
     return render(request, 'backend_index.html')
 
 
-# def test(request):
-#     # fig = plt.figure()
-#     plt.plot([1, 2, 3, 4], [10, 20, 25, 30], color='lightblue', linewidth=3)
-#     plt.xlim(0.5, 4.5)
-#     buffer = BytesIO()
-#     plt.savefig(buffer)
-#     plot_data = buffer.getvalue()
-#     imb = base64.b64encode(plot_data)  # 对plot_data进行编码
-#     ims = imb.decode()
-#     imd = "data:image/png;base64," + ims
-#     return render(request, "test.html", {"img": imd})
-
-
-# def test(request):
-#     fig = Figure(figsize=(6, 6))
-#     ax = fig.add_subplot(111)
-#     x = []
-#     y = []
-#     now = datetime.datetime.now()
-#     delta = datetime.timedelta(days=1)
-#     for i in range(10):
-#         x.append(now)
-#         now += delta
-#         y.append(random.randint(0, 1000))
-#     ax.plot_date(x, y, '-')
-#     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-#     fig.autofmt_xdate()
-#     canvas = FigureCanvasAgg(fig)
-#
-#     # 方法一：
-#
-#     # response = HttpResponse(content_type='image/jpg')
-#     # canvas.print_jpg(response)
-#     # plt.close(fig)
-#     # return response
-#
-#     # 方法二：
-#
-#     response = HttpResponse(content_type='image/jpeg')
-#     canvas.print_jpeg(response)
-#     plt.close(fig)
-#     return response
-
-
 def account_trend(request, year):
     """注册用户趋势分析"""
     year = int(year)

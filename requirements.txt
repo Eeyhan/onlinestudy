@@ -6,5 +6,5 @@ alipay-sdk-python
 django-cors-headers
 numpy
 pandas
-matplotlab
+matplotlib
 autopep8
